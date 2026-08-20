@@ -1,0 +1,1318 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>鼎新 BPM 欄位與按鈕權限設定工具</title>
+<style>
+:root {
+  --bg: #f4f6fb;
+  --bg-grad-a: #eef2fb;
+  --bg-grad-b: #e6ecf7;
+  --panel: rgba(255,255,255,.78);
+  --panel-solid: #ffffff;
+  --border: #d9e0ee;
+  --border-strong: #c3cde2;
+  --text: #1d2433;
+  --text-dim: #63708c;
+  --text-faint: #93a0b8;
+  --accent: #3b6ef5;
+  --accent-soft: rgba(59,110,245,.10);
+  --accent-text: #ffffff;
+  --ok: #129a6b;
+  --ok-soft: rgba(18,154,107,.12);
+  --warn: #c8871a;
+  --warn-soft: rgba(200,135,26,.14);
+  --danger: #d0433c;
+  --shadow: 0 1px 2px rgba(20,30,60,.05), 0 8px 24px rgba(20,30,60,.07);
+  --shadow-lg: 0 12px 40px rgba(20,30,60,.14);
+  --radius: 14px;
+  --mono: "Cascadia Mono", "JetBrains Mono", Consolas, "Courier New", monospace;
+}
+:root[data-theme="dark"] {
+  --bg: #0e1320;
+  --bg-grad-a: #131a2b;
+  --bg-grad-b: #0c1120;
+  --panel: rgba(25,32,48,.72);
+  --panel-solid: #171e2e;
+  --border: #2a3348;
+  --border-strong: #3a4560;
+  --text: #e8edf8;
+  --text-dim: #97a3bd;
+  --text-faint: #6a7793;
+  --accent: #5b8bff;
+  --accent-soft: rgba(91,139,255,.16);
+  --accent-text: #0b1020;
+  --ok: #3ecf9a;
+  --ok-soft: rgba(62,207,154,.14);
+  --warn: #e5a53c;
+  --warn-soft: rgba(229,165,60,.16);
+  --danger: #ff6b63;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.28);
+  --shadow-lg: 0 14px 44px rgba(0,0,0,.45);
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: "Segoe UI", "Microsoft JhengHei", "PingFang TC", system-ui, sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: linear-gradient(160deg, var(--bg-grad-a), var(--bg-grad-b) 60%, var(--bg));
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+.app { max-width: 1500px; margin: 0 auto; padding: 22px 26px 90px; }
+
+/* ---------- header ---------- */
+header { display: flex; align-items: center; gap: 14px; margin-bottom: 20px; }
+.logo {
+  width: 40px; height: 40px; border-radius: 11px; flex: none;
+  background: linear-gradient(140deg, var(--accent), #8a5bff);
+  display: grid; place-items: center; color: #fff; font-weight: 700; font-size: 17px;
+  box-shadow: 0 6px 18px rgba(59,110,245,.35);
+}
+header h1 { font-size: 18px; margin: 0; letter-spacing: .2px; }
+header p { margin: 2px 0 0; font-size: 12.5px; color: var(--text-dim); }
+.spacer { flex: 1; }
+
+/* ---------- generic ---------- */
+button { font: inherit; cursor: pointer; }
+.btn {
+  border: 1px solid var(--border-strong); background: var(--panel-solid); color: var(--text);
+  border-radius: 9px; padding: 7px 13px; transition: .16s; white-space: nowrap;
+}
+.btn:hover { border-color: var(--accent); color: var(--accent); }
+.btn.primary {
+  background: var(--accent); border-color: var(--accent); color: var(--accent-text); font-weight: 600;
+  box-shadow: 0 6px 18px rgba(59,110,245,.3);
+}
+.btn.primary:hover { filter: brightness(1.08); color: var(--accent-text); }
+.btn.tiny { padding: 3px 9px; font-size: 12px; border-radius: 7px; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.hidden { display: none !important; }
+.card {
+  background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius);
+  box-shadow: var(--shadow); backdrop-filter: blur(10px);
+}
+.mono { font-family: var(--mono); }
+
+/* ---------- drop zones ---------- */
+.loaders { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.drop {
+  padding: 18px 20px; display: flex; align-items: center; gap: 14px; cursor: pointer;
+  transition: .18s; position: relative; overflow: hidden;
+}
+.drop:hover { border-color: var(--accent); transform: translateY(-1px); }
+.drop.over { border-color: var(--accent); background: var(--accent-soft); }
+.drop.loaded { border-color: var(--ok); }
+.drop .ico {
+  width: 42px; height: 42px; flex: none; border-radius: 11px; display: grid; place-items: center;
+  background: var(--accent-soft); color: var(--accent); font-size: 19px;
+}
+.drop.loaded .ico { background: var(--ok-soft); color: var(--ok); }
+.drop .t { font-weight: 600; margin-bottom: 3px; }
+.drop .s { font-size: 12.5px; color: var(--text-dim); word-break: break-all; }
+.step-no {
+  position: absolute; top: 10px; right: 14px; font-size: 11px; letter-spacing: .5px;
+  color: var(--text-faint); font-weight: 600;
+}
+
+/* ---------- summary ---------- */
+.summary { margin-top: 16px; padding: 14px 18px; display: flex; flex-wrap: wrap; gap: 10px 26px; align-items: center; }
+.meta { display: flex; flex-direction: column; gap: 2px; }
+.meta .k { font-size: 11px; color: var(--text-faint); letter-spacing: .4px; }
+.meta .v { font-weight: 600; font-size: 13.5px; }
+.pill {
+  display: inline-flex; align-items: center; gap: 6px; padding: 4px 11px; border-radius: 999px;
+  font-size: 12px; font-weight: 600; border: 1px solid transparent;
+}
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.summary select {
+  font: inherit; padding: 5px 9px; border-radius: 8px; border: 1px solid var(--border-strong);
+  background: var(--panel-solid); color: var(--text);
+}
+
+/* ---------- toolbar ---------- */
+.toolbar {
+  margin-top: 18px; padding: 12px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+  position: sticky; top: 0; z-index: 30; background: var(--panel-solid);
+}
+.seg { display: inline-flex; background: var(--accent-soft); border-radius: 9px; padding: 3px; gap: 3px; }
+.seg button {
+  border: 0; background: transparent; color: var(--text-dim); padding: 6px 14px; border-radius: 7px;
+  font-size: 13px; font-weight: 600; transition: .15s;
+}
+.seg button.on { background: var(--panel-solid); color: var(--accent); box-shadow: var(--shadow); }
+.search { position: relative; }
+.search input {
+  font: inherit; padding: 8px 12px 8px 32px; width: 240px; border-radius: 9px;
+  border: 1px solid var(--border-strong); background: var(--panel-solid); color: var(--text);
+}
+.search input:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+.search .mag { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text-faint); }
+.chk { display: inline-flex; align-items: center; gap: 7px; font-size: 13px; color: var(--text-dim); cursor: pointer; }
+.chk input { accent-color: var(--accent); width: 15px; height: 15px; }
+
+/* ---------- tabs ---------- */
+.tabs { display: flex; gap: 9px; flex-wrap: wrap; margin: 18px 0 14px; }
+.tab {
+  border: 1px solid var(--border); background: var(--panel); border-radius: 11px; padding: 9px 15px;
+  text-align: left; transition: .16s; min-width: 150px; color: var(--text);
+}
+.tab:hover:not(:disabled) { border-color: var(--accent); transform: translateY(-1px); }
+.tab.on { border-color: var(--accent); background: var(--accent-soft); box-shadow: var(--shadow); }
+.tab .n { font-weight: 600; font-size: 13.5px; display: flex; align-items: center; gap: 7px; }
+.tab .c { font-size: 11.5px; color: var(--text-dim); margin-top: 4px; font-family: var(--mono); }
+.tab:disabled { opacity: .5; }
+.type-tag {
+  font-size: 10px; font-weight: 700; letter-spacing: .3px; padding: 2px 6px; border-radius: 5px;
+  background: var(--border); color: var(--text-dim);
+}
+.dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); flex: none; }
+
+/* ---------- quick actions ---------- */
+.quick { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 10px 14px; margin-bottom: 14px; }
+.quick .label { font-size: 12px; color: var(--text-faint); font-weight: 600; letter-spacing: .3px; }
+.quick select {
+  font: inherit; font-size: 13px; padding: 5px 9px; border-radius: 8px;
+  border: 1px solid var(--border-strong); background: var(--panel-solid); color: var(--text);
+}
+
+/* ---------- sections ---------- */
+.sec { padding: 16px 18px; margin-bottom: 14px; }
+.sec-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.sec-head h2 { font-size: 14px; margin: 0; letter-spacing: .3px; }
+.count { font-size: 12px; color: var(--text-faint); font-family: var(--mono); }
+.grp-head {
+  display: flex; align-items: center; gap: 9px; margin: 14px 0 8px; padding-top: 10px;
+  border-top: 1px dashed var(--border);
+}
+.grp-head:first-child { border-top: 0; padding-top: 0; margin-top: 0; }
+.grp-head .gt { font-size: 12px; font-weight: 700; color: var(--text-dim); letter-spacing: .4px; }
+
+.pills { display: flex; flex-wrap: wrap; gap: 10px; }
+.pill-btn {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 3px; text-align: left;
+  border: 1.5px solid var(--border); background: var(--panel-solid); border-radius: 12px;
+  padding: 9px 15px; transition: .16s; color: var(--text); min-width: 160px;
+}
+.pill-btn:hover { border-color: var(--accent); transform: translateY(-1px); }
+.pill-btn.on { border-color: var(--ok); background: var(--ok-soft); }
+.pill-btn .pn { font-weight: 600; font-size: 13.5px; display: flex; align-items: center; gap: 7px; }
+.pill-btn .pi { font-size: 11.5px; color: var(--text-dim); font-family: var(--mono); }
+.pill-btn .mark { color: var(--text-faint); font-size: 12px; }
+.pill-btn.on .mark { color: var(--ok); }
+
+.rows { display: grid; gap: 6px; }
+.row {
+  display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 12px;
+  padding: 8px 12px; border-radius: 10px; border: 1px solid transparent; transition: .12s;
+}
+.row:hover { background: var(--accent-soft); }
+.row.on { border-color: var(--ok); background: var(--ok-soft); }
+.row .rn { font-weight: 500; }
+.row .ri { font-size: 12px; color: var(--text-dim); font-family: var(--mono); }
+.row .rt {
+  font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 5px;
+  background: var(--border); color: var(--text-dim); white-space: nowrap;
+}
+.row.orphan .rt { background: var(--warn-soft); color: var(--warn); }
+.rmeta { display: flex; align-items: center; gap: 10px; }
+
+.sw { position: relative; width: 40px; height: 22px; flex: none; }
+.sw input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; z-index: 2; }
+.sw i {
+  position: absolute; inset: 0; border-radius: 999px; background: var(--border-strong);
+  transition: .18s; pointer-events: none;
+}
+.sw i::after {
+  content: ""; position: absolute; width: 17px; height: 17px; border-radius: 50%; background: #fff;
+  top: 2.5px; left: 2.5px; transition: .18s; box-shadow: 0 1px 3px rgba(0,0,0,.3);
+}
+.sw input:checked + i { background: var(--ok); }
+.sw input:checked + i::after { transform: translateX(18px); }
+
+.empty { padding: 26px; text-align: center; color: var(--text-faint); font-size: 13px; }
+.notice {
+  display: flex; gap: 9px; align-items: flex-start; padding: 10px 13px; border-radius: 10px;
+  background: var(--warn-soft); color: var(--warn); font-size: 12.5px; margin-bottom: 12px;
+}
+
+/* ---------- matrix ---------- */
+.matrix-wrap { overflow: auto; max-height: 62vh; border-radius: var(--radius); }
+table.matrix { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 13px; }
+table.matrix th, table.matrix td { border-bottom: 1px solid var(--border); padding: 7px 10px; }
+table.matrix thead th {
+  position: sticky; top: 0; z-index: 3; background: var(--panel-solid); text-align: center;
+  border-bottom: 2px solid var(--border-strong); font-size: 12.5px; white-space: nowrap;
+}
+table.matrix thead th.corner { left: 0; z-index: 5; text-align: left; }
+table.matrix tbody th {
+  position: sticky; left: 0; z-index: 2; background: var(--panel-solid); text-align: left;
+  font-weight: 500; min-width: 280px;
+}
+table.matrix tbody tr:hover th, table.matrix tbody tr:hover td { background: var(--accent-soft); }
+table.matrix td { text-align: center; }
+table.matrix td.off-col { background: repeating-linear-gradient(45deg, transparent, transparent 5px, var(--border) 5px, var(--border) 6px); opacity: .5; }
+.mx-name { display: flex; align-items: center; gap: 8px; }
+.mx-id { font-family: var(--mono); font-size: 11.5px; color: var(--text-dim); }
+.mx-head-btn { border: 0; background: transparent; color: inherit; font: inherit; font-weight: 600; padding: 2px 4px; border-radius: 6px; }
+.mx-head-btn:hover { color: var(--accent); background: var(--accent-soft); }
+.mx-sub { font-size: 11px; color: var(--text-faint); font-weight: 400; }
+table.matrix input[type=checkbox] { width: 17px; height: 17px; accent-color: var(--ok); cursor: pointer; }
+.grp-row th { background: var(--accent-soft) !important; font-weight: 700 !important; font-size: 12px; letter-spacing: .4px; color: var(--text-dim); }
+
+/* ---------- preview ---------- */
+.preview { margin-top: 16px; padding: 14px 18px; }
+.preview-head { display: flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+.preview pre {
+  margin: 0 0 4px; padding: 12px 14px; border-radius: 10px; background: var(--bg);
+  border: 1px solid var(--border); font-family: var(--mono); font-size: 12px; line-height: 1.6;
+  white-space: pre-wrap; word-break: break-all; max-height: 190px; overflow: auto;
+}
+.preview .sub { font-size: 11.5px; color: var(--text-faint); margin: 10px 0 5px; font-weight: 600; letter-spacing: .3px; }
+.preview pre.old { opacity: .72; }
+.tag-diff { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--warn-soft); color: var(--warn); font-weight: 700; }
+.tag-same { font-size: 11px; padding: 2px 8px; border-radius: 999px; background: var(--ok-soft); color: var(--ok); font-weight: 700; }
+.hl { color: var(--accent); }
+
+/* ---------- footer bar ---------- */
+.footbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; padding: 11px 26px;
+  display: flex; align-items: center; gap: 16px;
+  background: var(--panel-solid); border-top: 1px solid var(--border); box-shadow: 0 -4px 20px rgba(20,30,60,.07);
+}
+.footbar .info { font-size: 12.5px; color: var(--text-dim); }
+
+/* ---------- toasts & overlay ---------- */
+#toasts { position: fixed; right: 20px; bottom: 74px; display: flex; flex-direction: column; gap: 9px; z-index: 60; }
+.toast {
+  padding: 11px 16px; border-radius: 11px; background: var(--panel-solid); border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg); font-size: 13px; display: flex; align-items: center; gap: 9px;
+  animation: slide .22s ease; max-width: 380px;
+}
+.toast.ok { border-left: 3px solid var(--ok); }
+.toast.warn { border-left: 3px solid var(--warn); }
+.toast.err { border-left: 3px solid var(--danger); }
+@keyframes slide { from { opacity: 0; transform: translateX(18px); } }
+#overlay {
+  position: fixed; inset: 0; z-index: 80; display: none; place-items: center;
+  background: rgba(59,110,245,.12); backdrop-filter: blur(3px);
+  font-size: 19px; font-weight: 700; color: var(--accent);
+}
+#overlay.on { display: grid; }
+#overlay div { padding: 34px 54px; border: 2.5px dashed var(--accent); border-radius: 20px; background: var(--panel-solid); }
+
+@media (max-width: 900px) {
+  .loaders { grid-template-columns: 1fr; }
+  .app { padding: 16px 14px 96px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">權</div>
+    <div>
+      <h1>鼎新 BPM 欄位與按鈕權限設定工具</h1>
+      <p>本機執行 · 檔案不外傳 · 無損回寫 <code class="mono">&lt;formFieldAccessControl&gt;</code></p>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn" id="btnTheme" title="切換深色 / 淺色">🌓 佈景</button>
+  </header>
+
+  <section class="loaders">
+    <div class="drop card" id="dropBpmn">
+      <span class="step-no">步驟 1</span>
+      <div class="ico">⛓</div>
+      <div>
+        <div class="t">流程檔 <span class="mono">.bpmn</span></div>
+        <div class="s" id="bpmnInfo">拖曳檔案至此，或點擊選擇</div>
+      </div>
+    </div>
+    <div class="drop card" id="dropForm">
+      <span class="step-no">步驟 2（選用）</span>
+      <div class="ico">▤</div>
+      <div>
+        <div class="t">表單檔 <span class="mono">.form</span></div>
+        <div class="s" id="formInfo">拖曳檔案至此以取得欄位中文名稱</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="summary card hidden" id="summary"></section>
+
+  <main id="workspace" class="hidden">
+    <div class="toolbar card">
+      <div class="seg" id="viewSeg">
+        <button data-view="step" class="on">單一關卡</button>
+        <button data-view="matrix">權限矩陣</button>
+      </div>
+      <div class="search">
+        <span class="mag">⌕</span>
+        <input id="search" type="search" placeholder="搜尋中文名稱或元件 ID…">
+      </div>
+      <label class="chk"><input type="checkbox" id="showAll"> 顯示全部元件</label>
+      <div class="seg" id="sortSeg">
+        <button data-sort="layout" class="on">版面順序</button>
+        <button data-sort="type">依型別分組</button>
+      </div>
+      <div class="spacer"></div>
+      <span class="pill ok hidden" id="dirtyPill">● 有未匯出的變更</span>
+    </div>
+
+    <div id="stepView">
+      <div class="tabs" id="tabs"></div>
+      <div class="quick card" id="quick"></div>
+      <div id="sections"></div>
+    </div>
+
+    <div id="matrixView" class="hidden">
+      <div class="card matrix-wrap"><table class="matrix" id="matrix"></table></div>
+    </div>
+
+    <div class="preview card">
+      <div class="preview-head">
+        <span>XML 即時預覽</span>
+        <span id="previewTag"></span>
+        <div class="spacer"></div>
+        <span class="count" id="previewWho"></span>
+      </div>
+      <pre id="previewNew"></pre>
+      <div class="sub">原始檔內容（Before）</div>
+      <pre class="old" id="previewOld"></pre>
+    </div>
+  </main>
+</div>
+
+<div class="footbar">
+  <span class="info" id="footInfo">請先載入 .bpmn 流程檔</span>
+  <div class="spacer"></div>
+  <button class="btn primary" id="btnExport" disabled>⬇ 匯出已完成 BPMN</button>
+</div>
+
+<div id="toasts"></div>
+<div id="overlay"><div>放開以載入檔案</div></div>
+
+<input type="file" id="filePicker" accept=".bpmn,.form,.xml" class="hidden" multiple>
+
+<script>
+// ==== CORE START ====
+/* 純邏輯層：不碰 DOM，可於 Node 直接載入測試。 */
+var Core = (function () {
+  'use strict';
+
+  // ---------------------------------------------------------------- XML 定位
+  // 一次匹配一個標籤；屬性值內的 > 已用引號保護。與 Python 版 xml_utils 等價。
+  var TAG_SRC = '<(\\/?)([A-Za-z_][A-Za-z0-9_.\\-:]*)((?:"[^"]*"|\'[^\']*\'|[^>\'"])*?)\\s*(\\/?)>';
+
+  function eachTag(text, start, end, fn) {
+    var re = new RegExp(TAG_SRC, 'g');
+    re.lastIndex = start || 0;
+    var stop = (end == null) ? text.length : end;
+    var m;
+    while ((m = re.exec(text)) !== null) {
+      if (m.index >= stop || m.index + m[0].length > stop) return;
+      fn(m);
+    }
+  }
+
+  /** 找出所有 pred(標籤名) 為真的平衡區塊（任意深度）。 */
+  function findBlocks(text, pred, start, end) {
+    var stack = [], out = [];
+    eachTag(text, start, end, function (m) {
+      var closing = m[1], name = m[2], attrs = m[3], selfclose = m[4];
+      if (closing) {
+        for (var i = stack.length - 1; i >= 0; i--) {
+          if (stack[i].name === name) {
+            var st = stack[i];
+            stack.length = i;
+            if (pred(name)) {
+              out.push({ name: name, start: st.start, innerStart: st.innerStart,
+                         innerEnd: m.index, end: m.index + m[0].length, attrs: st.attrs });
+            }
+            break;
+          }
+        }
+      } else if (selfclose) {
+        var p = m.index + m[0].length;
+        if (pred(name)) out.push({ name: name, start: m.index, innerStart: p, innerEnd: p, end: p, attrs: attrs });
+      } else {
+        stack.push({ name: name, start: m.index, innerStart: m.index + m[0].length, attrs: attrs });
+      }
+    });
+    out.sort(function (a, b) { return a.start - b.start; });
+    return out;
+  }
+
+  /** span 底下深度 1 的子元素（不含孫節點）。 */
+  function directChildren(text, span) {
+    var res = [], depth = 0, pending = null;
+    eachTag(text, span.innerStart, span.innerEnd, function (m) {
+      var closing = m[1], name = m[2], attrs = m[3], selfclose = m[4];
+      if (closing) {
+        depth--;
+        if (depth === 0 && pending) {
+          res.push({ name: pending.name, start: pending.start, innerStart: pending.innerStart,
+                     innerEnd: m.index, end: m.index + m[0].length, attrs: pending.attrs });
+          pending = null;
+        } else if (depth < 0) { depth = 0; }
+      } else if (selfclose) {
+        if (depth === 0) {
+          var p = m.index + m[0].length;
+          res.push({ name: name, start: m.index, innerStart: p, innerEnd: p, end: p, attrs: attrs });
+        }
+      } else {
+        if (depth === 0) pending = { name: name, start: m.index, innerStart: m.index + m[0].length, attrs: attrs };
+        depth++;
+      }
+    });
+    return res;
+  }
+
+  function child(kids, name) {
+    for (var i = 0; i < kids.length; i++) if (kids[i].name === name) return kids[i];
+    return null;
+  }
+  function childText(text, kids, name) {
+    var c = child(kids, name);
+    return c ? text.slice(c.innerStart, c.innerEnd) : '';
+  }
+  function unesc(s) {
+    return String(s).replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"').replace(/&apos;/g, "'").replace(/&amp;/g, '&');
+  }
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  /** 套用 [{s,e,text}]；區間不得重疊。未指定的字元原封不動。 */
+  function applyEdits(text, edits) {
+    var list = edits.slice().sort(function (a, b) { return a.s - b.s || a.e - b.e; });
+    var last = -1;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].s < last) throw new Error('替換區間重疊，已中止以免破壞檔案結構');
+      last = list[i].e;
+    }
+    var out = [], pos = 0;
+    for (var j = 0; j < list.length; j++) {
+      out.push(text.slice(pos, list[j].s), list[j].text);
+      pos = list[j].e;
+    }
+    out.push(text.slice(pos));
+    return out.join('');
+  }
+
+  // ---------------------------------------------------------------- 型別對照
+  var CONTROL_TYPE_MAP = {
+    INPUT_TYPE: 'TEXTBOX', INPUT_TEXTAREA_TYPE: 'TEXTAREA',
+    INPUT_SECRET_TYPE: 'PASSWORD', INPUT_PASSWORD_TYPE: 'PASSWORD',
+    HIDDEN_TYPE: 'HIDDEN',
+    SELECT_RADIO_TYPE: 'RADIO', SELECT_CHECK_TYPE: 'CHECKBOX', SELECT_CHECKBOX_TYPE: 'CHECKBOX',
+    SELECT_COMBO_TYPE: 'DROPDOWN', SELECT_LIST_TYPE: 'LISTBOX',
+    DIALOG_DATE: 'DATE', DIALOG_DATETIME: 'DATETIME', DIALOG_TIME: 'TIME'
+  };
+  var CLASS_TYPE_MAP = {
+    TriggerElementDefinition: 'BUTTON', SerialNumberElementDefinition: 'SERIAL_NUMBER',
+    HorizontalLineElementDefinition: 'HORIZONTAL_LINE', OutputElementDefinition: 'LABEL',
+    DateElementDefinition: 'DATE', InputElementDefinition: 'TEXTBOX',
+    SelectElementDefinition: 'SELECT', GridElementDefinition: 'GRID',
+    AttachmentElementDefinition: 'ATTACHMENT'
+  };
+  var TYPE_LABEL = {
+    BUTTON: '按鈕', TEXTBOX: '文字框', TEXTAREA: '輸入區域', PASSWORD: '密碼', HIDDEN: '隱藏欄位',
+    RADIO: '選擇按鈕', CHECKBOX: '複選按鈕', DROPDOWN: '下拉選單', LISTBOX: '列表', SELECT: '選單',
+    DATE: '日期', DATETIME: '日期時間', TIME: '時間', SERIAL_NUMBER: '單號',
+    GRID: '表格', LIST: '表格', ATTACHMENT: '附件', HANDWRITING: '手寫區域',
+    DIALOGINPUT: '按鈕+輸入框', DIALOGINPUTLABEL: '按鈕+雙輸入框', DIALOGINPUTMULTI: '按鈕+輸入區域',
+    DOUBLETEXT: '雙輸入框', LABEL: '標籤文字', TITLE: '標題', HORIZONTAL_LINE: '分隔線',
+    IMAGE: '圖片', LINK: '連結', BARCODE: '條碼', QRCODE: 'QRCode', SUBTAB: '子頁籤',
+    UNKNOWN: '未知元件'
+  };
+  // 可授權 = 使用者實際會控制存取的互動元件；其餘為裝飾/版面元件，預設收起。
+  var GRANTABLE = {
+    BUTTON: 1, TEXTBOX: 1, TEXTAREA: 1, PASSWORD: 1, RADIO: 1, CHECKBOX: 1, DROPDOWN: 1,
+    LISTBOX: 1, SELECT: 1,
+    DATE: 1, DATETIME: 1, TIME: 1, SERIAL_NUMBER: 1, GRID: 1, LIST: 1, ATTACHMENT: 1,
+    HANDWRITING: 1, DIALOGINPUT: 1, DIALOGINPUTLABEL: 1, DIALOGINPUTMULTI: 1, DOUBLETEXT: 1
+  };
+  // 依型別分組時的群組歸屬
+  var TYPE_GROUP = {
+    TEXTBOX: '文字輸入', TEXTAREA: '文字輸入', PASSWORD: '文字輸入', DOUBLETEXT: '文字輸入', SERIAL_NUMBER: '文字輸入',
+    RADIO: '選擇類', CHECKBOX: '選擇類', DROPDOWN: '選擇類', LISTBOX: '選擇類', SELECT: '選擇類',
+    DATE: '日期時間', DATETIME: '日期時間', TIME: '日期時間',
+    DIALOGINPUT: '對話輸入', DIALOGINPUTLABEL: '對話輸入', DIALOGINPUTMULTI: '對話輸入',
+    GRID: '表格與附件', LIST: '表格與附件', ATTACHMENT: '表格與附件', HANDWRITING: '表格與附件'
+  };
+  var GROUP_ORDER = ['文字輸入', '選擇類', '日期時間', '對話輸入', '表格與附件', '其他', '版面/裝飾'];
+
+  function typeGroup(type) {
+    if (TYPE_GROUP[type]) return TYPE_GROUP[type];
+    return GRANTABLE[type] ? '其他' : '版面/裝飾';
+  }
+
+  // ---------------------------------------------------------------- .form 解析
+  var FORM_NS = 'com.dsc.nana.domain.form.';
+  var SUFFIX = 'ElementDefinition';
+
+  function parseForm(text, fileName) {
+    var spans = findBlocks(text, function (n) {
+      return n.indexOf(FORM_NS) === 0 && n.slice(-SUFFIX.length) === SUFFIX;
+    });
+    var els = spans.map(function (sp) {
+      var kids = directChildren(text, sp);
+      var cls = sp.name.slice(FORM_NS.length);
+      var ct = '';
+      var ctSpan = child(kids, 'controlType');
+      if (ctSpan) {
+        var mm = /<value>([^<]*)<\/value>/.exec(text.slice(ctSpan.innerStart, ctSpan.innerEnd));
+        if (mm) ct = mm[1];
+      }
+      return {
+        cls: cls, span: sp,
+        id: childText(text, kids, 'id'),
+        name: childText(text, kids, 'name'),
+        pairId: childText(text, kids, 'pairId'),
+        textValue: unesc(childText(text, kids, 'textValue')),
+        caption: unesc(childText(text, kids, 'caption')),
+        controlType: ct,
+        isLabel: cls === 'OutputElementDefinition',
+        label: null
+      };
+    });
+
+    // Label 配對：優先 lbl_{id}，其次 pairId
+    var labels = els.filter(function (e) { return e.isLabel; });
+    var controls = els.filter(function (e) { return !e.isLabel; });
+    var byId = {}, byPair = {};
+    labels.forEach(function (lb) {
+      if (lb.id && !byId[lb.id]) byId[lb.id] = lb;
+      if (lb.pairId) (byPair[lb.pairId] = byPair[lb.pairId] || []).push(lb);
+    });
+    var used = new Set();
+    controls.forEach(function (c) {
+      var lb = c.id ? byId['lbl_' + c.id] : null;
+      if (!lb && c.pairId) {
+        var cands = byPair[c.pairId] || [];
+        for (var i = 0; i < cands.length; i++) if (!used.has(cands[i])) { lb = cands[i]; break; }
+      }
+      if (lb) { c.label = lb; used.add(lb); }
+    });
+    var standalone = labels.filter(function (lb) { return !used.has(lb); });
+    var ordered = controls.concat(standalone).sort(function (a, b) { return a.span.start - b.span.start; });
+
+    var fields = ordered.map(function (e, i) {
+      var type = e.cls === 'TriggerElementDefinition' ? 'BUTTON'
+        : (CONTROL_TYPE_MAP[e.controlType] || CLASS_TYPE_MAP[e.cls]
+          || e.cls.replace(SUFFIX, '').toUpperCase());
+      var nm = (e.label && e.label.textValue.trim()) ? e.label.textValue
+        : (e.caption.trim() ? e.caption : (e.textValue.trim() ? e.textValue : e.id));
+      return {
+        id: e.id, name: nm, type: type, typeLabel: TYPE_LABEL[type] || type,
+        grantable: !!GRANTABLE[type], group: typeGroup(type), index: i
+      };
+    });
+
+    var root = findBlocks(text, function (n) { return n === FORM_NS + 'FormDefinition'; });
+    var formId = '', formName = '';
+    if (root.length) {
+      var rk = directChildren(text, root[0]);
+      formId = childText(text, rk, 'id');
+      formName = unesc(childText(text, rk, 'name'));
+    }
+    return { fileName: fileName || '', formId: formId, formName: formName, fields: fields };
+  }
+
+  // ---------------------------------------------------------------- .bpmn 解析
+  var ACT_CLASS = 'com.dsc.nana.domain.workflow__definition.ActivityDefinition';
+  var RDD_CLASS = 'com.dsc.nana.domain.workflow__definition.RelevantDataDefinition';
+  var PKG_CLASS = 'com.dsc.nana.domain.workflow__definition.ProcessPackage';
+  var PROC_CLASS = 'com.dsc.nana.domain.workflow__definition.ProcessDefinition';
+  // 有表單可供設定權限的關卡類型（其餘節點若有 formFieldAccessDefinition 仍可設定）
+  var HUMAN_TYPES = { UserTask: 1, ManualTask: 1 };
+
+  /** 反轉義後拆出 [{formDefId, entries:[[id,value]...]}]；保留原始順序。 */
+  function parseControl(raw) {
+    if (!raw || !raw.trim()) return [];
+    var inner = unesc(raw);
+    var m = /<FormFieldAccessControl>([\s\S]*)<\/FormFieldAccessControl>/.exec(inner);
+    if (!m) return [];
+    var body = m[1], groups = [];
+    var gre = /<([A-Za-z_][\w.\-]*)>([\s\S]*?)<\/\1>/g, g;
+    while ((g = gre.exec(body)) !== null) {
+      var entries = [];
+      var ere = /<([A-Za-z_][\w.\-]*)>([^<>]*)<\/\1>/g, e;
+      while ((e = ere.exec(g[2])) !== null) entries.push([e[1], e[2]]);
+      groups.push({ formDefId: g[1], entries: entries });
+    }
+    return groups;
+  }
+
+  function parseBpmn(text, fileName) {
+    var pkgs = findBlocks(text, function (n) { return n === PKG_CLASS; });
+    var packageId = '', processName = '';
+    if (pkgs.length) {
+      var pk = directChildren(text, pkgs[0]);
+      packageId = childText(text, pk, 'id');
+      processName = unesc(childText(text, pk, 'name'));
+    }
+    var procs = findBlocks(text, function (n) { return n === PROC_CLASS; });
+    var processId = '';
+    if (procs.length) {
+      var ck = directChildren(text, procs[0]);
+      processId = childText(text, ck, 'id');
+      var pn = unesc(childText(text, ck, 'name'));
+      if (pn) processName = pn;
+    }
+
+    // 流程引用的表單（FormType 的 RelevantDataDefinition）
+    var formRefs = [];
+    findBlocks(text, function (n) { return n === RDD_CLASS; }).forEach(function (sp) {
+      var kids = directChildren(text, sp);
+      var dt = child(kids, 'dataType');
+      if (!dt || dt.attrs.indexOf('FormType') < 0) return;
+      var dk = directChildren(text, dt);
+      formRefs.push({
+        id: childText(text, kids, 'id'),
+        name: unesc(childText(text, kids, 'name')),
+        formDefinitionId: childText(text, dk, 'formDefinitionId')
+      });
+    });
+
+    var acts = findBlocks(text, function (n) { return n === ACT_CLASS; }).map(function (sp, i) {
+      var kids = directChildren(text, sp);
+      var fad = findBlocks(text, function (n) { return n === 'formFieldAccessDefinition'; },
+                           sp.innerStart, sp.innerEnd)[0] || null;
+      var fac = fad ? (findBlocks(text, function (n) { return n === 'formFieldAccessControl'; },
+                                  fad.innerStart, fad.innerEnd)[0] || null) : null;
+      var raw = fac ? text.slice(fac.innerStart, fac.innerEnd) : '';
+      var type = childText(text, kids, 'bpmnType');
+      return {
+        index: i,
+        id: childText(text, kids, 'id'),
+        name: unesc(childText(text, kids, 'name')),
+        type: type,
+        human: !!HUMAN_TYPES[type],
+        editable: !!fad,
+        fad: fad, fac: fac,
+        originalRaw: raw,
+        groups: parseControl(raw).map(function (g) {
+          var map = new Map();
+          g.entries.forEach(function (kv) { map.set(kv[0], kv[1]); });
+          return { formDefId: g.formDefId, entries: map };
+        }),
+        dirty: false
+      };
+    });
+
+    return {
+      fileName: fileName || '', text: text, packageId: packageId, processId: processId,
+      processName: processName, formRefs: formRefs, activities: acts
+    };
+  }
+
+  // ---------------------------------------------------------------- 產生 / 回寫
+  function getGroup(act, formDefId, create) {
+    for (var i = 0; i < act.groups.length; i++) if (act.groups[i].formDefId === formDefId) return act.groups[i];
+    if (!create) return null;
+    var g = { formDefId: formDefId, entries: new Map() };
+    act.groups.push(g);
+    return g;
+  }
+
+  /**
+   * 產生逃脫後的 <formFieldAccessControl> 內容字串。
+   * rank(formDefId, elementId) 回傳排序權重（表單版面順序）；未知元件排在最後並維持原順序。
+   */
+  function buildControl(act, rank) {
+    var parts = [];
+    act.groups.forEach(function (g) {
+      var ids = Array.from(g.entries.keys());
+      if (!ids.length) return;
+      if (rank) {
+        var seq = new Map();
+        ids.forEach(function (id, i) { seq.set(id, i); });
+        ids = ids.slice().sort(function (a, b) {
+          var ra = rank(g.formDefId, a), rb = rank(g.formDefId, b);
+          if (ra !== rb) return ra - rb;
+          return seq.get(a) - seq.get(b);
+        });
+      }
+      var body = ids.map(function (id) {
+        return '<' + id + '>' + g.entries.get(id) + '</' + id + '>';
+      }).join('');
+      parts.push('<' + g.formDefId + '>' + body + '</' + g.formDefId + '>');
+    });
+    if (!parts.length) return '';
+    return esc('<FormFieldAccessControl>' + parts.join('') + '</FormFieldAccessControl>');
+  }
+
+  function lineIndent(text, pos) {
+    var s = pos;
+    while (s > 0 && (text[s - 1] === ' ' || text[s - 1] === '\t')) s--;
+    return { start: s, indent: text.slice(s, pos) };
+  }
+
+  /**
+   * 依目前權限狀態產生新的 BPMN 全文。
+   * 僅改動使用者實際變更過（dirty）且內容確實不同的關卡，其餘位元組原封不動。
+   */
+  function buildOutput(bpmn, rank) {
+    var text = bpmn.text, edits = [], changes = [];
+    bpmn.activities.forEach(function (act) {
+      if (!act.editable || !act.dirty) return;
+      var next = buildControl(act, rank);
+      if (next === act.originalRaw) return;
+
+      if (act.fac) {
+        if (next === '') {
+          // 清空 → 整個 <formFieldAccessControl> 標籤移除（回到原生未設定的樣子）
+          var li = lineIndent(text, act.fac.start);
+          var s = act.fac.start, e = act.fac.end;
+          if (li.start > 0 && text[li.start - 1] === '\n') {
+            s = li.start;
+            if (text[e] === '\r') e++;
+            if (text[e] === '\n') e++;
+          }
+          edits.push({ s: s, e: e, text: '' });
+          changes.push({ id: act.id, name: act.name, action: 'removed' });
+        } else {
+          edits.push({ s: act.fac.innerStart, e: act.fac.innerEnd, text: next });
+          changes.push({ id: act.id, name: act.name, action: 'updated' });
+        }
+      } else if (next !== '') {
+        // 於 <formFieldAccessDefinition> 內第一順位插入
+        var ind = lineIndent(text, act.fad.start).indent;
+        var frag = '\n' + ind + '  <formFieldAccessControl>' + next + '</formFieldAccessControl>';
+        edits.push({ s: act.fad.innerStart, e: act.fad.innerStart, text: frag });
+        changes.push({ id: act.id, name: act.name, action: 'inserted' });
+      }
+    });
+    return { text: applyEdits(text, edits), changes: changes };
+  }
+
+  return {
+    findBlocks: findBlocks, directChildren: directChildren, child: child, childText: childText,
+    unesc: unesc, esc: esc, applyEdits: applyEdits,
+    parseForm: parseForm, parseBpmn: parseBpmn, parseControl: parseControl,
+    getGroup: getGroup, buildControl: buildControl, buildOutput: buildOutput,
+    TYPE_LABEL: TYPE_LABEL, GRANTABLE: GRANTABLE, GROUP_ORDER: GROUP_ORDER, typeGroup: typeGroup
+  };
+})();
+if (typeof module !== 'undefined' && module.exports) module.exports = Core;
+// ==== CORE END ====
+</script>
+
+<script>
+(function () {
+  'use strict';
+  if (typeof document === 'undefined') return;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var S = {
+    bpmn: null, bom: false, form: null, bindId: '', act: null,
+    view: 'step', sort: 'layout', search: '', showAll: false
+  };
+
+  // ---------------------------------------------------------------- 小工具
+  function h(s) {
+    return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
+  }
+  function toast(msg, kind) {
+    var d = document.createElement('div');
+    d.className = 'toast ' + (kind || 'ok');
+    d.innerHTML = (kind === 'err' ? '✘ ' : kind === 'warn' ? '⚠ ' : '✔ ') + h(msg);
+    $('toasts').appendChild(d);
+    setTimeout(function () {
+      d.style.transition = '.3s'; d.style.opacity = 0; d.style.transform = 'translateX(18px)';
+      setTimeout(function () { d.remove(); }, 320);
+    }, kind === 'err' ? 6000 : 3200);
+  }
+
+  // ---------------------------------------------------------------- 元件清單
+  /** 目前綁定表單的元件清單（.form 元件 + BPMN 內找不到對應的孤兒 ID）。 */
+  function elementList() {
+    var out = [], seen = {};
+    if (S.form) {
+      S.form.fields.forEach(function (f) {
+        seen[f.id] = 1;
+        out.push({ id: f.id, name: f.name, type: f.type, typeLabel: f.typeLabel,
+                   grantable: f.grantable, group: f.group, index: f.index, orphan: false });
+      });
+    }
+    if (S.bpmn) {
+      var extra = 0;
+      S.bpmn.activities.forEach(function (a) {
+        var g = Core.getGroup(a, S.bindId, false);
+        if (!g) return;
+        g.entries.forEach(function (v, id) {
+          if (seen[id]) return;
+          seen[id] = 1;
+          out.push({ id: id, name: id, type: 'UNKNOWN',
+                     typeLabel: S.form ? '未知（表單中找不到）' : '未載入表單',
+                     grantable: true, group: S.form ? '未知元件' : '流程既有權限',
+                     index: 100000 + (extra++), orphan: true });
+        });
+      });
+    }
+    return out;
+  }
+  function rank(formDefId, id) {
+    if (formDefId !== S.bindId || !S.form) return 1e9;
+    for (var i = 0; i < S.form.fields.length; i++) if (S.form.fields[i].id === id) return i;
+    return 1e9;
+  }
+  function visible(list) {
+    var q = S.search.trim().toLowerCase();
+    return list.filter(function (e) {
+      if (!S.showAll && !e.grantable) return false;
+      if (!q) return true;
+      return e.name.toLowerCase().indexOf(q) >= 0 || e.id.toLowerCase().indexOf(q) >= 0;
+    });
+  }
+  function isOn(act, id) {
+    var g = Core.getGroup(act, S.bindId, false);
+    return !!(g && g.entries.has(id));
+  }
+  function setOn(act, id, on) {
+    if (!act.editable) return;
+    var g = Core.getGroup(act, S.bindId, true);
+    if (on) { if (!g.entries.has(id)) g.entries.set(id, 'ENABLED'); }
+    else { g.entries.delete(id); }
+    act.dirty = true;
+  }
+  function counts(act) {
+    var g = Core.getGroup(act, S.bindId, false);
+    if (!g) return { btn: 0, fld: 0 };
+    var byId = {};
+    elementList().forEach(function (e) { byId[e.id] = e; });
+    var btn = 0, fld = 0;
+    g.entries.forEach(function (v, id) { ((byId[id] && byId[id].type === 'BUTTON') ? btn++ : fld++); });
+    return { btn: btn, fld: fld };
+  }
+  function anyDirty() {
+    return !!(S.bpmn && S.bpmn.activities.some(function (a) {
+      return a.dirty && Core.buildControl(a, rank) !== a.originalRaw;
+    }));
+  }
+
+  // ---------------------------------------------------------------- 檔案載入
+  function readFile(file) {
+    return file.arrayBuffer().then(function (buf) {
+      var bytes = new Uint8Array(buf), bom = false;
+      if (bytes[0] === 0xEF && bytes[1] === 0xBB && bytes[2] === 0xBF) { bom = true; bytes = bytes.subarray(3); }
+      return { text: new TextDecoder('utf-8').decode(bytes), bom: bom, name: file.name };
+    });
+  }
+
+  function loadFiles(files) {
+    var arr = Array.prototype.slice.call(files);
+    var jobs = arr.map(function (f) {
+      return readFile(f).then(function (r) {
+        var ext = (r.name.split('.').pop() || '').toLowerCase();
+        try {
+          if (ext === 'bpmn') {
+            var b = Core.parseBpmn(r.text, r.name);
+            if (!b.activities.length) throw new Error('檔案中找不到任何關卡定義');
+            S.bpmn = b; S.bom = r.bom;
+            S.bindId = b.formRefs.length ? b.formRefs[0].id : '';
+            if (!S.bindId) {
+              // 流程未宣告 FormType，改用既有權限中出現的表單 ID
+              b.activities.some(function (a) { if (a.groups.length) { S.bindId = a.groups[0].formDefId; return true; } });
+            }
+            S.act = (b.activities.filter(function (a) { return a.editable && a.human; })[0]
+                     || b.activities.filter(function (a) { return a.editable; })[0]
+                     || b.activities[0]).id;
+            toast('已解析流程「' + b.processName + '」：' + b.activities.length + ' 個關卡');
+          } else if (ext === 'form') {
+            var fm = Core.parseForm(r.text, r.name);
+            if (!fm.fields.length) throw new Error('檔案中找不到任何表單元件');
+            S.form = fm;
+            toast('已解析表單「' + fm.formName + '」：' + fm.fields.length + ' 個元件');
+          } else {
+            toast('略過不支援的檔案：' + r.name, 'warn');
+          }
+        } catch (err) {
+          toast(r.name + ' 解析失敗：' + err.message, 'err');
+        }
+      });
+    });
+    Promise.all(jobs).then(render);
+  }
+
+  // ---------------------------------------------------------------- 繪製
+  function render() {
+    if (!S.bpmn) { $('footInfo').textContent = '請先載入 .bpmn 流程檔'; return; }
+    renderLoaders();
+    renderSummary();
+    $('workspace').classList.remove('hidden');
+    $('btnExport').disabled = false;
+    $('dirtyPill').classList.toggle('hidden', !anyDirty());
+    if (S.view === 'step') { $('stepView').classList.remove('hidden'); $('matrixView').classList.add('hidden'); renderStep(); }
+    else { $('stepView').classList.add('hidden'); $('matrixView').classList.remove('hidden'); renderMatrix(); }
+    renderPreview();
+    var editable = S.bpmn.activities.filter(function (a) { return a.editable; }).length;
+    $('footInfo').innerHTML = '關卡 <b>' + S.bpmn.activities.length + '</b>（可設定 ' + editable + '）· 表單元件 <b>'
+      + (S.form ? S.form.fields.length : 0) + '</b> · 匯出檔名 <span class="mono">' + h(outName()) + '</span>';
+  }
+
+  function renderLoaders() {
+    if (S.bpmn) {
+      $('dropBpmn').classList.add('loaded');
+      $('bpmnInfo').innerHTML = h(S.bpmn.fileName) + ' · 流程「' + h(S.bpmn.processName) + '」· '
+        + S.bpmn.activities.length + ' 個關卡';
+    }
+    if (S.form) {
+      $('dropForm').classList.add('loaded');
+      $('formInfo').innerHTML = h(S.form.fileName) + ' · 表單「' + h(S.form.formName) + '」· '
+        + S.form.fields.length + ' 個元件';
+    }
+  }
+
+  function renderSummary() {
+    var b = S.bpmn, box = $('summary');
+    box.classList.remove('hidden');
+    var refs = b.formRefs;
+    var opts = refs.map(function (r) {
+      return '<option value="' + h(r.id) + '"' + (r.id === S.bindId ? ' selected' : '') + '>'
+        + h(r.id) + (r.name ? '（' + h(r.name) + '）' : '') + '</option>';
+    }).join('');
+    if (!refs.some(function (r) { return r.id === S.bindId; }) && S.bindId) {
+      opts = '<option value="' + h(S.bindId) + '" selected>' + h(S.bindId) + '（既有權限）</option>' + opts;
+    }
+    var link;
+    if (!S.form) {
+      link = '<span class="pill warn">未載入 .form：僅顯示元件 ID</span>';
+    } else {
+      var ref = refs.filter(function (r) { return r.id === S.bindId; })[0];
+      var fdi = ref ? ref.formDefinitionId : '';
+      link = (fdi && S.form.formId && fdi !== S.form.formId)
+        ? '<span class="pill warn" title="BPMN 的 formDefinitionId 與 .form 的 formId 不同，這在匯入流程時屬正常現象，請自行確認綁定正確">⚠ ID 不同（' + h(fdi) + ' ↔ ' + h(S.form.formId) + '）</span>'
+        : '<span class="pill ok">✔ 表單已綁定</span>';
+    }
+    box.innerHTML =
+      '<div class="meta"><span class="k">流程名稱</span><span class="v">' + h(b.processName || '(未命名)') + '</span></div>'
+      + '<div class="meta"><span class="k">流程 ID</span><span class="v mono">' + h(b.processId || b.packageId) + '</span></div>'
+      + '<div class="meta"><span class="k">權限對應表單（逃脫 XML 外層標籤）</span>'
+      + '<select id="bindSel">' + (opts || '<option value="">（流程未引用表單）</option>') + '</select></div>'
+      + '<div class="spacer"></div>' + link;
+    var sel = $('bindSel');
+    if (sel) sel.onchange = function () { S.bindId = sel.value; render(); };
+  }
+
+  // ---------- 單一關卡 ----------
+  function renderStep() {
+    var b = S.bpmn;
+    $('tabs').innerHTML = b.activities.map(function (a) {
+      var c = counts(a);
+      var on = a.id === S.act;
+      var note = a.editable ? ('按鈕 ' + c.btn + ' · 欄位 ' + c.fld) : '不支援欄位權限';
+      return '<button class="tab' + (on ? ' on' : '') + '" data-act="' + h(a.id) + '"'
+        + (a.editable ? '' : ' disabled title="此關卡沒有 formFieldAccessDefinition 節點，無法設定欄位權限"')
+        + '><span class="n">' + (a.dirty ? '<span class="dot"></span>' : '') + h(a.name || a.id)
+        + ' <span class="type-tag">' + h(a.type) + '</span></span>'
+        + '<span class="c">' + h(a.id) + ' · ' + note + '</span></button>';
+    }).join('');
+    Array.prototype.forEach.call($('tabs').querySelectorAll('.tab'), function (el) {
+      el.onclick = function () { S.act = el.dataset.act; render(); };
+    });
+
+    var act = current();
+    if (!act) { $('quick').innerHTML = ''; $('sections').innerHTML = '<div class="card empty">請選擇關卡</div>'; return; }
+
+    var others = b.activities.filter(function (a) { return a.editable && a.id !== act.id; });
+    $('quick').innerHTML =
+      '<span class="label">快捷操作</span>'
+      + '<button class="btn tiny" data-q="all">全選（目前清單）</button>'
+      + '<button class="btn tiny" data-q="none">清空本關卡</button>'
+      + '<span class="label" style="margin-left:8px">複製自</span>'
+      + '<select id="copyFrom"><option value="">選擇來源關卡…</option>'
+      + others.map(function (a) { return '<option value="' + h(a.id) + '">' + h(a.name || a.id) + '</option>'; }).join('')
+      + '</select><button class="btn tiny" data-q="copy">套用</button>'
+      + '<div class="spacer"></div>'
+      + '<span class="count" id="qCount"></span>';
+
+    $('quick').onclick = function (ev) {
+      var t = ev.target.closest('[data-q]'); if (!t) return;
+      var q = t.dataset.q, list = visible(elementList());
+      if (q === 'all') { list.forEach(function (e) { setOn(act, e.id, true); }); toast('已勾選 ' + list.length + ' 個元件'); }
+      else if (q === 'none') {
+        var g = Core.getGroup(act, S.bindId, false);
+        if (g) { g.entries.clear(); act.dirty = true; }
+        toast('已清空「' + (act.name || act.id) + '」的權限', 'warn');
+      } else if (q === 'copy') {
+        var src = $('copyFrom').value;
+        if (!src) { toast('請先選擇來源關卡', 'warn'); return; }
+        var sa = b.activities.filter(function (a) { return a.id === src; })[0];
+        var sg = Core.getGroup(sa, S.bindId, false);
+        var tg = Core.getGroup(act, S.bindId, true);
+        tg.entries.clear();
+        if (sg) sg.entries.forEach(function (v, k) { tg.entries.set(k, v); });
+        act.dirty = true;
+        toast('已將「' + (sa.name || sa.id) + '」的權限套用至「' + (act.name || act.id) + '」');
+      }
+      render();
+    };
+
+    var all = elementList(), list = visible(all);
+    var btns = list.filter(function (e) { return e.type === 'BUTTON'; });
+    var flds = list.filter(function (e) { return e.type !== 'BUTTON'; });
+    $('qCount').textContent = '目前顯示 ' + list.length + ' / ' + all.length + ' 個元件';
+
+    var html = '';
+    if (!act.editable) {
+      html += '<div class="card sec"><div class="notice">⚠ 此關卡（' + h(act.type)
+        + '）沒有 <span class="mono">&lt;formFieldAccessDefinition&gt;</span> 節點，工具不會替它偽造節點，因此無法設定欄位權限。</div></div>';
+    }
+    html += '<div class="card sec"><div class="sec-head"><h2>🔘 按鈕權限</h2><span class="count">'
+      + btns.filter(function (e) { return isOn(act, e.id); }).length + ' / ' + btns.length + ' 已授權</span></div>';
+    html += btns.length
+      ? '<div class="pills">' + btns.map(function (e) { return pillHtml(act, e); }).join('') + '</div>'
+      : '<div class="empty">此表單沒有按鈕元件（TriggerElementDefinition）</div>';
+    html += '</div>';
+
+    html += '<div class="card sec"><div class="sec-head"><h2>▤ 欄位權限</h2><span class="count">'
+      + flds.filter(function (e) { return isOn(act, e.id); }).length + ' / ' + flds.length + ' 已授權</span></div>';
+    if (!flds.length) {
+      html += '<div class="empty">沒有符合條件的欄位</div>';
+    } else if (S.sort === 'type') {
+      var groups = {};
+      flds.forEach(function (e) { (groups[e.group] = groups[e.group] || []).push(e); });
+      var names = Object.keys(groups).sort(function (a, b2) {
+        var ia = Core.GROUP_ORDER.indexOf(a), ib = Core.GROUP_ORDER.indexOf(b2);
+        return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+      });
+      names.forEach(function (n) {
+        html += '<div class="grp-head"><span class="gt">' + h(n) + '</span><span class="count">'
+          + groups[n].length + '</span><button class="btn tiny" data-grp="' + h(n) + '" data-on="1">全開</button>'
+          + '<button class="btn tiny" data-grp="' + h(n) + '" data-on="0">全關</button></div>';
+        html += '<div class="rows">' + groups[n].map(function (e) { return rowHtml(act, e); }).join('') + '</div>';
+      });
+    } else {
+      html += '<div class="rows">' + flds.map(function (e) { return rowHtml(act, e); }).join('') + '</div>';
+    }
+    html += '</div>';
+    $('sections').innerHTML = html;
+
+    $('sections').onclick = function (ev) {
+      var g = ev.target.closest('[data-grp]');
+      if (g) {
+        var on = g.dataset.on === '1';
+        visible(elementList()).filter(function (e) { return e.type !== 'BUTTON' && e.group === g.dataset.grp; })
+          .forEach(function (e) { setOn(act, e.id, on); });
+        render(); return;
+      }
+      var p = ev.target.closest('[data-pill]');
+      if (p) { setOn(act, p.dataset.pill, !isOn(act, p.dataset.pill)); render(); }
+    };
+    Array.prototype.forEach.call($('sections').querySelectorAll('input[data-row]'), function (cb) {
+      cb.onchange = function () { setOn(act, cb.dataset.row, cb.checked); render(); };
+    });
+  }
+
+  function pillHtml(act, e) {
+    var on = isOn(act, e.id);
+    return '<button class="pill-btn' + (on ? ' on' : '') + '" data-pill="' + h(e.id) + '"'
+      + (act.editable ? '' : ' disabled') + '>'
+      + '<span class="pn"><span class="mark">' + (on ? '●' : '○') + '</span>' + h(e.name) + '</span>'
+      + '<span class="pi">' + h(e.id) + '</span></button>';
+  }
+  function rowHtml(act, e) {
+    var on = isOn(act, e.id);
+    return '<label class="row' + (on ? ' on' : '') + (e.orphan ? ' orphan' : '') + '">'
+      + '<span class="rn">' + h(e.name) + '</span>'
+      + '<span class="rmeta"><span class="ri">' + h(e.id) + '</span>'
+      + '<span class="rt">' + h(e.typeLabel) + '</span></span>'
+      + '<span class="sw"><input type="checkbox" data-row="' + h(e.id) + '"' + (on ? ' checked' : '')
+      + (act.editable ? '' : ' disabled') + '><i></i></span></label>';
+  }
+
+  // ---------- 矩陣 ----------
+  function renderMatrix() {
+    var b = S.bpmn, acts = b.activities;
+    var list = visible(elementList());
+    var head = '<thead><tr><th class="corner">元件（' + list.length + '）</th>'
+      + acts.map(function (a) {
+        var c = counts(a);
+        return '<th' + (a.editable ? '' : ' title="此關卡不支援欄位權限"') + '>'
+          + '<button class="mx-head-btn" data-col="' + h(a.id) + '"' + (a.editable ? '' : ' disabled') + '>'
+          + h(a.name || a.id) + '</button>'
+          + '<div class="mx-sub">' + h(a.type) + (a.editable ? ' · ' + (c.btn + c.fld) : ' · —') + '</div></th>';
+      }).join('') + '</tr></thead>';
+
+    var rowsHtml = '', lastGroup = null;
+    var ordered = list.slice();
+    if (S.sort === 'type') {
+      ordered.sort(function (x, y) {
+        var ix = Core.GROUP_ORDER.indexOf(x.group), iy = Core.GROUP_ORDER.indexOf(y.group);
+        ix = ix < 0 ? 99 : ix; iy = iy < 0 ? 99 : iy;
+        return ix - iy || x.index - y.index;
+      });
+    }
+    ordered.forEach(function (e) {
+      if (S.sort === 'type' && e.group !== lastGroup) {
+        lastGroup = e.group;
+        rowsHtml += '<tr class="grp-row"><th colspan="' + (acts.length + 1) + '">' + h(e.group) + '</th></tr>';
+      }
+      rowsHtml += '<tr><th><div class="mx-name"><button class="mx-head-btn" data-row-all="' + h(e.id) + '">'
+        + h(e.name) + '</button><span class="mx-id">' + h(e.id) + '</span>'
+        + '<span class="rt">' + h(e.typeLabel) + '</span></div></th>'
+        + acts.map(function (a) {
+          if (!a.editable) return '<td class="off-col"></td>';
+          return '<td><input type="checkbox" data-cell="' + h(a.id) + '|' + h(e.id) + '"'
+            + (isOn(a, e.id) ? ' checked' : '') + '></td>';
+        }).join('') + '</tr>';
+    });
+
+    $('matrix').innerHTML = head + '<tbody>' + (rowsHtml || '<tr><td class="empty" colspan="'
+      + (acts.length + 1) + '">沒有符合條件的元件</td></tr>') + '</tbody>';
+
+    $('matrix').onclick = function (ev) {
+      var col = ev.target.closest('[data-col]');
+      if (col) {
+        var a = byId(col.dataset.col);
+        var vis = visible(elementList());
+        var allOn = vis.every(function (e) { return isOn(a, e.id); });
+        vis.forEach(function (e) { setOn(a, e.id, !allOn); });
+        render(); return;
+      }
+      var row = ev.target.closest('[data-row-all]');
+      if (row) {
+        var eid = row.dataset.rowAll;
+        var editables = S.bpmn.activities.filter(function (x) { return x.editable; });
+        var on = editables.every(function (x) { return isOn(x, eid); });
+        editables.forEach(function (x) { setOn(x, eid, !on); });
+        render(); return;
+      }
+    };
+    Array.prototype.forEach.call($('matrix').querySelectorAll('input[data-cell]'), function (cb) {
+      cb.onchange = function () {
+        var p = cb.dataset.cell.split('|');
+        setOn(byId(p[0]), p[1], cb.checked);
+        render();
+      };
+    });
+  }
+
+  // ---------- 預覽 ----------
+  function renderPreview() {
+    var act = current();
+    var target = (S.view === 'matrix') ? null : act;
+    if (S.view === 'matrix' || !act) {
+      var chunks = S.bpmn.activities.filter(function (a) { return a.editable; }).map(function (a) {
+        var s = Core.buildControl(a, rank);
+        return '【' + (a.name || a.id) + '】' + (s ? '\n' + s : '（無權限，將移除標籤）');
+      });
+      $('previewWho').textContent = '全部關卡';
+      $('previewTag').outerHTML = '<span id="previewTag"></span>';
+      $('previewNew').textContent = chunks.join('\n\n');
+      $('previewOld').textContent = S.bpmn.activities.filter(function (a) { return a.editable; })
+        .map(function (a) { return '【' + (a.name || a.id) + '】' + (a.originalRaw ? '\n' + a.originalRaw : '（原本無此標籤）'); })
+        .join('\n\n');
+      return;
+    }
+    var next = Core.buildControl(act, rank);
+    var same = next === act.originalRaw;
+    $('previewWho').textContent = act.name + ' · ' + act.id;
+    $('previewTag').outerHTML = '<span id="previewTag" class="' + (same ? 'tag-same' : 'tag-diff') + '">'
+      + (same ? '與原始檔相同' : '已變更') + '</span>';
+    $('previewNew').textContent = next
+      ? '<formFieldAccessControl>' + next + '</formFieldAccessControl>'
+      : (act.fac ? '（無任何授權 → 匯出時移除整個 <formFieldAccessControl> 標籤）' : '（無任何授權 → 不寫入）');
+    $('previewOld').textContent = act.originalRaw
+      ? '<formFieldAccessControl>' + act.originalRaw + '</formFieldAccessControl>'
+      : '（原始檔此關卡沒有 <formFieldAccessControl> 標籤）';
+  }
+
+  function byId(id) {
+    return S.bpmn.activities.filter(function (a) { return a.id === id; })[0];
+  }
+  function current() { return S.bpmn ? byId(S.act) : null; }
+  function outName() {
+    var n = S.bpmn ? S.bpmn.fileName : 'process.bpmn';
+    return n.indexOf('已完成_') === 0 ? n : '已完成_' + n;
+  }
+
+  // ---------------------------------------------------------------- 匯出
+  function doExport() {
+    try {
+      var res = Core.buildOutput(S.bpmn, rank);
+      if (!res.changes.length) { toast('沒有任何變更，未產生檔案', 'warn'); return; }
+      var blob = new Blob([S.bom ? '﻿' : '', res.text], { type: 'application/xml;charset=utf-8' });
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = outName();
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(function () { URL.revokeObjectURL(a.href); }, 4000);
+      toast('已匯出 ' + outName() + '（更新 ' + res.changes.length + ' 個關卡）');
+    } catch (err) {
+      toast('匯出失敗：' + err.message, 'err');
+    }
+  }
+
+  // ---------------------------------------------------------------- 事件綁定
+  var picker = $('filePicker'), pickTarget = '';
+  picker.onchange = function () { if (picker.files.length) loadFiles(picker.files); picker.value = ''; };
+  [['dropBpmn', '.bpmn'], ['dropForm', '.form']].forEach(function (p) {
+    var el = $(p[0]);
+    el.onclick = function () { picker.accept = p[1]; picker.click(); };
+    el.ondragover = function (ev) { ev.preventDefault(); el.classList.add('over'); };
+    el.ondragleave = function () { el.classList.remove('over'); };
+    el.ondrop = function (ev) {
+      ev.preventDefault(); ev.stopPropagation();
+      el.classList.remove('over'); $('overlay').classList.remove('on');
+      if (ev.dataTransfer.files.length) loadFiles(ev.dataTransfer.files);
+    };
+  });
+  var dragDepth = 0;
+  window.addEventListener('dragenter', function (ev) { ev.preventDefault(); if (++dragDepth === 1) $('overlay').classList.add('on'); });
+  window.addEventListener('dragover', function (ev) { ev.preventDefault(); });
+  window.addEventListener('dragleave', function () { if (--dragDepth <= 0) { dragDepth = 0; $('overlay').classList.remove('on'); } });
+  window.addEventListener('drop', function (ev) {
+    ev.preventDefault(); dragDepth = 0; $('overlay').classList.remove('on');
+    if (ev.dataTransfer && ev.dataTransfer.files.length) loadFiles(ev.dataTransfer.files);
+  });
+
+  $('viewSeg').onclick = function (ev) {
+    var b = ev.target.closest('[data-view]'); if (!b) return;
+    S.view = b.dataset.view;
+    Array.prototype.forEach.call($('viewSeg').children, function (c) { c.classList.toggle('on', c === b); });
+    render();
+  };
+  $('sortSeg').onclick = function (ev) {
+    var b = ev.target.closest('[data-sort]'); if (!b) return;
+    S.sort = b.dataset.sort;
+    Array.prototype.forEach.call($('sortSeg').children, function (c) { c.classList.toggle('on', c === b); });
+    render();
+  };
+  var timer;
+  $('search').oninput = function () {
+    clearTimeout(timer);
+    timer = setTimeout(function () { S.search = $('search').value; render(); }, 120);
+  };
+  $('showAll').onchange = function () { S.showAll = $('showAll').checked; render(); };
+  $('btnExport').onclick = doExport;
+  $('btnTheme').onclick = function () {
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    var next = dark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('bpmPermTheme', next); } catch (e) {}
+  };
+  (function () {
+    var saved;
+    try { saved = localStorage.getItem('bpmPermTheme'); } catch (e) {}
+    if (!saved) saved = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.setAttribute('data-theme', saved);
+  })();
+  window.addEventListener('beforeunload', function (ev) {
+    if (anyDirty()) { ev.preventDefault(); ev.returnValue = ''; }
+  });
+})();
+</script>
+</body>
+</html>
