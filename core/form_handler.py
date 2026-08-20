@@ -3,8 +3,10 @@
 
 萃取：以「配對 Label 的 textValue」作為中文名稱，輸出欄位清單。
       完全不輸出 <script> / <mobileScript> / <rwdLayout> / cssStyle / 座標 / 色彩。
-回寫：以 originalId 為主鍵定位元件，只更新該元件與其 Label 的 <id> 與 <name>。
-      不動 pairId，不動 script / rwdLayout。
+回寫：以 originalId 為主鍵定位元件，更新：
+      1. 元件與其 Label 的 <id> 與 <name>
+      2. <rwdLayout> 內的元件 ID 版面參照
+      3. <script> / <mobileScript> 內的表格事件函式 (${GridId}_add_onclick) 與物件變數 (${GridId}Obj)
 """
 
 import re
@@ -226,6 +228,44 @@ def write_back(xml_path, config, out_path):
                                 % (title, lb.id))
         changed += 1
 
+    # 3. 同步更新 <rwdLayout> 內的元件 ID 參照（避免 BPM 前端解析版面時因找不到元件拋出 TypeError）
+    rwd_spans = X.find_blocks(text, lambda n: n == 'rwdLayout')
+    rwd_hits = 0
+    for rwd_span in rwd_spans:
+        raw_rwd = text[rwd_span.inner_start:rwd_span.inner_end]
+        new_rwd = raw_rwd
+        for old, new, _ in renames:
+            pattern = re.compile(
+                r'(&quot;id&quot;|"id")\s*:\s*(&quot;|")' + re.escape(old) + r'(&quot;|")'
+            )
+            def _repl(m, n=new):
+                return m.group(1) + ':' + m.group(2) + n + m.group(3)
+            new_rwd, count = pattern.subn(_repl, new_rwd)
+            rwd_hits += count
+        if new_rwd != raw_rwd:
+            edits.append((rwd_span.inner_start, rwd_span.inner_end, new_rwd))
+
+    if rwd_hits:
+        messages.append('  RWD 版面配置 (<rwdLayout>) 同步更新了 %d 處元件 ID' % rwd_hits)
+
+    # 4. 同步更新 <script> / <mobileScript> 中的 Grid 事件函式與物件變數
+    script_spans = X.find_blocks(text, lambda n: n in ('script', 'mobileScript'))
+    script_hits = 0
+    for s_span in script_spans:
+        raw_script = text[s_span.inner_start:s_span.inner_end]
+        new_script = raw_script
+        for old, new, _ in renames:
+            p1 = re.compile(r'\b' + re.escape(old) + r'_(add|edit|delete)_onclick\b')
+            new_script, c1 = p1.subn(new + r'_\1_onclick', new_script)
+            p2 = re.compile(r'\b' + re.escape(old) + r'Obj\b')
+            new_script, c2 = p2.subn(new + 'Obj', new_script)
+            script_hits += (c1 + c2)
+        if new_script != raw_script:
+            edits.append((s_span.inner_start, s_span.inner_end, new_script))
+
+    if script_hits:
+        messages.append('  表單腳本 (<script>) 同步更新了 %d 處表格事件與物件參照' % script_hits)
+
     if not edits:
         return 0, messages
 
@@ -248,3 +288,4 @@ def _queue_id_name_edits(text, element, old_id, new_id, edits, messages):
     else:
         messages.append('! 元件「%s」的 <name> 為「%s」（不等於舊 ID），已保留不動'
                         % (old_id, current))
+

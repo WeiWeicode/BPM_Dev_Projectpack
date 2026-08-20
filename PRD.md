@@ -162,11 +162,12 @@ graph TD
 ### 3.2 功能二：匯入 JSON 回寫 XML (JSON to XML Write-back)
 
 #### (1) 表單回寫機制 (`.form`)
-- **比對鍵值**：以 JSON 中每個項目的 **`name`（中文欄位名稱）** 作為查找 Key。
+- **比對鍵值**：以 JSON 中每個項目的 **`originalId`** 作為查找 Key。
 - **替換標的**：
-  1. 尋找對應的控制項節點（其配對 Label 的 `textValue` 等於 `name`，或按鈕 `caption` 等於 `name`）。
-  2. 將控制項的 `<id>` 與 `<name>` 節點值更新為 JSON 中指定的新 `id`。
-  3. 若有對應的標籤（Label），同步將標籤的 `<id>`、`<name>` 更新為 `lbl_{新ID}`，並更新對應的 `pairId`。
+  1. 尋找對應的控制項節點，將控制項的 `<id>` 與 `<name>` 節點值更新為 JSON 中指定的新 `id`。
+  2. 若有對應的標籤（Label），同步將標籤的 `<id>`、`<name>` 更新為 `lbl_{新ID}`。
+  3. **RWD 版面配置 (`<rwdLayout>`)**：同步將版面 JSON 中的元件 ID 參照更新為新 ID，避免 BPM Web 設計器拋出 `TypeError: Cannot read properties of null (reading 'type')`。
+  4. **表單腳本 (`<script>` / `<mobileScript>`)**：同步更新表格事件函式名稱（如 `${GridId}_add_onclick`）與物件變數（如 `${GridId}Obj`）。
 - **輸出檔名規則**：
   - 範例：若來源為 `SP_DetectionOPForm.form`，回寫輸出檔名為 `已完成_SP_DetectionOPForm.form`。
 
