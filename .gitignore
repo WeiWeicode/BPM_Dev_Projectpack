@@ -11,3 +11,8 @@
 /3_db_explorer/docs/schema/*.json
 
 __pycache__/
+
+# 4_db_viewer 前後端建置產物
+/4_db_viewer/frontend/node_modules/
+/4_db_viewer/frontend/dist/
+/4_db_viewer/frontend/src/api/types.ts

@@ -1,6 +1,6 @@
 # 鼎新 BPM 資料模型重點整理
 
-> 由 `bpm_kb` 自動產生。資料來源：`sa@10.10.130.191,1433/NaNa`，範圍：近 30 天建立的版本。
+> 由 `bpm_kb` 自動產生。資料來源：`sa@10.10.130.191,1433/NaNa`，範圍：近 7 天建立的版本。
 
 ## 1. 定義存在哪裡
 
@@ -65,7 +65,7 @@ ProcessDefinition.OID = containerOID 之下掛：
 
 ## 3. 目前有哪些表單與流程
 
-### 表單（近 30 天建立的版本）
+### 表單（近 7 天建立的版本）
 
 | id | formDefinitionName | version | publicationStatus | createdTime | xml_chars |
 | --- | --- | --- | --- | --- | --- |
@@ -73,7 +73,7 @@ ProcessDefinition.OID = containerOID 之下掛：
 | quickDevTestForm | 快速開發測試 | 2 | RELEASED | 2026-08-20 14:22:35.203000 | 218933 |
 | quickDevTestForm | quickDevTestForm | 1 | UNDER_REVISION | 2026-08-20 14:22:09.953000 | 218671 |
 
-### 流程（近 30 天建立的版本）
+### 流程（近 7 天建立的版本）
 
 | id | processPackageName | version | publicationStatus | createdTime | flowType |
 | --- | --- | --- | --- | --- | --- |
@@ -90,11 +90,97 @@ ProcessDefinition.OID = containerOID 之下掛：
 `<FormFieldAccessControl><表單ID><欄位ID>權限</欄位ID>…</表單ID></FormFieldAccessControl>`。
 所以「表單掛在哪個關卡」與「該關卡看得到什麼」是同一筆資料決定的。
 
-（尚未萃取流程，請先執行 `python bpm_kb_tool.py pull`）
+#### quickDevTestProcessImportWebTool v1　測試快速開發（SignatureFlow，UNDER_REVISION）
+
+`ACT_Start_03 → ACT_CreateForm_06 → ACT_ManagerApprove_02 → ACT_SendNotify_01 → ACT_ManualTask_05 → ACT_End_04`
+
+| 關卡 ID | 名稱 | BPMN 型別 | 執行方式 | 執行者 | 表單 | 欄位權限 | 按鈕數 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| ACT_Start_03 | Event | StartEvent | NORMAL | - | - | - | 0 |
+| ACT_CreateForm_06 | 開單 | UserTask | NORMAL | PROCESS_REQUESTER | quickDevTestFormImport | ENABLED×14 | 1 |
+| ACT_ManagerApprove_02 | 主管 | UserTask | NORMAL | MANAGER | quickDevTestFormImport | ENABLED×10 | 1 |
+| ACT_SendNotify_01 | 通知任務 | SendTask | NOTICE | PROCESS_REQUESTER | - | - | 0 |
+| ACT_ManualTask_05 | 人工任務 | ManualTask | NORMAL | PROCESS_REQUESTER | quickDevTestFormImport | ENABLED×4 | 0 |
+| ACT_End_04 | Event | EndEvent | NORMAL | - | - | - | 0 |
+
+#### quickDevTestProcessImportWebTool v2　測試快速開發(webTool)（SignatureFlow，RELEASED）
+
+`ACT_Start_03 → ACT_CreateForm_06 → ACT_ManagerApprove_02 → ACT_SendNotify_01 → ACT_ManualTask_05 → ACT_End_04`
+
+| 關卡 ID | 名稱 | BPMN 型別 | 執行方式 | 執行者 | 表單 | 欄位權限 | 按鈕數 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| ACT_Start_03 | Event | StartEvent | NORMAL | - | - | - | 0 |
+| ACT_CreateForm_06 | 開單 | UserTask | NORMAL | PROCESS_REQUESTER | quickDevTestFormImport | ENABLED×14 | 1 |
+| ACT_ManagerApprove_02 | 主管 | UserTask | NORMAL | MANAGER | quickDevTestFormImport | ENABLED×10 | 1 |
+| ACT_SendNotify_01 | 通知任務 | SendTask | NOTICE | PROCESS_REQUESTER | - | - | 0 |
+| ACT_ManualTask_05 | 人工任務 | ManualTask | NORMAL | PROCESS_REQUESTER | quickDevTestFormImport | ENABLED×4 | 0 |
+| ACT_End_04 | Event | EndEvent | NORMAL | - | - | - | 0 |
+
+#### quickDevTestProcessImport v1　測試快速開發（SignatureFlow，UNDER_REVISION）
+
+`ACT_Start_03 → ACT_CreateForm_06 → ACT_ManagerApprove_02 → ACT_SendNotify_01 → ACT_DecisionRule_07 → ACT_ManualTask_05 → ACT_End_04`
+
+| 關卡 ID | 名稱 | BPMN 型別 | 執行方式 | 執行者 | 表單 | 欄位權限 | 按鈕數 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| ACT_Start_03 | Event | StartEvent | NORMAL | - | - | - | 0 |
+| ACT_CreateForm_06 | 開單 | UserTask | NORMAL | PROCESS_REQUESTER | - | - | 0 |
+| ACT_ManagerApprove_02 | 主管 | UserTask | NORMAL | MANAGER | - | - | 0 |
+| ACT_SendNotify_01 | 通知任務 | SendTask | NOTICE | PROCESS_REQUESTER | - | - | 0 |
+| ACT_DecisionRule_07 | 核決層級 | DecisionRuleTask | NORMAL | - | - | - | 0 |
+| ACT_ManualTask_05 | 人工任務 | ManualTask | NORMAL | PROCESS_REQUESTER | - | - | 0 |
+| ACT_End_04 | Event | EndEvent | NORMAL | - | - | - | 0 |
+
+#### quickDevTestProcessImport v2　測試快速開發（SignatureFlow，UNDER_REVISION）
+
+`ACT_Start_03 → ACT_CreateForm_06 → ACT_ManagerApprove_02 → ACT_SendNotify_01 → ACT_ManualTask_05 → ACT_End_04`
+
+| 關卡 ID | 名稱 | BPMN 型別 | 執行方式 | 執行者 | 表單 | 欄位權限 | 按鈕數 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| ACT_Start_03 | Event | StartEvent | NORMAL | - | - | - | 0 |
+| ACT_CreateForm_06 | 開單 | UserTask | NORMAL | PROCESS_REQUESTER | - | - | 0 |
+| ACT_ManagerApprove_02 | 主管 | UserTask | NORMAL | MANAGER | - | - | 0 |
+| ACT_SendNotify_01 | 通知任務 | SendTask | NOTICE | PROCESS_REQUESTER | - | - | 0 |
+| ACT_ManualTask_05 | 人工任務 | ManualTask | NORMAL | PROCESS_REQUESTER | - | - | 0 |
+| ACT_End_04 | Event | EndEvent | NORMAL | - | - | - | 0 |
+
+#### quickDevTestProcessImport v3　測試快速開發（SignatureFlow，RELEASED）
+
+`ACT_Start_03 → ACT_CreateForm_06 → ACT_ManagerApprove_02 → ACT_SendNotify_01 → ACT_ManualTask_05 → ACT_End_04`
+
+| 關卡 ID | 名稱 | BPMN 型別 | 執行方式 | 執行者 | 表單 | 欄位權限 | 按鈕數 |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| ACT_Start_03 | Event | StartEvent | NORMAL | - | - | - | 0 |
+| ACT_CreateForm_06 | 開單 | UserTask | NORMAL | PROCESS_REQUESTER | quickDevTestFormImport | ENABLED×2 | 1 |
+| ACT_ManagerApprove_02 | 主管 | UserTask | NORMAL | MANAGER | quickDevTestFormImport | ENABLED×1 | 0 |
+| ACT_SendNotify_01 | 通知任務 | SendTask | NOTICE | PROCESS_REQUESTER | - | - | 0 |
+| ACT_ManualTask_05 | 人工任務 | ManualTask | NORMAL | PROCESS_REQUESTER | quickDevTestFormImport | ENABLED×4 | 0 |
+| ACT_End_04 | Event | EndEvent | NORMAL | - | - | - | 0 |
 
 ### 關卡 × 欄位權限矩陣
 
-（尚未萃取流程）
+以 `quickDevTestProcessImportWebTool` v1 為例：
+
+| 欄位 ID | 開單 | 主管 | 人工任務 |
+| --- | --- | --- | --- |
+| TEST_Attachment_05 | ENABLED | — | — |
+| TEST_TextBox_07 | ENABLED | ENABLED | — |
+| TEST_TextArea_08 | ENABLED | ENABLED | — |
+| TEST_Grid_10 | ENABLED | — | — |
+| TEST_DialogInput_11 | ENABLED | ENABLED | — |
+| TEST_DialogInputLabel_12 | ENABLED | ENABLED | ENABLED |
+| TEST_DialogInputMulti_13 | ENABLED | ENABLED | ENABLED |
+| TEST_DoubleTextBox_14 | ENABLED | ENABLED | ENABLED |
+| TEST_RadioButton_15 | ENABLED | ENABLED | — |
+| TEST_CheckBox_16 | ENABLED | ENABLED | — |
+| TEST_Dropdown_17 | ENABLED | ENABLED | ENABLED |
+| TEST_Date_19 | ENABLED | — | — |
+| TEST_Time_20 | ENABLED | — | — |
+| TEST_HandWriting_28 | ENABLED | ENABLED | — |
+| TEST_Button_06 | ENABLED | ENABLED | — |
+
+權限值取自資料庫實測（取樣 4000 筆 FormFieldAccessDefinition）：
+`ENABLED`（可編輯，絕大多數）、`INVISIBLE`（隱藏）、`FULL_CONTROL`（完全控制）。
+未列出者以 `—` 表示，代表該關卡未設定、沿用表單預設。
 
 ### 表單欄位樣本
 
@@ -130,18 +216,18 @@ ProcessDefinition.OID = containerOID 之下掛：
 | TEST_QRCode_27 | TEST_QRCode_27 | QRCODE |
 | TEST_HandWriting_28 | 手寫區域 | HANDWRITING |
 
-#### quickDevTestForm（快速開發測試，共 27 個元件）
+#### quickDevTestForm（quickDevTestForm，共 27 個元件）
 
 | 元件 ID | 顯示名稱 | 型別 |
 | --- | --- | --- |
-| HiddenTextBox7 | HiddenTextBox | HIDDEN |
 | Title1 | Title | TITLE |
 | HorizontalLine2 | 分隔線 | HORIZONTAL_LINE |
 | Label3 | 文本 | LABEL |
-| Attachment | 檔案上傳 | ATTACHMENT |
 | Button4 | 按鈕 | BUTTON |
 | TextBox5 | 輸入框 | TEXTBOX |
 | TextArea6 | 輸入區域 | TEXTAREA |
+| HiddenTextBox7 | HiddenTextBox | HIDDEN |
+| Attachment | 檔案上傳 | ATTACHMENT |
 | SerialNumber9 | 單號 | SERIAL_NUMBER |
 | Grid10 | 表格 | LIST |
 | DialogInput11 | 按鈕+輸入框 | DIALOGINPUT |

@@ -1,7 +1,7 @@
 # 鼎新 BPM 快速開發工具集 —— 專案地圖
 
-三個各自獨立、但共用同一套解析核心的工具，對應 BPM 開發的三個階段：
-**改造既有檔案 → 設定權限 → 理解線上現況**。
+四個各自獨立、但共用同一套解析核心的工具，對應 BPM 開發的四個階段：
+**改造既有檔案 → 設定權限 → 理解線上現況 → 隨時查閱**。
 
 ```
 BPM快速開發/
@@ -21,14 +21,19 @@ BPM快速開發/
 │   ├── index.html             單檔網頁工具，開啟即用
 │   └── test_core.mjs          用真實範例檔驗證解析與位元組還原
 │
-└── 3_db_explorer/         ③ 查詢線上結構與說明
-    ├── bpm_kb/                資料庫萃取模組
-    ├── bpm_kb_tool.py         命令列進入點
-    ├── .env.example           連線設定範本
-    ├── docs/
-    │   ├── BPM_知識重點.md        ★ 自動產生的結構說明
-    │   └── schema/                資料表快照
-    └── out/                   撈下來的 .form / .bpmn / .json
+├── 3_db_explorer/         ③ 查詢線上結構與說明
+│   ├── bpm_kb/                資料庫萃取模組
+│   ├── bpm_kb_tool.py         命令列進入點
+│   ├── .env.example           連線設定範本
+│   ├── docs/
+│   │   ├── BPM_知識重點.md        ★ 自動產生的結構說明
+│   │   └── schema/                資料表快照
+│   └── out/                   撈下來的 .form / .bpmn / .json
+│
+└── 4_db_viewer/           ④ 線上結構檢視器（規劃中）
+    ├── PLAN.md                專案計劃書
+    ├── backend/               FastAPI，沿用 3 的關聯邏輯
+    └── frontend/              Vue 3 + Vite
 ```
 
 ---
@@ -89,9 +94,20 @@ python bpm_kb_tool.py pull       # 撈定義、組流程圖、產生文件
 產出的 [3_db_explorer/docs/BPM_知識重點.md](3_db_explorer/docs/BPM_知識重點.md)
 是這個專案的主要交付物，詳見 [3_db_explorer/bpm_kb/README.md](3_db_explorer/bpm_kb/README.md)。
 
+## ④ 4_db_viewer —— 線上結構檢視器（規劃中）
+
+把 `3_db_explorer` 撈到的資料做成**前後端分離的網頁應用**：表單的元件
+id／name／type，流程的關卡 id／name 與按鈕權限，並提供關卡 × 元件的權限矩陣。
+
+- 後端 FastAPI，直接 import `bpm_kb` 的關聯邏輯，唯讀連線、無寫入端點
+- 前端 Vue 3 + Vite，型別由後端 OpenAPI 產生，契約只有一份
+- **只呈現 RELEASED 版本**，與專案 ② 完全隔離，不提供任何回寫
+
+詳見 [4_db_viewer/PLAN.md](4_db_viewer/PLAN.md)。
+
 ---
 
-## 三者的關係
+## 四者的關係
 
 ```
         鼎新 BPM 設計師                        BPM 資料庫
@@ -109,9 +125,13 @@ python bpm_kb_tool.py pull       # 撈定義、組流程圖、產生文件
               ↓                                     ↓
         改好的 XML ──匯入──→ 鼎新 BPM ──→ docs/BPM_知識重點.md
                                               （驗證結果、留下說明）
+                                                    │
+                                                    ↓
+                                              4_db_viewer
+                                           （網頁瀏覽，唯讀）
 ```
 
-`1_xml_tool/core/` 是三者共用的解析核心：`3_db_explorer` 直接 import 它來解析
+`1_xml_tool/core/` 是共用的解析核心：`3_db_explorer` 直接 import 它來解析
 撈下來的 XML，`2_web_builder` 則是它的 JavaScript 對應實作（邏輯一致，
 以 `test_core.mjs` 對同一批範例檔交叉驗證）。
 
@@ -151,8 +171,8 @@ python bpm_kb_tool.py pull       # 撈定義、組流程圖、產生文件
 
 **表單與流程之間沒有外鍵**，關聯寫在 `formFieldAccessControl` 裡：
 每個關卡指定一張表單，並逐一列出該關卡對各欄位的權限
-（`ENABLED` / `READ_ONLY` / `HIDDEN`）。這就是同一張表單在不同簽核關卡
-呈現不同樣貌的機制。
+（實測值為 `ENABLED` / `INVISIBLE` / `FULL_CONTROL`）。這就是同一張表單
+在不同簽核關卡呈現不同樣貌的機制。
 
 ---
 
@@ -163,5 +183,6 @@ python bpm_kb_tool.py pull       # 撈定義、組流程圖、產生文件
 | 1_xml_tool | Python 3.x，無第三方套件 |
 | 2_web_builder | 瀏覽器即可；跑測試需 Node.js |
 | 3_db_explorer | Python 3.x + `pyodbc`，以及 SQL Server ODBC 驅動 |
+| 4_db_viewer | 後端 Python 3.x + FastAPI（需 3_db_explorer 的環境）；前端 Node.js + Vite |
 
 `.env`（連線帳密）與 `samples/` 內的實際表單檔都已列入 `.gitignore`。
