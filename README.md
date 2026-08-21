@@ -1,7 +1,11 @@
 # 鼎新 BPM 快速開發工具集 —— 專案地圖
 
 四個各自獨立、但共用同一套解析核心的工具，對應 BPM 開發的四個階段：
-**改造既有檔案 → 設定權限 → 理解線上現況 → 隨時查閱**。
+**改造既有檔案 → 設定權限 → 理解線上現況 → 隨時查閱與快速調整**。
+
+> **資料庫預設一律唯讀。** 全工具集只有一個地方會寫資料庫
+> （`4_db_viewer/backend/app/writer.py`），且預設關閉、正式區永久禁寫。
+> 詳見下方「安全邊界」。
 
 ```
 BPM快速開發/
@@ -13,7 +17,7 @@ BPM快速開發/
 ├── 1_xml_tool/            ① 萃取表單與流程
 │   ├── PRD.md
 │   ├── bpm_tool.py            終端互動主程式
-│   └── core/                  ★ 解析核心，三個專案共用
+│   └── core/                  ★ 解析核心，1／3／4 共用，2 有對應的 JS 實作
 │       ├── xml_utils.py           XML 區塊定位與無損編輯
 │       ├── form_handler.py        .form 萃取／回寫
 │       └── bpmn_handler.py        .bpmn 萃取／回寫
@@ -32,10 +36,12 @@ BPM快速開發/
 │   │   └── schema/                資料表快照
 │   └── out/                   撈下來的 .form / .bpmn / .json
 │
-└── 4_db_viewer/           ④ 線上結構檢視器
-    ├── PLAN.md                專案計劃書
+└── 4_db_viewer/           ④ 線上結構檢視器 + 權限快速開發
+    ├── PLAN.md                專案計劃書（含寫入可行性實測記錄）
     ├── README.md              使用說明
     ├── backend/               FastAPI，沿用 3 的關聯邏輯
+    │   ├── app/writer.py          ★ 全工具集唯一的寫入路徑
+    │   └── backups/              寫入前的自動備份與稽核紀錄（不進版控）
     └── frontend/              Vue 3 + Vite
 ```
 
@@ -97,16 +103,40 @@ python bpm_kb_tool.py pull       # 撈定義、組流程圖、產生文件
 產出的 [3_db_explorer/docs/BPM_知識重點.md](3_db_explorer/docs/BPM_知識重點.md)
 是這個專案的主要交付物，詳見 [3_db_explorer/bpm_kb/README.md](3_db_explorer/bpm_kb/README.md)。
 
-## ④ 4_db_viewer —— 線上結構檢視器
+## ④ 4_db_viewer —— 線上結構檢視器 + 權限快速開發
 
 把 `3_db_explorer` 撈到的資料做成**前後端分離的網頁應用**：表單的元件
 id／name／type，流程的關卡 id／name 與按鈕權限，並提供關卡 × 元件的權限矩陣。
 
-- 後端 FastAPI，直接 import `bpm_kb` 的關聯邏輯，唯讀連線、無寫入端點
-- 前端 Vue 3 + Vite，型別由後端 OpenAPI 產生，契約只有一份
-- **只呈現 RELEASED 版本**，與專案 ② 完全隔離，不提供任何回寫
+```bash
+cd 4_db_viewer/backend
+pip install -r requirements.txt
+python -m uvicorn app.main:app --port 8000     # 唯讀模式
+```
 
-詳見 [4_db_viewer/PLAN.md](4_db_viewer/PLAN.md)。
+前端建置過（`cd frontend && npm install && npm run build`）之後，
+只需跑 uvicorn 一個服務，開 <http://127.0.0.1:8000> 即可。
+
+**三個檢視**：表單元件清單、流程關卡與按鈕權限、關卡 × 元件權限矩陣。
+矩陣支援篩選元件、表頭排序（三態：升冪 → 降冪 → 表單原始順序）、
+匯出目前檢視為 CSV。
+
+**主機切換**：標題列下拉可在 191 測試區與 190 正式區之間切換，
+主機是每個請求的參數（後端不存狀態），兩台快取各自獨立。
+切到正式區會顯示紅色標記並自動退回唯讀。
+
+**權限快速開發（選用，預設關閉）**：
+
+```bash
+BPM_VIEWER_ENABLE_WRITE=1 BPM_VIEWER_WRITABLE_PROCESSES=流程ID python -m uvicorn app.main:app --port 8000
+```
+
+開啟後矩陣頁多出「編輯權限」，可直接改按鈕與欄位權限並寫回資料庫，
+省掉開設計師逐格點選的來回。改動先進 pending 區、預覽差異、確認才套用，
+套用後可一鍵還原。**只改權限值，不碰任何結構。**
+
+詳見 [4_db_viewer/README.md](4_db_viewer/README.md) 與
+[PLAN.md](4_db_viewer/PLAN.md)（含寫入可行性的實測記錄）。
 
 ---
 
@@ -131,12 +161,19 @@ id／name／type，流程的關卡 id／name 與按鈕權限，並提供關卡 �
                                                     │
                                                     ↓
                                               4_db_viewer
-                                           （網頁瀏覽，唯讀）
+                                          （網頁瀏覽 + 權限微調）
+                                                    ╎
+                                        只有權限值可直接寫回資料庫
+                                        （預設關閉，正式區永久禁寫）
 ```
 
 `1_xml_tool/core/` 是共用的解析核心：`3_db_explorer` 直接 import 它來解析
-撈下來的 XML，`2_web_builder` 則是它的 JavaScript 對應實作（邏輯一致，
+撈下來的 XML，`4_db_viewer` 再經由 `bpm_kb` 間接使用同一套；
+`2_web_builder` 則是它的 JavaScript 對應實作（邏輯一致，
 以 `test_core.mjs` 對同一批範例檔交叉驗證）。
+
+**分工界線**：結構性變更（加減元件、改關卡、改流程）走 ②，
+純權限值的微調才走 ④。這條線要守住，否則版本控制會失控。
 
 ---
 
@@ -173,9 +210,55 @@ id／name／type，流程的關卡 id／name 與按鈕權限，並提供關卡 �
 資料庫裡沒有任何一個欄位長得跟它一樣。
 
 **表單與流程之間沒有外鍵**，關聯寫在 `formFieldAccessControl` 裡：
-每個關卡指定一張表單，並逐一列出該關卡對各欄位的權限
-（實測值為 `ENABLED` / `INVISIBLE` / `FULL_CONTROL`；**未列出代表唯讀**）。
+每個關卡指定一張表單，並逐一列出該關卡對各欄位的權限。
 這就是同一張表單在不同簽核關卡呈現不同樣貌的機制。
+
+### 權限值（資料庫實測 20,000 筆 + 設計師 UI 對照）
+
+| 資料庫存的值 | 設計師 UI | 佔比 |
+| --- | --- | --- |
+| `ENABLED` | 可編輯(Enable) | ~98.2% |
+| `INVISIBLE` | 隱藏(Invisible) | ~1.5% |
+| `FULL_CONTROL` | （UI 未對照到） | ~0.2% |
+| **未列出** | **唯讀(Disable)** | — |
+
+資料庫只存三種值。**要把元件設成唯讀，作法是把它從權限字串中移除**，
+不是寫入某個值。`INVALIDITY`（失效）在取樣中從未出現，格式未知。
+
+### 一個會出事的地雷
+
+權限定義列**會被多個關卡共用**。全庫掃描發現：
+
+```
+1def277bd04a10048563bc0546718357  被 24,765 個關卡引用
+329200f5de1510048afb1d2d9212f85e  被 24,707 個關卡引用
+```
+
+改一筆就是改上萬個關卡。任何寫入路徑都必須先檢查
+`SELECT COUNT(*) FROM ActivityDefinition WHERE formFieldAccessDefinitionOID = ?`，
+不是 1 就拒絕 —— `4_db_viewer` 已內建這道檢查。
+
+---
+
+## 安全邊界
+
+| 元件 | 資料庫存取 |
+| --- | --- |
+| `bpm_kb.db.Database`（1／3／4 共用） | **`readonly=True`**，永遠唯讀 |
+| `3_db_explorer` CLI 的 `sql` 指令 | 只接受 `SELECT` / `WITH` |
+| `4_db_viewer` 唯讀端點 | 全為 `GET`，參數化查詢，不接受 SQL 片段 |
+| `4_db_viewer/backend/app/writer.py` | **唯一的寫入路徑**，另開連線，不與唯讀共用 |
+
+寫入路徑的十道防護（共用列偵測、預設關閉、流程白名單、主機白名單、
+強制備份、稽核紀錄、兩段式 preview／apply、值白名單、rowcount 驗證、
+寫後回讀）詳見 [4_db_viewer/README.md](4_db_viewer/README.md)。
+
+**已知風險**：這條路徑繞過 BPM 的版本控制，設計師 UI 看不出改過，
+且 `objectVersion` 不遞增 —— 日後有人從設計師存檔會靜默覆蓋。
+測試區練手沒問題，正式區預設就寫不進去。
+
+`.env`（連線帳密）、`samples/` 內的實際表單檔、
+`4_db_viewer/backend/backups/` 都已列入 `.gitignore`。
 
 ---
 
@@ -188,4 +271,19 @@ id／name／type，流程的關卡 id／name 與按鈕權限，並提供關卡 �
 | 3_db_explorer | Python 3.x + `pyodbc`，以及 SQL Server ODBC 驅動 |
 | 4_db_viewer | 後端 Python 3.x + FastAPI（需 3_db_explorer 的環境）；前端 Node.js + Vite |
 
-`.env`（連線帳密）與 `samples/` 內的實際表單檔都已列入 `.gitignore`。
+已驗證組合：Python 3.14.3、FastAPI 0.141.1、Pydantic 2.13.4、
+Node v24.14.0、npm 11.12.0、ODBC Driver 18 for SQL Server、SQL Server 2019。
+
+## 測試
+
+| 專案 | 指令 | 目前 |
+| --- | --- | --- |
+| 1_xml_tool ／ 2_web_builder | `cd 2_web_builder && node test_core.mjs` | 62 項通過 |
+| 4_db_viewer 後端 | `cd 4_db_viewer/backend && python -m pytest tests -q` | 33 通過、2 跳過 |
+| 4_db_viewer 前端 | `cd 4_db_viewer/frontend && npx vue-tsc --noEmit` | 無錯誤 |
+
+那 2 個跳過的是**真的會寫資料庫**的整合測試，需三個環境變數同時設齊才會執行；
+跳過時會說明原因，不會假裝通過。
+
+改動 `1_xml_tool/core/` 一定要跑 `node test_core.mjs` ——
+它會用真實範例檔驗證「載入 → 修改 → 匯出」位元組層級可還原。
