@@ -6,6 +6,8 @@
 ```
 BPM快速開發/
 ├── README.md              ← 本檔（專案地圖）
+├── AGENTS.md              ← AI agent 開發規範（規範本體）
+├── CLAUDE.md              ← 指向 AGENTS.md
 ├── samples/               ← 共用範例檔（.form / .bpmn，不進版控）
 │
 ├── 1_xml_tool/            ① 萃取表單與流程
