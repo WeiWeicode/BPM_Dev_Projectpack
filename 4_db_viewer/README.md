@@ -12,11 +12,31 @@
 
 ### 1. 後端
 
+**一般模式（預設唯讀）：**
+
 ```bash
 cd 4_db_viewer/backend
 pip install -r requirements.txt
 python -m uvicorn app.main:app --reload --port 8000
 ```
+
+**編輯模式（啟用權限寫入，需指定流程白名單）：**
+
+- **PowerShell (Windows)**:
+  ```powershell
+  $env:BPM_VIEWER_ENABLE_WRITE="1"; $env:BPM_VIEWER_WRITABLE_PROCESSES="流程ID"; python -m uvicorn app.main:app --reload --port 8000
+  ```
+    ```powershell
+  $env:BPM_VIEWER_ENABLE_WRITE="1"; $env:BPM_VIEWER_WRITABLE_PROCESSES="quickDevTestProcessImportWebTool"; python -m uvicorn app.main:app --reload --port 8000
+  ```
+- **Bash / Linux / macOS**:
+  ```bash
+  BPM_VIEWER_ENABLE_WRITE=1 BPM_VIEWER_WRITABLE_PROCESSES=流程ID python -m uvicorn app.main:app --reload --port 8000
+  ```
+- **CMD (Windows)**:
+  ```cmd
+  set BPM_VIEWER_ENABLE_WRITE=1&& set BPM_VIEWER_WRITABLE_PROCESSES=流程ID&& python -m uvicorn app.main:app --reload --port 8000
+  ```
 
 連線設定沿用 `3_db_explorer` 的 `.env`（本專案不另外存帳密）。
 啟動後 <http://127.0.0.1:8000/docs> 可看互動式 API 文件。
@@ -84,9 +104,14 @@ npm run build
 
 預設**完全關閉** —— 沒開旗標時寫入路由根本不會註冊。要啟用需同時給兩個環境變數：
 
-```bash
-BPM_VIEWER_ENABLE_WRITE=1 BPM_VIEWER_WRITABLE_PROCESSES=流程ID1,流程ID2 python -m uvicorn app.main:app --port 8000
-```
+- **PowerShell (Windows)**:
+  ```powershell
+  $env:BPM_VIEWER_ENABLE_WRITE="1"; $env:BPM_VIEWER_WRITABLE_PROCESSES="流程ID1,流程ID2"; python -m uvicorn app.main:app --port 8000
+  ```
+- **Bash / Linux / macOS**:
+  ```bash
+  BPM_VIEWER_ENABLE_WRITE=1 BPM_VIEWER_WRITABLE_PROCESSES=流程ID1,流程ID2 python -m uvicorn app.main:app --port 8000
+  ```
 
 白名單留空代表全部禁止 —— 就算開了旗標也不會誤傷。
 
