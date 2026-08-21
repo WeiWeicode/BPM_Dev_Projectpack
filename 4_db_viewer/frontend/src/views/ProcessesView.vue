@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, inject, ref, watch, type Ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { api, type ProcessDetail, type ProcessSummary } from '../api/client';
+import { activeHost, api, type ProcessDetail, type ProcessSummary } from '../api/client';
 import { useAsync } from '../composables/useAsync';
 import { downloadCsv } from '../composables/useCsv';
 import EntityList from '../components/EntityList.vue';
@@ -20,6 +20,9 @@ const detail = useAsync<ProcessDetail>();
 const highlighted = ref('');
 
 list.run(() => api.listProcesses());
+
+// 切換資料庫主機後整份清單都要重撈
+watch(activeHost, () => list.run(() => api.listProcesses()));
 
 const items = computed(() => {
   const low = keyword.value.trim().toLowerCase();

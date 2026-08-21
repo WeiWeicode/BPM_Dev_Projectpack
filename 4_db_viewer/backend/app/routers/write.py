@@ -24,22 +24,23 @@ def _guard(func, *args):
 
 @router.post('/processes/{process_id}/activities/{activity_id}/permissions/preview',
              response_model=PermissionPreview)
-def preview_permissions(process_id: str, activity_id: str, body: PermissionRequest):
+def preview_permissions(process_id: str, activity_id: str,
+                        body: PermissionRequest, host: str = ''):
     """回傳 舊值 → 新值 的差異與套用 token，不寫入任何東西。"""
     items = [item.model_dump() for item in body.items]
-    return _guard(writer.preview, process_id, activity_id, items)
+    return _guard(writer.preview, process_id, activity_id, items, host)
 
 
 @router.patch('/processes/{process_id}/activities/{activity_id}/permissions',
               response_model=PermissionApplyResult)
 def apply_permissions(process_id: str, activity_id: str, body: PermissionRequest,
-                      request: Request):
+                      request: Request, host: str = ''):
     """實際套用。token 必填且必須來自 preview。"""
     if not body.token:
         raise HTTPException(400, '缺少 token，請先呼叫 preview')
     items = [item.model_dump() for item in body.items]
     actor = request.client.host if request.client else ''
-    return _guard(writer.apply, process_id, activity_id, items, body.token, actor)
+    return _guard(writer.apply, process_id, activity_id, items, body.token, actor, host)
 
 
 @router.get('/write/backups', response_model=list[BackupEntry])
@@ -48,5 +49,5 @@ def list_backups():
 
 
 @router.post('/write/restore/{backup_id}', response_model=RestoreResult)
-def restore_backup(backup_id: str):
-    return _guard(writer.restore, backup_id)
+def restore_backup(backup_id: str, host: str = ''):
+    return _guard(writer.restore, backup_id, host)

@@ -2,7 +2,7 @@
 import { computed, inject, ref, watch, type Ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import {
-  api, PERMISSION_LABELS, WRITABLE_VALUES,
+  activeHost, api, PERMISSION_LABELS, WRITABLE_VALUES,
   type Health, type Matrix, type MatrixRow, type PermissionChange,
   type PermissionItem, type ProcessSummary, type WritablePermission,
 } from '../api/client';
@@ -40,9 +40,9 @@ const lastBackupId = ref('');
 
 const processId = computed(() => String(route.params.id ?? ''));
 
-// 後端沒開旗標、或這支流程不在白名單，就完全不顯示編輯功能
+// 旗標沒開、目前主機不允許寫入（例如正式區）、或流程不在白名單 -> 不顯示編輯功能
 const canWrite = computed(() =>
-  Boolean(health.value?.write_enabled)
+  Boolean(health.value?.write_allowed_here)
   && (health.value?.writable_processes ?? []).includes(processId.value));
 
 const items = computed(() => {
@@ -54,6 +54,14 @@ const items = computed(() => {
 });
 
 list.run(() => api.listProcesses());
+
+// 切換資料庫主機後清單與矩陣都要重撈，編輯狀態一律作廢
+watch(activeHost, () => {
+  resetEditing();
+  editing.value = false;
+  list.run(() => api.listProcesses());
+  load();
+});
 
 const columns = computed(() => matrix.data.value?.columns ?? []);
 

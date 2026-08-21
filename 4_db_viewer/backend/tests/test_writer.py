@@ -116,6 +116,28 @@ def test_locate_rejects_process_outside_whitelist(monkeypatch):
         writer._locate('some_other_process', 'ACT_1')
 
 
+def test_locate_rejects_production_host(monkeypatch):
+    """就算旗標開了、流程也在白名單，切到正式區仍必須被擋下。"""
+    monkeypatch.setattr(settings, 'ENABLE_WRITE', True)
+    monkeypatch.setattr(settings, 'WRITABLE_PROCESSES', ('P1',))
+    with pytest.raises(writer.WriteError, match='不允許寫入'):
+        writer._locate('P1', 'ACT_1', host='190')
+
+
+def test_production_host_not_writable_by_default():
+    """預設白名單只含非正式區 —— 這個測試若失敗代表有人放寬了預設值。"""
+    if os.environ.get('BPM_VIEWER_WRITABLE_HOSTS'):
+        pytest.skip('本次執行自訂了可寫主機清單')
+    for key, _label, _address, production in settings.HOSTS:
+        assert settings.host_writable(key) is not production
+
+
+def test_restore_rejects_production_host(monkeypatch):
+    monkeypatch.setattr(settings, 'ENABLE_WRITE', True)
+    with pytest.raises(writer.WriteError, match='不允許寫入'):
+        writer.restore('whatever', host='190')
+
+
 def test_allowed_values_exclude_invalidity():
     """INVALIDITY 在 20000 筆取樣中從未出現，格式未知，不可支援。"""
     assert 'INVALIDITY' not in writer.ALLOWED_VALUES
@@ -124,9 +146,10 @@ def test_allowed_values_exclude_invalidity():
 
 def test_preview_rejects_unknown_permission(monkeypatch):
     monkeypatch.setattr(writer, '_locate',
-                        lambda p, a: {'process_id': p, 'activity_id': a,
-                                      'activity_name': '', 'perm_oid': 'x',
-                                      'ctl': CTL, 'object_version': 1})
+                        lambda p, a, host=None: {'host': '191', 'process_id': p,
+                                                 'activity_id': a, 'activity_name': '',
+                                                 'perm_oid': 'x', 'ctl': CTL,
+                                                 'object_version': 1})
     with pytest.raises(writer.WriteError, match='不支援的權限值'):
         writer.preview('p', 'a', [{'id': 'TEST_Button_06', 'permission': 'READ_ONLY'}])
 

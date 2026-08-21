@@ -216,3 +216,19 @@ th .sort {
   color: var(--text-dim); font-size: 12px; font-weight: 600;
 }
 th .sort:hover { color: var(--accent); text-decoration: underline; }
+
+/* ---------------------------------------------------------------- 主機切換 */
+.host-select {
+  padding: 4px 10px; border: 1px solid var(--border-strong);
+  border-radius: 999px; background: var(--panel); color: var(--text);
+  font-size: 12px; max-width: 220px;
+}
+.host-select:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+/* 正式區用紅框，避免看錯資料來源 */
+.host-select.production {
+  border-color: var(--danger); color: var(--danger); font-weight: 600;
+}
+.header .prod-flag {
+  padding: 2px 8px; border-radius: 999px;
+  background: var(--danger); color: #fff; font-size: 12px; font-weight: 700;
+}

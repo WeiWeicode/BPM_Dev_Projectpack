@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, inject, ref, watch, type Ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { api, type FormDetail, type FormSummary, type FormUsage } from '../api/client';
+import { activeHost, api, type FormDetail, type FormSummary, type FormUsage }
+  from '../api/client';
 import { useAsync } from '../composables/useAsync';
 import { downloadCsv } from '../composables/useCsv';
 import EntityList from '../components/EntityList.vue';
@@ -18,6 +19,9 @@ const usage = useAsync<FormUsage[]>();
 const highlighted = ref('');
 
 list.run(() => api.listForms());
+
+// 切換資料庫主機後整份清單都要重撈
+watch(activeHost, () => list.run(() => api.listForms()));
 
 const items = computed(() => {
   const low = keyword.value.trim().toLowerCase();

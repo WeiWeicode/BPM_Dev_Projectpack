@@ -4,18 +4,22 @@
 一律唯讀，且只取已發佈（RELEASED）的最新版 —— 檢視器要呈現的是線上現況，
 修訂中的版本會造成誤導。
 
+主機由每個請求的 host 參數決定（見 settings.HOSTS），不存伺服器端狀態，
+多人同時看不同主機也不會互相干擾。快取 key 一律帶主機前綴。
+
 效能上最需要注意的是 formFieldAccessControl 這個 ntext 欄位：
 全部撈出來是 860 MB / 55 秒，但表單 ID 就寫在字串開頭，
 只取前 200 字元建索引是 0.44 MB / 0.4 秒（見 _usage_index）。
 """
 
+import os
 import re
 
 from . import cache, settings
 
 settings.ensure_bpm_kb()
 
-from bpm_kb import extract, process_graph  # noqa: E402
+from bpm_kb import config, extract, process_graph  # noqa: E402
 from bpm_kb.db import Database, big_text  # noqa: E402
 
 # formFieldAccessControl 開頭：<FormFieldAccessControl><表單ID>
@@ -37,22 +41,52 @@ def _clean(value):
     return (value or '').strip() if isinstance(value, str) else value
 
 
+# ---------------------------------------------------------------- 主機
+
+def db_settings(host=None):
+    """把 .env 的設定套上指定主機的位址與（選填的）專屬帳密。"""
+    entry = settings.host_entry(host or settings.DEFAULT_HOST)
+    values = dict(config.load())
+    values['BPM_DB_HOST'] = entry[2]
+    # 正式區帳密通常與測試區不同，可用 BPM_DB_USER_190 / BPM_DB_PASSWORD_190 覆寫
+    for field in ('BPM_DB_USER', 'BPM_DB_PASSWORD', 'BPM_DB_NAME'):
+        override = os.environ.get('%s_%s' % (field, entry[0]))
+        if override:
+            values[field] = override
+    return values
+
+
+def connect(host=None):
+    return Database(db_settings(host))
+
+
+def _key(host, name):
+    """快取 key 一律帶主機，避免兩台的資料互相污染。"""
+    return '%s:%s' % (host or settings.DEFAULT_HOST, name)
+
+
+def host_list():
+    return [{'key': key, 'label': label, 'address': address,
+             'production': production, 'writable': settings.host_writable(key)}
+            for key, label, address, production in settings.HOSTS]
+
+
 # ---------------------------------------------------------------- 基礎清單
 
-def _form_rows():
+def _form_rows(host=None):
     """已發佈表單的最新版（中繼資料，不含 XML）。"""
     def produce():
-        with Database() as database:
+        with connect(host) as database:
             return extract.list_forms(database, latest_only=True, released_only=True)
-    return cache.get_or_set('form_rows', produce)
+    return cache.get_or_set(_key(host, 'form_rows'), produce)
 
 
-def _process_rows():
+def _process_rows(host=None):
     """已發佈流程的最新版（中繼資料，不含 XML）。"""
     def produce():
-        with Database() as database:
+        with connect(host) as database:
             return extract.list_processes(database, latest_only=True, released_only=True)
-    return cache.get_or_set('process_rows', produce)
+    return cache.get_or_set(_key(host, 'process_rows'), produce)
 
 
 def _find(rows, key, value):
@@ -96,47 +130,53 @@ def _page(items, limit, offset):
 
 # ---------------------------------------------------------------- 對外查詢
 
-def health():
+def health(host=None):
+    entry = settings.host_entry(host or settings.DEFAULT_HOST)
+    base = {
+        'host': entry[0], 'host_label': entry[1], 'production': entry[3],
+        'hosts': host_list(),
+        'write_enabled': settings.ENABLE_WRITE,
+        'write_allowed_here': settings.ENABLE_WRITE and settings.host_writable(entry[0]),
+        'writable_processes': list(settings.WRITABLE_PROCESSES),
+        'cache': cache.stats(),
+    }
     try:
-        with Database() as database:
+        values = db_settings(host)
+        with Database(values) as database:
             version = database.scalar('SELECT @@VERSION') or ''
             name = database.scalar('SELECT DB_NAME()') or ''
-        from bpm_kb import config
-        return {'ok': True, 'database': name, 'connection': config.describe(),
-                'server_version': version.splitlines()[0].strip(),
-                'cache': cache.stats(),
-                'write_enabled': settings.ENABLE_WRITE,
-                'writable_processes': list(settings.WRITABLE_PROCESSES)}
+        base.update({'ok': True, 'database': name, 'connection': config.describe(values),
+                     'server_version': version.splitlines()[0].strip()})
     except Exception as exc:                     # 連線失敗要如實回報，不假裝成功
-        return {'ok': False, 'error': str(exc), 'cache': cache.stats(),
-                'write_enabled': settings.ENABLE_WRITE,
-                'writable_processes': list(settings.WRITABLE_PROCESSES)}
+        base.update({'ok': False, 'error': str(exc)})
+    return base
 
 
-def list_forms(keyword='', limit=None, offset=0):
-    rows = [r for r in _form_rows() if _match(r, keyword, ('id', 'formDefinitionName'))]
+def list_forms(keyword='', limit=None, offset=0, host=None):
+    rows = [r for r in _form_rows(host)
+            if _match(r, keyword, ('id', 'formDefinitionName'))]
     page, total = _page(rows, limit, offset)
     return [_form_summary(r) for r in page], total
 
 
-def list_processes(keyword='', limit=None, offset=0):
-    rows = [r for r in _process_rows()
+def list_processes(keyword='', limit=None, offset=0, host=None):
+    rows = [r for r in _process_rows(host)
             if _match(r, keyword, ('id', 'processPackageName'))]
     page, total = _page(rows, limit, offset)
     return [_process_summary(r) for r in page], total
 
 
-def get_form(form_id):
+def get_form(form_id, host=None):
     """單一表單的元件明細：id / name / type。解析 XML，故有快取。"""
-    row = _find(_form_rows(), 'id', form_id)
+    row = _find(_form_rows(host), 'id', form_id)
     if row is None:
         return None
 
     def produce():
-        with Database() as database:
+        with connect(host) as database:
             return extract.parse_form(database, row)
 
-    parsed = cache.get_or_set('form:%s' % form_id, produce)
+    parsed = cache.get_or_set(_key(host, 'form:%s' % form_id), produce)
     summary = _form_summary(row)
     fields = [{'id': f['id'], 'name': f['name'], 'type': f['type']}
               for f in parsed.get('fields', [])]
@@ -145,19 +185,19 @@ def get_form(form_id):
     return summary
 
 
-def _usage_index():
+def _usage_index(host=None):
     """{表單ID: [{container_oid, activity_id, activity_name}, ...]}。
 
     只取控制字串前 200 字元 —— 表單 ID 就在開頭，不需要整份 ntext。
     """
     def produce():
-        rows = _process_rows()
+        rows = _process_rows(host)
         oids = [r['processDefinitionOID'] for r in rows if r.get('processDefinitionOID')]
         if not oids:
             return {}
         placeholders = ','.join('?' for _ in oids)
         sql = USAGE_SQL % (big_text('fa.formFieldAccessControl'), HEAD_LEN, placeholders)
-        with Database() as database:
+        with connect(host) as database:
             hits = database.query(sql, tuple(oids))
         index = {}
         for hit in hits:
@@ -170,16 +210,16 @@ def _usage_index():
                 'activity_name': _clean(hit.get('activity_name')),
             })
         return index
-    return cache.get_or_set('usage_index', produce)
+    return cache.get_or_set(_key(host, 'usage_index'), produce)
 
 
-def get_form_usage(form_id):
+def get_form_usage(form_id, host=None):
     """這張表單被哪些流程的哪些關卡使用。"""
-    if _find(_form_rows(), 'id', form_id) is None:
+    if _find(_form_rows(host), 'id', form_id) is None:
         return None
-    by_oid = {_clean(r.get('processDefinitionOID')): r for r in _process_rows()}
+    by_oid = {_clean(r.get('processDefinitionOID')): r for r in _process_rows(host)}
     usages = []
-    for entry in _usage_index().get(form_id, []):
+    for entry in _usage_index(host).get(form_id, []):
         row = by_oid.get(entry['container_oid'])
         if row is None:
             continue
@@ -194,27 +234,27 @@ def get_form_usage(form_id):
     return usages
 
 
-def _graph(process_id):
+def _graph(process_id, host=None):
     """流程的完整結構，含表單型別 join。"""
-    row = _find(_process_rows(), 'id', process_id)
+    row = _find(_process_rows(host), 'id', process_id)
     if row is None:
         return None
 
     def produce():
-        with Database() as database:
+        with connect(host) as database:
             plain = process_graph.build(database, row)
             form_ids = {a['formId'] for a in plain.get('activities', []) if a['formId']}
             index = extract.form_index(database, form_ids) if form_ids else {}
             return process_graph.build(database, row, index)
 
-    return cache.get_or_set('process:%s' % process_id, produce)
+    return cache.get_or_set(_key(host, 'process:%s' % process_id), produce)
 
 
-def get_process(process_id):
-    graph = _graph(process_id)
+def get_process(process_id, host=None):
+    graph = _graph(process_id, host)
     if graph is None:
         return None
-    row = _find(_process_rows(), 'id', process_id)
+    row = _find(_process_rows(host), 'id', process_id)
     detail = _process_summary(row)
     detail['activities'] = [{
         'id': a['id'],
@@ -233,19 +273,20 @@ def get_process(process_id):
     return detail
 
 
-def _form_indexes(form_ids):
+def _form_indexes(form_ids, host=None):
     """取多張表單的 {元件ID: {name, type}}，有快取。"""
     if not form_ids:
         return {}
 
     def produce():
-        with Database() as database:
+        with connect(host) as database:
             return extract.form_index(database, form_ids)
 
-    return cache.get_or_set('form_index:%s' % ','.join(sorted(form_ids)), produce)
+    return cache.get_or_set(_key(host, 'form_index:%s' % ','.join(sorted(form_ids))),
+                            produce)
 
 
-def get_matrix(process_id, only='all'):
+def get_matrix(process_id, only='all', host=None):
     """關卡 × 元件的權限矩陣。
 
     columns 收錄**所有掛了表單的關卡**，即使它一項權限都沒設 ——
@@ -254,11 +295,11 @@ def get_matrix(process_id, only='all'):
 
     rows 以**表單定義**為準，不是以既有權限為準，這樣未設定的元件也看得到、改得動。
     """
-    detail = get_process(process_id)
+    detail = get_process(process_id, host)
     if detail is None:
         return None
     columns = [a for a in detail['activities'] if a['form_id']]
-    indexes = _form_indexes({a['form_id'] for a in columns})
+    indexes = _form_indexes({a['form_id'] for a in columns}, host)
 
     # 依表單定義順序建立列；同一流程可能有多張表單，依 columns 出現順序串接
     order, meta = [], {}
@@ -303,24 +344,24 @@ def get_matrix(process_id, only='all'):
             'version': detail['version'], 'columns': columns, 'rows': rows}
 
 
-def search(query, limit=50, include_fields=False):
+def search(query, limit=50, include_fields=False, host=None):
     """全域搜尋：表單、流程、關卡；include_fields 才會掃元件（需解析所有表單 XML）。"""
     low = (query or '').strip().lower()
     if len(low) < 2:
         return {'query': query, 'hits': [], 'truncated': False}
 
     hits = []
-    for row in _form_rows():
+    for row in _form_rows(host):
         if _match(row, low, ('id', 'formDefinitionName')):
             hits.append({'kind': 'form', 'id': _clean(row.get('id')),
                          'name': _clean(row.get('formDefinitionName'))})
-    for row in _process_rows():
+    for row in _process_rows(host):
         if _match(row, low, ('id', 'processPackageName')):
             hits.append({'kind': 'process', 'id': _clean(row.get('id')),
                          'name': _clean(row.get('processPackageName'))})
 
-    by_oid = {_clean(r.get('processDefinitionOID')): r for r in _process_rows()}
-    for form_id, entries in _usage_index().items():
+    by_oid = {_clean(r.get('processDefinitionOID')): r for r in _process_rows(host)}
+    for _form_id, entries in _usage_index(host).items():
         for entry in entries:
             if low not in entry['activity_id'].lower() \
                     and low not in entry['activity_name'].lower():
@@ -334,18 +375,18 @@ def search(query, limit=50, include_fields=False):
                          'parent_name': _clean(row.get('processPackageName'))})
 
     if include_fields:
-        hits.extend(_search_fields(low))
+        hits.extend(_search_fields(low, host))
 
     truncated = len(hits) > limit
     return {'query': query, 'hits': hits[:limit], 'truncated': truncated}
 
 
-def _search_fields(low):
+def _search_fields(low, host=None):
     """掃所有已發佈表單的元件。第一次要解析全部 XML，很慢，故預設不啟用。"""
     def produce():
-        rows = _form_rows()
+        rows = _form_rows(host)
         table = []
-        with Database() as database:
+        with connect(host) as database:
             for row in rows:
                 parsed = extract.parse_form(database, row)
                 form_id = _clean(row.get('id'))
@@ -354,7 +395,7 @@ def _search_fields(low):
                                   field['id'], field['name']))
         return table
 
-    table = cache.get_or_set('field_table', produce)
+    table = cache.get_or_set(_key(host, 'field_table'), produce)
     return [{'kind': 'form_field', 'id': fid, 'name': fname,
              'parent_id': form_id, 'parent_name': form_name}
             for form_id, form_name, fid, fname in table

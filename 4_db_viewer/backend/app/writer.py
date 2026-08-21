@@ -25,7 +25,7 @@ from . import cache, service, settings
 settings.ensure_bpm_kb()
 
 from bpm_kb import config, extract  # noqa: E402
-from bpm_kb.db import Database, big_text  # noqa: E402
+from bpm_kb.db import big_text  # noqa: E402
 
 # DISABLE 代表移除該元件的權限設定，BPM 設計師會顯示成「唯讀(Disable)」
 REMOVE = 'DISABLE'
@@ -53,24 +53,30 @@ class WriteError(Exception):
 
 # ---------------------------------------------------------------- 定位
 
-def _process_row(process_id):
-    row = service._find(service._process_rows(), 'id', process_id)
+def _process_row(process_id, host=None):
+    row = service._find(service._process_rows(host), 'id', process_id)
     if row is None:
         raise WriteError('找不到已發佈的流程：%s' % process_id)
     return row
 
 
-def _locate(process_id, activity_id):
+def _locate(process_id, activity_id, host=None):
     """找出關卡與它的權限定義列，並跑完所有前置檢查。"""
     if not settings.ENABLE_WRITE:
         raise WriteError('寫入功能未啟用（需設定 BPM_VIEWER_ENABLE_WRITE=1）')
+
+    entry = settings.host_entry(host or settings.DEFAULT_HOST)
+    if not settings.host_writable(entry[0]):
+        # 正式區預設不在 WRITABLE_HOSTS 中，切過去就寫不下去
+        raise WriteError('主機 %s（%s）不允許寫入' % (entry[1], entry[2]))
+
     if process_id not in settings.WRITABLE_PROCESSES:
         raise WriteError('流程 %s 不在寫入白名單中（BPM_VIEWER_WRITABLE_PROCESSES）'
                          % process_id)
 
-    row = _process_row(process_id)
+    row = _process_row(process_id, host)
     container_oid = (row.get('processDefinitionOID') or '').strip()
-    with Database() as database:
+    with service.connect(host) as database:
         found = database.query(ACTIVITY_SQL, (container_oid, activity_id))
     if not found:
         raise WriteError('流程 %s 中找不到關卡 %s' % (process_id, activity_id))
@@ -80,18 +86,19 @@ def _locate(process_id, activity_id):
     if not perm_oid:
         raise WriteError('關卡 %s 沒有權限定義列，代表它未掛表單' % activity_id)
 
-    with Database() as database:
+    with service.connect(host) as database:
         shared = database.scalar(SHARE_SQL, (perm_oid,))
     if shared != 1:
         # 線上最多有一列被 24765 個關卡共用，改下去就是災難
         raise WriteError('這筆權限定義被 %d 個關卡共用，拒絕修改（只允許 1:1）' % shared)
 
-    with Database() as database:
+    with service.connect(host) as database:
         rows = database.query(READ_SQL, (perm_oid,))
     if not rows:
         raise WriteError('讀不到權限定義列 %s' % perm_oid)
 
     return {
+        'host': entry[0],
         'process_id': process_id,
         'activity_id': (activity['activity_id'] or '').strip(),
         'activity_name': (activity['activity_name'] or '').strip(),
@@ -142,15 +149,15 @@ def _token(ctl):
 
 # ---------------------------------------------------------------- 預覽
 
-def preview(process_id, activity_id, items):
+def preview(process_id, activity_id, items, host=None):
     """回傳每個元件的 舊值 → 新值，以及套用所需的 token。不寫入任何東西。"""
-    located = _locate(process_id, activity_id)
+    located = _locate(process_id, activity_id, host)
     ctl = located['ctl']
     form_id = _form_id(ctl)
 
     known = {}
     if form_id:
-        with Database() as database:
+        with service.connect(host) as database:
             known = extract.form_index(database, {form_id}).get(form_id, {})
 
     changes, new_ctl = [], ctl
@@ -179,6 +186,7 @@ def preview(process_id, activity_id, items):
         })
 
     return {
+        'host': located['host'],
         'process_id': process_id,
         'activity_id': located['activity_id'],
         'activity_name': located['activity_name'],
@@ -214,13 +222,14 @@ def _audit(entry):
         fh.write(json.dumps(entry, ensure_ascii=False, default=str) + '\n')
 
 
-def _writable_connection():
+def _writable_connection(host=None):
     """唯一一條可寫連線。刻意不與 bpm_kb.Database 共用。"""
     import pyodbc
-    return pyodbc.connect(config.connection_string(), timeout=15)
+    return pyodbc.connect(config.connection_string(service.db_settings(host)),
+                          timeout=15)
 
 
-def _update(perm_oid, new_ctl, bump_from=None):
+def _update(perm_oid, new_ctl, bump_from=None, host=None):
     """單筆 UPDATE；rowcount 不是 1 一律 rollback。"""
     sql = 'UPDATE FormFieldAccessDefinition SET formFieldAccessControl = ?'
     params = [new_ctl]
@@ -230,7 +239,7 @@ def _update(perm_oid, new_ctl, bump_from=None):
     sql += ' WHERE OID = ?'
     params.append(perm_oid)
 
-    connection = _writable_connection()
+    connection = _writable_connection(host)
     try:
         cursor = connection.cursor()
         cursor.execute(sql, tuple(params))
@@ -245,14 +254,14 @@ def _update(perm_oid, new_ctl, bump_from=None):
 
 # ---------------------------------------------------------------- 套用
 
-def apply(process_id, activity_id, items, token, actor=''):
+def apply(process_id, activity_id, items, token, actor='', host=None):
     """實際寫入。token 必須來自 preview，且期間內容未被他人改動。"""
-    located = _locate(process_id, activity_id)
+    located = _locate(process_id, activity_id, host)
     ctl = located['ctl']
     if token != _token(ctl):
         raise WriteError('資料已被其他人改動，請重新預覽後再套用')
 
-    result = preview(process_id, activity_id, items)
+    result = preview(process_id, activity_id, items, host)
     if not result['changed_count']:
         return {'applied': False, 'reason': '沒有任何實際變更', 'backup_id': '',
                 'changes': result['changes']}
@@ -265,18 +274,19 @@ def apply(process_id, activity_id, items, token, actor=''):
     backup_id, backup_path = _backup(located['perm_oid'], ctl)
 
     bump_from = located['object_version'] if settings.BUMP_OBJECT_VERSION else None
-    _update(located['perm_oid'], new_ctl, bump_from)
+    _update(located['perm_oid'], new_ctl, bump_from, host)
 
     # 寫後回讀：不一致就用備份還原，絕不假裝成功
-    with Database() as database:
+    with service.connect(host) as database:
         after = database.query(READ_SQL, (located['perm_oid'],))[0]['ctl']
     if after != new_ctl:
-        _update(located['perm_oid'], ctl)
+        _update(located['perm_oid'], ctl, None, host)
         raise WriteError('寫入後回讀內容不一致，已用備份還原（備份 %s）' % backup_id)
 
     _audit({
         'time': time.strftime('%Y-%m-%d %H:%M:%S'),
         'actor': actor,
+        'host': located['host'],
         'process_id': process_id,
         'activity_id': located['activity_id'],
         'perm_oid': located['perm_oid'],
@@ -312,10 +322,13 @@ def list_backups(limit=100):
     return entries
 
 
-def restore(backup_id):
+def restore(backup_id, host=None):
     """由備份還原。還原後同樣回讀比對。"""
     if not settings.ENABLE_WRITE:
         raise WriteError('寫入功能未啟用')
+    entry = settings.host_entry(host or settings.DEFAULT_HOST)
+    if not settings.host_writable(entry[0]):
+        raise WriteError('主機 %s（%s）不允許寫入' % (entry[1], entry[2]))
     path = os.path.join(settings.BACKUP_DIR, backup_id + '.xml')
     if not os.path.isfile(path):
         raise WriteError('找不到備份 %s' % backup_id)
@@ -324,18 +337,18 @@ def restore(backup_id):
     with io.open(path, encoding='utf-8', newline='') as fh:
         original = fh.read()
 
-    with Database() as database:
+    with service.connect(host) as database:
         shared = database.scalar(SHARE_SQL, (perm_oid,))
     if shared != 1:
         raise WriteError('這筆權限定義被 %d 個關卡共用，拒絕還原' % shared)
 
-    _update(perm_oid, original)
-    with Database() as database:
+    _update(perm_oid, original, None, host)
+    with service.connect(host) as database:
         after = database.query(READ_SQL, (perm_oid,))[0]['ctl']
     if after != original:
         raise WriteError('還原後回讀內容不一致')
 
     _audit({'time': time.strftime('%Y-%m-%d %H:%M:%S'), 'action': 'restore',
-            'perm_oid': perm_oid, 'backup_id': backup_id})
+            'host': entry[0], 'perm_oid': perm_oid, 'backup_id': backup_id})
     cache.clear()
     return {'restored': True, 'backup_id': backup_id, 'perm_oid': perm_oid}

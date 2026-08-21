@@ -115,8 +115,10 @@ def _fake_detail(empty_first=False):
 
 
 def _patch(monkeypatch, empty_first=False):
-    monkeypatch.setattr(service, 'get_process', lambda pid: _fake_detail(empty_first))
-    monkeypatch.setattr(service, '_form_indexes', lambda ids: FORM_INDEX)
+    monkeypatch.setattr(service, 'get_process',
+                        lambda pid, host=None: _fake_detail(empty_first))
+    monkeypatch.setattr(service, '_form_indexes',
+                        lambda ids, host=None: FORM_INDEX)
 
 
 def test_matrix_excludes_activities_without_a_form(monkeypatch):

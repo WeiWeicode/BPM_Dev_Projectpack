@@ -14,6 +14,14 @@ from pydantic import BaseModel, Field
 Permission = Literal['ENABLED', 'INVISIBLE', 'FULL_CONTROL']
 
 
+class HostOption(BaseModel):
+    key: str
+    label: str
+    address: str
+    production: bool = False      # 正式區，UI 要顯著標示
+    writable: bool = False        # 是否允許寫入
+
+
 class Health(BaseModel):
     ok: bool
     database: str = ''
@@ -21,7 +29,12 @@ class Health(BaseModel):
     server_version: str = ''
     cache: dict = {}
     error: str = ''
-    write_enabled: bool = False   # 寫入旗標是否開啟
+    host: str = ''
+    host_label: str = ''
+    production: bool = False
+    hosts: list[HostOption] = []
+    write_enabled: bool = False        # 寫入旗標是否開啟
+    write_allowed_here: bool = False   # 旗標開啟「且」目前主機允許寫入
     writable_processes: list[str] = []
 
 
@@ -156,6 +169,7 @@ class PermissionChange(BaseModel):
 
 
 class PermissionPreview(BaseModel):
+    host: str = ''
     process_id: str
     activity_id: str
     activity_name: str = ''

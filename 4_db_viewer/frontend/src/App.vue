@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { onMounted, provide, ref } from 'vue';
-import { api, type Health } from './api/client';
+import { useRoute, useRouter } from 'vue-router';
+import { activeHost, api, setActiveHost, type Health } from './api/client';
 
+const route = useRoute();
+const router = useRouter();
 const health = ref<Health | null>(null);
 const keyword = ref('');
 const toast = ref('');
@@ -15,20 +18,41 @@ function showToast(message: string) {
 }
 provide('showToast', showToast);
 
-onMounted(async () => {
+async function loadHealth() {
   try {
     health.value = await api.health();
+    // 首次進站沒有選過主機，就採用後端的預設值
+    if (!activeHost.value && health.value?.host) setActiveHost(health.value.host);
   } catch {
     health.value = { ok: false, error: '無法連線到後端' } as Health;
   }
-});
+}
+
+/** 切換主機：清掉選定的項目，回到清單首頁重新載入。 */
+function switchHost(key: string) {
+  if (key === activeHost.value) return;
+  setActiveHost(key);
+  loadHealth();
+  router.replace(`/${String(route.name ?? 'forms')}`);
+}
+
+onMounted(loadHealth);
 </script>
 
 <template>
   <div class="app">
     <header class="header">
       <h1>BPM 線上結構檢視器</h1>
-      <span v-if="health?.write_enabled" class="writable"
+      <select v-if="(health?.hosts ?? []).length" class="host-select"
+              :class="{ production: health?.production }"
+              :value="health?.host"
+              @change="switchHost(($event.target as HTMLSelectElement).value)">
+        <option v-for="option in health?.hosts ?? []" :key="option.key" :value="option.key">
+          {{ option.label }}（{{ option.address }}）
+        </option>
+      </select>
+      <span v-if="health?.production" class="prod-flag">正式區</span>
+      <span v-if="health?.write_allowed_here" class="writable"
             :title="`可寫入的流程：${(health.writable_processes ?? []).join('、') || '（白名單為空，全部禁止）'}`">
         可編輯
       </span>

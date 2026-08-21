@@ -1,4 +1,5 @@
 // API 呼叫封裝。型別全部來自 types.ts（由後端 OpenAPI 產生，勿手改）。
+import { ref } from 'vue';
 import type { components } from './types';
 
 type Schemas = components['schemas'];
@@ -16,6 +17,7 @@ export type MatrixRow = Schemas['MatrixRow'];
 export type Health = Schemas['Health'];
 export type SearchResult = Schemas['SearchResult'];
 export type SearchHit = Schemas['SearchHit'];
+export type HostOption = Schemas['HostOption'];
 export type Permission = NonNullable<ActivityPermission['permission']>;
 
 export type PermissionItem = Schemas['PermissionItem'];
@@ -37,6 +39,19 @@ export const PERMISSION_LABELS: Record<string, string> = {
   DISABLE: '唯讀(Disable)',
 };
 
+/**
+ * 目前選定的資料庫主機。所有請求都會自動帶上，後端無伺服器端狀態，
+ * 兩台的快取也各自獨立。存進 localStorage 讓重新整理後保持選擇。
+ */
+const HOST_STORAGE_KEY = 'bpm-viewer-host';
+export const activeHost = ref<string>(
+  window.localStorage.getItem(HOST_STORAGE_KEY) ?? '');
+
+export function setActiveHost(key: string) {
+  activeHost.value = key;
+  window.localStorage.setItem(HOST_STORAGE_KEY, key);
+}
+
 export class ApiError extends Error {
   constructor(message: string, readonly status: number) {
     super(message);
@@ -52,6 +67,7 @@ interface RequestOptions {
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { params, method = 'GET', body } = options;
   const url = new URL(path, window.location.origin);
+  if (activeHost.value) url.searchParams.set('host', activeHost.value);
   for (const [key, value] of Object.entries(params ?? {})) {
     if (value !== undefined && value !== null && value !== '') {
       url.searchParams.set(key, String(value));

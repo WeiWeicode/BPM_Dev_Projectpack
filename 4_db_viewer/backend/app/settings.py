@@ -24,6 +24,44 @@ MAX_LIMIT = 1000
 # 開發時 Vite dev server 的來源，正式部署由後端直接吐靜態檔不需要 CORS
 DEV_ORIGINS = ['http://localhost:5173', 'http://127.0.0.1:5173']
 
+# ---------------------------------------------------------------- 資料庫主機
+# 可切換的主機。key 會出現在 API 的 host 參數與前端下拉中。
+# 用 BPM_VIEWER_HOSTS 覆寫，格式：key|標籤|位址|是否正式區，多筆以逗號分隔
+DEFAULT_HOSTS = [
+    ('191', 'BPM 191 測試區', '10.10.130.191', False),
+    ('190', 'BPM 190 正式區', '10.10.130.190', True),
+]
+
+
+def _parse_hosts():
+    raw = os.environ.get('BPM_VIEWER_HOSTS') or ''
+    if not raw:
+        return list(DEFAULT_HOSTS)
+    hosts = []
+    for chunk in raw.split(','):
+        parts = [p.strip() for p in chunk.split('|')]
+        if len(parts) < 3 or not parts[0]:
+            continue
+        production = len(parts) > 3 and parts[3].lower() in ('1', 'true', 'yes')
+        hosts.append((parts[0], parts[1] or parts[0], parts[2], production))
+    return hosts or list(DEFAULT_HOSTS)
+
+
+HOSTS = _parse_hosts()
+HOST_KEYS = tuple(h[0] for h in HOSTS)
+DEFAULT_HOST = os.environ.get('BPM_VIEWER_DEFAULT_HOST') or (HOST_KEYS[0] if HOST_KEYS else '')
+
+
+def host_entry(key):
+    """回傳 (key, 標籤, 位址, 是否正式區)；找不到就用預設主機。"""
+    for entry in HOSTS:
+        if entry[0] == key:
+            return entry
+    for entry in HOSTS:
+        if entry[0] == DEFAULT_HOST:
+            return entry
+    return HOSTS[0]
+
 # ---------------------------------------------------------------- 寫入功能
 # 預設關閉。沒開時連寫入路由都不會註冊，不是靠檢查擋。
 ENABLE_WRITE = (os.environ.get('BPM_VIEWER_ENABLE_WRITE') or '').lower() \
@@ -33,6 +71,15 @@ ENABLE_WRITE = (os.environ.get('BPM_VIEWER_ENABLE_WRITE') or '').lower() \
 WRITABLE_PROCESSES = tuple(
     p.strip() for p in (os.environ.get('BPM_VIEWER_WRITABLE_PROCESSES') or '').split(',')
     if p.strip())
+
+# 允許寫入的主機。預設只有非正式區 —— 就算開了旗標，切到正式區也寫不下去。
+WRITABLE_HOSTS = tuple(
+    h.strip() for h in (os.environ.get('BPM_VIEWER_WRITABLE_HOSTS') or '').split(',')
+    if h.strip()) or tuple(h[0] for h in HOSTS if not h[3])
+
+
+def host_writable(key):
+    return key in WRITABLE_HOSTS
 
 # 是否連帶遞增 objectVersion。實測未驗證其影響，故預設不動 ——
 # 我們唯一驗證過的組合是「不動 objectVersion」，設計師能正常讀到改動。
