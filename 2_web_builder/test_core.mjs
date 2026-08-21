@@ -3,12 +3,22 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const DIR = path.dirname(decodeURIComponent(new URL(import.meta.url).pathname).replace(/^\/(?=[A-Za-z]:)/, ''));
+// 範例檔集中在 repo 根目錄的 samples/，與 1_xml_tool 共用
+const SAMPLES = path.join(DIR, '..', 'samples');
+
+// 範例檔改名時只需改這裡
+const SAMPLE = {
+  bpmnWithPerm: '已完成匯入_測試快速開發-欄位權限.bpmn',  // 已設權限，引用 quickDevTestFormImport
+  formRenamed:  '已完成匯入_quickDevTestForm.form',      // 已套用命名規範的表單
+  bpmnOriginal: '原檔案-測試快速開發.bpmn',                // 設計師原始匯出
+  formOriginal: '原檔案-quickDevTestForm.form',           // 未改 ID 的表單
+};
 const html = fs.readFileSync(path.join(DIR, 'index.html'), 'utf8');
 const core = html.split('// ==== CORE START ====')[1].split('// ==== CORE END ====')[0];
 const Core = new Function(core + '\nreturn Core;')();
 
 const readXml = (f) => {
-  let b = fs.readFileSync(path.join(DIR, f));
+  let b = fs.readFileSync(path.join(SAMPLES, f));
   let bom = false;
   if (b[0] === 0xef && b[1] === 0xbb && b[2] === 0xbf) { bom = true; b = b.subarray(3); }
   return { text: b.toString('utf8'), bom };
@@ -20,8 +30,8 @@ const eq = (a, b, msg) => ok(a === b, msg + (a === b ? '' : `\n      實得: ${J
 
 // ---------------------------------------------------------------- 1. BPMN 解析
 console.log('\n[1] BPMN 解析');
-const src = readXml('測試快速開發-欄位權限.bpmn');
-const bpmn = Core.parseBpmn(src.text, '測試快速開發-欄位權限.bpmn');
+const src = readXml(SAMPLE.bpmnWithPerm);
+const bpmn = Core.parseBpmn(src.text, SAMPLE.bpmnWithPerm);
 eq(bpmn.processName, '測試快速開發', '流程名稱');
 eq(bpmn.activities.length, 6, '關卡數量');
 eq(bpmn.formRefs.length, 1, 'FormType 引用數量');
@@ -54,8 +64,8 @@ eq(Core.getGroup(A.ACT_CreateForm_06, 'quickDevTestFormImport', false).entries.g
 
 // ---------------------------------------------------------------- 3. FORM 解析
 console.log('\n[3] FORM 解析');
-const fsrc = readXml('已完成_quickDevTestForm.form');
-const form = Core.parseForm(fsrc.text, '已完成_quickDevTestForm.form');
+const fsrc = readXml(SAMPLE.formRenamed);
+const form = Core.parseForm(fsrc.text, SAMPLE.formRenamed);
 eq(form.formId, 'quickDevTestForm', 'formId');
 eq(form.formName, '快速開發測試', '表單中文名');
 eq(form.fields.length, 27, '元件總數');
@@ -181,7 +191,7 @@ ok(r6.text === src.text, '未載入 .form 時仍能位元組還原');
 
 // ---------------------------------------------------------------- 5. 其他 BPMN 檔相容性
 console.log('\n[5] 其他樣本檔相容性');
-for (const f of ['測試快速開發.bpmn', '已完成_測試快速開發.bpmn']) {
+for (const f of [SAMPLE.bpmnOriginal, SAMPLE.bpmnWithPerm]) {
   const s = readXml(f);
   const p = Core.parseBpmn(s.text, f);
   const t = Core.parseBpmn(s.text, f);
@@ -189,9 +199,9 @@ for (const f of ['測試快速開發.bpmn', '已完成_測試快速開發.bpmn']
   const r = Core.buildOutput(t, rank);
   ok(p.activities.length > 0 && r.text === s.text, `${f}：${p.activities.length} 關卡，回寫位元組不變`);
 }
-const qf = readXml('quickDevTestForm.form');
-const qform = Core.parseForm(qf.text, 'quickDevTestForm.form');
-eq(qform.fields.length, 27, 'quickDevTestForm.form 元件數');
+const qf = readXml(SAMPLE.formOriginal);
+const qform = Core.parseForm(qf.text, SAMPLE.formOriginal);
+eq(qform.fields.length, 27, `${SAMPLE.formOriginal} 元件數`);
 
 console.log(`\n${'='.repeat(50)}\n通過 ${pass} 項，失敗 ${fail} 項\n${'='.repeat(50)}`);
 process.exit(fail ? 1 : 0);

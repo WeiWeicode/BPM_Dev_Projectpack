@@ -1,7 +1,13 @@
-/*.form
-/*.bpmn
-/*.json
+# 範例檔含實際表單資料，不進版控
+/samples/*.form
+/samples/*.bpmn
+/samples/*.json
+
+# 連線帳密
 .env
-/out/
-/docs/schema/*.json
+
+# 從資料庫撈下來的產出
+/3_db_explorer/out/
+/3_db_explorer/docs/schema/*.json
+
 __pycache__/

@@ -11,11 +11,13 @@ import json
 import os
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+sys.path.insert(0, SCRIPT_DIR)
 
 from core import bpmn_handler, form_handler  # noqa: E402
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+# 待處理的 .form / .bpmn 放在 repo 根目錄的 samples/，與網頁工具共用同一份範例
+BASE_DIR = os.path.join(os.path.dirname(SCRIPT_DIR), 'samples')
 OUTPUT_PREFIX = '已完成_'
 LINE = '=' * 60
 

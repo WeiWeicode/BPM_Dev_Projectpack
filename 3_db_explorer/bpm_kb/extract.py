@@ -25,11 +25,11 @@ import os
 import re
 import sys
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from . import config, db  # noqa: E402
+
+sys.path.insert(0, config.XML_TOOL_DIR)
 
 from core import bpmn_handler, form_handler  # noqa: E402
-
-from . import config, db  # noqa: E402
 
 FORM_TABLE = 'FormDefinition'
 FORM_XML_COLUMN = 'defSerialize'

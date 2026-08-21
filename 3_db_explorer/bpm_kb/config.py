@@ -4,8 +4,16 @@
 import io
 import os
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ENV_PATH = os.path.join(BASE_DIR, '.env')
+PACKAGE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(PACKAGE_DIR)          # 3_db_explorer
+REPO_ROOT = os.path.dirname(BASE_DIR)
+
+# 1_xml_tool 內的 core 套件負責解析 .form / .bpmn，本專案直接沿用
+XML_TOOL_DIR = os.path.join(REPO_ROOT, '1_xml_tool')
+
+# .env 放專案內或 repo 根目錄都能被找到
+ENV_CANDIDATES = [os.path.join(BASE_DIR, '.env'), os.path.join(REPO_ROOT, '.env')]
+ENV_PATH = ENV_CANDIDATES[0]
 
 OUT_DIR = os.path.join(BASE_DIR, 'out')
 FORM_DIR = os.path.join(OUT_DIR, 'forms')
@@ -37,10 +45,12 @@ class ConfigError(Exception):
     """設定缺漏或無法建立連線字串。"""
 
 
-def _load_env_file(path=ENV_PATH):
+def _load_env_file(path=None):
     """讀取 .env（KEY=VALUE，# 為註解），不覆寫既有的環境變數。"""
     values = {}
-    if not os.path.isfile(path):
+    candidates = [path] if path else ENV_CANDIDATES
+    path = next((p for p in candidates if os.path.isfile(p)), None)
+    if path is None:
         return values
     with io.open(path, encoding='utf-8-sig') as fh:
         for raw in fh:

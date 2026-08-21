@@ -18,11 +18,11 @@ import re
 import sys
 import os
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from . import config, db, extract  # noqa: E402
+
+sys.path.insert(0, config.XML_TOOL_DIR)
 
 from core import bpmn_handler  # noqa: E402
-
-from . import db, extract  # noqa: E402
 
 NODE_RE = re.compile(r'<Node\s+ClassName="([^"]+)"\s+Id="([^"]+)"')
 

@@ -6,9 +6,12 @@
 一律**唯讀**連線，`Database` 以 `readonly=True` 開啟，CLI 的 `sql` 指令只接受
 `SELECT` / `WITH`。
 
+本專案是工具集的第三部分，整體脈絡見 [repo 根目錄的 README.md](../../README.md)。
+
 ## 安裝與設定
 
 ```bash
+cd 3_db_explorer
 pip install -r requirements.txt
 ```
 
@@ -86,8 +89,8 @@ python bpm_kb_tool.py pull quickDevTest --days=30
 | `digest.py` | 產生 `docs/BPM_知識重點.md` |
 | `cli.py` | 命令列進入點 |
 
-表單與流程 XML 的解析共用既有的 `core.form_handler` / `core.bpmn_handler`，
-避免兩份實作各自漂移。
+表單與流程 XML 的解析共用 `1_xml_tool/core` 的 `form_handler` / `bpmn_handler`，
+路徑由 `config.XML_TOOL_DIR` 指定，避免兩份實作各自漂移。
 
 ## 已知限制
 
