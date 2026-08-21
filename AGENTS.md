@@ -190,6 +190,34 @@
 
 **匯出的 `.bpmn` 檔在資料庫裡沒有對應欄位** —— 它是設計師重新序列化的產物。
 
+#### 「這支流程用哪張表單」有兩個來源，只查一個會漏
+
+資料表裡**沒有任何一欄記錄流程與表單的綁定關係**，要從兩處還原：
+
+| 來源 | 位置 | 可信度 |
+|:---|:---|:---|
+| 主來源 | `FormFieldAccessDefinition.formFieldAccessControl` 的第一層子標籤 | 高，直接決定執行期欄位權限 |
+| 次來源 | `ProcessPackage.subjectTemplet` 的 `<#表單ID~~欄位ID>` 語法 | 中，複製流程時會被一起帶走 |
+
+**主來源的盲點**：`formFieldAccessControl` 只有在「該關卡設定過欄位權限」時才有值。
+關卡沿用表單預設權限時這欄是 NULL，表單 ID 完全不落地。
+2026-08-21 盤點 742 支最新 `RELEASED` 流程，有 87 支所有關卡都是 NULL ——
+其中 49 支靠主旨範本救回來，剩 38 支兩邊都查不到
+（31 支是沒掛公司別後綴的 `TIPTOPPROCESSPKG_*` 原廠範本，表單在 ERP 端）。
+
+**查不到不等於沒有表單**。例如 `Companycars_Application_solar_`（碩禾公務車預約單）
+四個關卡的 `formFieldAccessDefinitionOID` 都有值、`formFieldAccessControl` 全是 NULL，
+但表單 `Company_cars_Application_Solar` 確實存在。
+
+兩來源不一致的有 47 支（如 `TIPTOPPROCESSPKG_apyt104_*` 請假單的欄位權限指向
+`axmt410` 一般訂單維護作業）。**不要自行挑一個當答案**，兩邊都是合法設定，
+要標記出來給人工確認。
+
+需要這份關聯時跑 `3_db_explorer/form_process_map.py`，不要重寫查詢。
+已驗證走不通的路（`FormType`、`NoCmDocument`、`boundViewInformationOID`、
+`ProcessInstance.contextOID`、流程與表單同名猜測等 8 條）記在
+`3_db_explorer/out/鼎新BPM_表單流程關聯.md` 第 4.5 節，不要重複掃。
+
 ### 7.2 XML 回寫必須位元組級無損
 
 `1_xml_tool/core/xml_utils.py` 用字串區間定位做編輯，不建 DOM。
