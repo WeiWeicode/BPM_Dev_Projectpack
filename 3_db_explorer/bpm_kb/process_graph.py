@@ -86,8 +86,30 @@ def _performers(raw, participants):
     return result
 
 
-def build(database, package_row):
-    """組出單一流程版本的完整結構，可直接 json.dump。"""
+def _classify(field_id, permission, lookup):
+    """依表單定義的型別判斷這是按鈕還是欄位，並補上中文名。
+
+    lookup 為該表單的 {元件ID: {'name', 'type'}}；沒有表單索引時退回 ID 命名猜測。
+    """
+    meta = lookup.get(field_id) if lookup else None
+    item = {
+        'id': field_id,
+        'name': meta['name'] if meta else '',
+        'type': meta['type'] if meta else '',
+        'permission': permission,
+        # 權限清單裡有、但表單定義中沒有 —— 代表流程版本與表單版本脫節
+        'orphaned': bool(lookup) and meta is None,
+    }
+    is_button = (meta['type'] == 'BUTTON') if meta else _is_button(field_id)
+    return item, is_button
+
+
+def build(database, package_row, form_index=None):
+    """組出單一流程版本的完整結構，可直接 json.dump。
+
+    傳入 form_index（見 extract.form_index）時，按鈕與欄位以表單型別區分；
+    未傳入則退回 ID 命名猜測。
+    """
     container_oid = package_row.get('processDefinitionOID')
     if not container_oid:
         return {}
@@ -111,10 +133,11 @@ def build(database, package_row):
         activity_id = (row['id'] or '').strip()
         form_id, pairs = bpmn_handler._parse_access_control(
             row.get('formFieldAccessControl') or '')
+        lookup = (form_index or {}).get(form_id) or {}
         buttons, fields = [], []
         for field_id, permission in pairs:
-            item = {'id': field_id, 'permission': permission}
-            (buttons if _is_button(field_id) else fields).append(item)
+            item, is_button = _classify(field_id, permission, lookup)
+            (buttons if is_button else fields).append(item)
         activities.append({
             'id': activity_id,
             'name': (row['activityDefinitionName'] or '').strip(),

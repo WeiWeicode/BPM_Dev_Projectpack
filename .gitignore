@@ -16,3 +16,7 @@ __pycache__/
 /4_db_viewer/frontend/node_modules/
 /4_db_viewer/frontend/dist/
 /4_db_viewer/frontend/src/api/types.ts
+
+/4_db_viewer/backend/openapi.json
+
+/4_db_viewer/backend/backups/

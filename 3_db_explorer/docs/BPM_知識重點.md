@@ -178,9 +178,10 @@ ProcessDefinition.OID = containerOID 之下掛：
 | TEST_HandWriting_28 | ENABLED | ENABLED | — |
 | TEST_Button_06 | ENABLED | ENABLED | — |
 
-權限值取自資料庫實測（取樣 4000 筆 FormFieldAccessDefinition）：
-`ENABLED`（可編輯，絕大多數）、`INVISIBLE`（隱藏）、`FULL_CONTROL`（完全控制）。
-未列出者以 `—` 表示，代表該關卡未設定、沿用表單預設。
+權限值取自資料庫實測（取樣 20000 筆 FormFieldAccessDefinition）：
+`ENABLED`（可編輯，~98%）、`INVISIBLE`（隱藏）、`FULL_CONTROL`（完全控制）。
+未列出者以 `—` 表示 —— 對照 BPM 設計師 UI 確認，這代表**唯讀(Disable)**，
+不是「沿用表單預設」。要把元件設成唯讀，作法是把它從權限字串中移除。
 
 ### 表單欄位樣本
 

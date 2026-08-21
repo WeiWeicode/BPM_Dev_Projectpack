@@ -62,6 +62,9 @@ LEFT JOIN ProcessDefinition d ON d.OID = link.ProcessDefinitionOID
                              AND d.id = p.mainProcessDefinitionId
 """
 
+# 已發佈狀態；另一種是 UNDER_REVISION（修訂中）
+RELEASED = 'RELEASED'
+
 FORM_SEARCH_COLUMNS = ('f.id', 'f.formDefinitionName')
 PROCESS_SEARCH_COLUMNS = ('p.id', 'p.processPackageName')
 
@@ -70,7 +73,8 @@ def _where(conditions):
     return ('\nWHERE ' + '\n  AND '.join(conditions)) if conditions else ''
 
 
-def _filters(keyword, search_columns, date_column, since_days):
+def _filters(keyword, search_columns, date_column, since_days,
+             status_column='', released_only=False):
     conditions, params = [], []
     if keyword:
         conditions.append('(' + ' OR '.join('%s LIKE ?' % c for c in search_columns) + ')')
@@ -78,6 +82,9 @@ def _filters(keyword, search_columns, date_column, since_days):
     if since_days:
         conditions.append('%s >= DATEADD(day, ?, GETDATE())' % date_column)
         params.append(-abs(int(since_days)))
+    if released_only and status_column:
+        conditions.append('%s = ?' % status_column)
+        params.append(RELEASED)
     return conditions, params
 
 
@@ -93,18 +100,25 @@ def _latest_only(rows, key='id'):
                                                 r.get('createdTime')), reverse=True)
 
 
-def list_forms(database, keyword='', since_days=None, latest_only=False):
-    """列出表單版本，預設由新到舊。"""
-    conditions, params = _filters(keyword, FORM_SEARCH_COLUMNS, 'f.createdTime', since_days)
+def list_forms(database, keyword='', since_days=None, latest_only=False,
+               released_only=False):
+    """列出表單版本，預設由新到舊；released_only 只保留已發佈版本。"""
+    conditions, params = _filters(keyword, FORM_SEARCH_COLUMNS, 'f.createdTime',
+                                  since_days, 'f.publicationStatus', released_only)
     sql = (FORM_LIST_SQL.format(xml=FORM_XML_COLUMN, table=FORM_TABLE)
            + _where(conditions) + '\nORDER BY f.createdTime DESC, f.version DESC')
     rows = database.query(sql, tuple(params))
     return _latest_only(rows) if latest_only else rows
 
 
-def list_processes(database, keyword='', since_days=None, latest_only=False):
-    """列出流程套件版本，預設由新到舊。"""
-    conditions, params = _filters(keyword, PROCESS_SEARCH_COLUMNS, 'h.createdTime', since_days)
+def list_processes(database, keyword='', since_days=None, latest_only=False,
+                   released_only=False):
+    """列出流程套件版本，預設由新到舊；released_only 只保留已發佈版本。
+
+    流程的發佈狀態在 RedefinableHeader，不在 ProcessPackage 上。
+    """
+    conditions, params = _filters(keyword, PROCESS_SEARCH_COLUMNS, 'h.createdTime',
+                                  since_days, 'r.publicationStatus', released_only)
     sql = (PROCESS_LIST_SQL.format(xml=PROCESS_XML_COLUMN, table=PROCESS_TABLE)
            + _where(conditions) + '\nORDER BY h.createdTime DESC, r.version DESC')
     rows = database.query(sql, tuple(params))
@@ -173,6 +187,36 @@ def dump_process(database, row):
 def summarize_form(path):
     """用既有 core.form_handler 解析成欄位清單。"""
     return form_handler.extract(path)
+
+
+def parse_form(database, row):
+    """直接由資料庫取 XML 解析成欄位清單，不落地檔案。"""
+    xml = fetch_form_xml(database, row['OID'])
+    if not xml:
+        return {}
+    return form_handler.extract_text(xml, '%s v%s' % (row.get('id'), row.get('version')))
+
+
+def form_index(database, form_ids, since_days=None):
+    """建立 {表單ID: {元件ID: {'name': ..., 'type': ...}}}。
+
+    供關卡權限做型別對照 —— 判斷某個元件是不是按鈕，靠表單定義的型別，
+    不靠 ID 命名猜測。同一表單有多版時取已發佈的最新版（見 PLAN.md 3.4）。
+    """
+    wanted = {fid for fid in form_ids if fid}
+    if not wanted:
+        return {}
+    rows = list_forms(database, since_days=since_days, latest_only=True,
+                      released_only=True)
+    index = {}
+    for row in rows:
+        form_id = (row.get('id') or '').strip()
+        if form_id not in wanted or form_id in index:
+            continue
+        summary = parse_form(database, row)
+        index[form_id] = {f['id']: {'name': f['name'], 'type': f['type']}
+                          for f in summary.get('fields', []) if f.get('id')}
+    return index
 
 
 def summarize_process(path):

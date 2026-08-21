@@ -135,9 +135,8 @@ def _form_meta(text):
             X.xml_unescape(X.child_text(text, root[0], 'name', kids)))
 
 
-def extract(path):
-    """.form -> dict（可直接 json.dump）。"""
-    text, _bom = X.read_xml(path)
+def extract_text(text, source_name=''):
+    """已讀入的 .form 內容 -> dict。供直接從資料庫取得 XML 時使用，免落地暫存檔。"""
     form_id, form_name = _form_meta(text)
     _all, ordered = _parse(text)
 
@@ -154,9 +153,15 @@ def extract(path):
         'fileType': 'FORM',
         'formId': form_id,
         'formName': form_name,
-        'sourceFile': path.replace('\\', '/').split('/')[-1],
+        'sourceFile': source_name,
         'fields': fields,
     }
+
+
+def extract(path):
+    """.form -> dict（可直接 json.dump）。"""
+    text, _bom = X.read_xml(path)
+    return extract_text(text, path.replace('\\', '/').split('/')[-1])
 
 
 def write_back(xml_path, config, out_path):

@@ -151,9 +151,10 @@ def _section_permissions(process_summaries, limit=1):
             cells.append(lookup.get(field_id, '—'))
         rows.append(cells)
     return ('以 `%s` v%s 為例：\n\n%s\n\n'
-            '權限值取自資料庫實測（取樣 4000 筆 FormFieldAccessDefinition）：\n'
-            '`ENABLED`（可編輯，絕大多數）、`INVISIBLE`（隱藏）、`FULL_CONTROL`（完全控制）。\n'
-            '未列出者以 `—` 表示，代表該關卡未設定、沿用表單預設。'
+            '權限值取自資料庫實測（取樣 20000 筆 FormFieldAccessDefinition）：\n'
+            '`ENABLED`（可編輯，~98%%）、`INVISIBLE`（隱藏）、`FULL_CONTROL`（完全控制）。\n'
+            '未列出者以 `—` 表示 —— 對照 BPM 設計師 UI 確認，這代表**唯讀(Disable)**，\n'
+            '不是「沿用表單預設」。要把元件設成唯讀，作法是把它從權限字串中移除。'
             % (graph['processId'], graph['version'], _table(headers, rows)))
 
 

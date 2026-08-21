@@ -32,8 +32,9 @@ BPM快速開發/
 │   │   └── schema/                資料表快照
 │   └── out/                   撈下來的 .form / .bpmn / .json
 │
-└── 4_db_viewer/           ④ 線上結構檢視器（規劃中）
+└── 4_db_viewer/           ④ 線上結構檢視器
     ├── PLAN.md                專案計劃書
+    ├── README.md              使用說明
     ├── backend/               FastAPI，沿用 3 的關聯邏輯
     └── frontend/              Vue 3 + Vite
 ```
@@ -96,7 +97,7 @@ python bpm_kb_tool.py pull       # 撈定義、組流程圖、產生文件
 產出的 [3_db_explorer/docs/BPM_知識重點.md](3_db_explorer/docs/BPM_知識重點.md)
 是這個專案的主要交付物，詳見 [3_db_explorer/bpm_kb/README.md](3_db_explorer/bpm_kb/README.md)。
 
-## ④ 4_db_viewer —— 線上結構檢視器（規劃中）
+## ④ 4_db_viewer —— 線上結構檢視器
 
 把 `3_db_explorer` 撈到的資料做成**前後端分離的網頁應用**：表單的元件
 id／name／type，流程的關卡 id／name 與按鈕權限，並提供關卡 × 元件的權限矩陣。
@@ -173,8 +174,8 @@ id／name／type，流程的關卡 id／name 與按鈕權限，並提供關卡 �
 
 **表單與流程之間沒有外鍵**，關聯寫在 `formFieldAccessControl` 裡：
 每個關卡指定一張表單，並逐一列出該關卡對各欄位的權限
-（實測值為 `ENABLED` / `INVISIBLE` / `FULL_CONTROL`）。這就是同一張表單
-在不同簽核關卡呈現不同樣貌的機制。
+（實測值為 `ENABLED` / `INVISIBLE` / `FULL_CONTROL`；**未列出代表唯讀**）。
+這就是同一張表單在不同簽核關卡呈現不同樣貌的機制。
 
 ---
 

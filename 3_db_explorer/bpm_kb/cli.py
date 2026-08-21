@@ -13,6 +13,7 @@
     --days=N   只看 N 天內建立的版本（預設 7，鼎新改版後舊單結構未必相同）
     --all      不限日期
     --latest   每個 id 只留最新版本
+    --released 只看已發佈（RELEASED）版本，排除修訂中
 """
 
 import io
@@ -40,13 +41,16 @@ def _setup_console():
 
 def _split_options(args):
     """把 --days=N / --all / --latest 從位置參數中拆出來。"""
-    options = {'since_days': DEFAULT_DAYS, 'latest_only': False}
+    options = {'since_days': DEFAULT_DAYS, 'latest_only': False,
+               'released_only': False}
     rest = []
     for arg in args:
         if arg == '--all':
             options['since_days'] = None
         elif arg == '--latest':
             options['latest_only'] = True
+        elif arg == '--released':
+            options['released_only'] = True
         elif arg.startswith('--days='):
             options['since_days'] = int(arg.split('=', 1)[1])
         else:
@@ -58,6 +62,8 @@ def _scope(options):
     parts = ['近 %d 天' % options['since_days'] if options['since_days'] else '全部日期']
     if options['latest_only']:
         parts.append('僅最新版')
+    if options['released_only']:
+        parts.append('僅已發佈')
     return '、'.join(parts)
 
 
@@ -158,12 +164,12 @@ def _pull_forms(database, rows):
     return summaries
 
 
-def _pull_processes(database, rows):
+def _pull_processes(database, rows, form_index=None):
     """流程：bpmXML 只有版面，邏輯要從關聯表組回來。"""
     summaries = []
     for row in rows:
         path = extract.dump_process(database, row)  # 保留原始 bpmXML 供比對
-        graph = process_graph.build(database, row)
+        graph = process_graph.build(database, row, form_index)
         if not graph:
             print('   %s %s v%s 找不到主流程定義，略過'
                   % (NG, row.get('id'), row.get('version')))
@@ -191,11 +197,25 @@ def cmd_pull(args):
         print('%s 匯出表單' % LINE)
         forms = _pull_forms(database, extract.list_forms(database, keyword, **options))
         print('%s 匯出流程' % LINE)
-        processes = _pull_processes(database,
-                                    extract.list_processes(database, keyword, **options))
+        process_rows = extract.list_processes(database, keyword, **options)
+        index = _build_form_index(database, process_rows, options)
+        processes = _pull_processes(database, process_rows, index)
         path = digest.build(database, forms, processes, options=options)
     print('%s 重點整理：%s' % (OK, path))
     return 0
+
+
+def _build_form_index(database, process_rows, options):
+    """先掃出流程參照到的表單，建索引供按鈕型別判定使用。"""
+    form_ids = set()
+    for row in process_rows:
+        graph = process_graph.build(database, row)
+        form_ids.update(a['formId'] for a in graph.get('activities', []) if a['formId'])
+    if not form_ids:
+        return {}
+    index = extract.form_index(database, form_ids, since_days=options.get('since_days'))
+    print('   已建立 %d 張表單的型別索引' % len(index))
+    return index
 
 
 def _load_cached_summaries():
