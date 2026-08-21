@@ -1,3 +1,7 @@
 /*.form
 /*.bpmn
 /*.json
+.env
+/out/
+/docs/schema/*.json
+__pycache__/
