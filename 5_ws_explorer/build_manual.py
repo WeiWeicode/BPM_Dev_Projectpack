@@ -24,12 +24,15 @@ API_PATH = os.path.join(BASE_DIR, 'out', 'WorkflowServiceService.json')
 
 PROBE_PATH = os.path.join(BASE_DIR, 'out', 'probe_result.json')
 
+WRITE_PROBE_PATH = os.path.join(BASE_DIR, 'out', 'write_probe_result.json')
+
 NOTES_PATH = os.path.join(BASE_DIR, 'notes.json')
 
 MANUAL_PATH = os.path.join(DOCS_DIR, 'WorkflowService_API手冊.md')
 
 CONFIDENCE = {
     'verified': '✅ 已實測',
+    'verified_write': '✅ 已實測（有副作用，實際執行過）',
     'external': '☑️ 已在既有服務驗證',
     'guess': '⚠️ 未實測，僅推測',
 }
@@ -40,6 +43,7 @@ STATUS = {
     'error': '實測失敗（連線層）',
     'soft_error': '假成功（回傳值是例外）',
     'skipped': '未實測',
+    'refused': '刻意未執行',
 }
 
 PREFACE = """
@@ -143,6 +147,27 @@ def _probe_index(probe):
     return index
 
 
+def _write_index():
+    """寫入實測的結果，以方法名為 key。
+
+    情境式實測沒有辦法逐個多載分開記（同一支方法可能被呼叫多次），
+    因此只彙總「這支方法有沒有成功執行過」，細節寫在 notes.json。
+    """
+    if not os.path.exists(WRITE_PROBE_PATH):
+        return {}
+    result = _load(WRITE_PROBE_PATH)
+    index = {}
+    for step in result['steps']:
+        name = step['method']
+        status = step['status']
+        if name not in index or status == 'ok':
+            index[name] = {
+                'status': status,
+                'fault': step.get('fault') or step.get('reason'),
+            }
+    return index
+
+
 def _signature(operation):
     args = ', '.join('%s %s' % (part['type'], part['name'])
                      for part in operation['parameters'])
@@ -216,6 +241,17 @@ def build():
     notes = dict((key, value) for key, value in _load(NOTES_PATH).items()
                  if not key.startswith('_'))
     probed = _probe_index(probe)
+    written = _write_index()
+
+    # 唯讀實測標成 skipped 的，改看寫入實測的結果
+    for operation in api['operations']:
+        key = operation['inputMessage']
+        item = probed.get(key)
+        if item and item['status'] == 'skipped' and operation['name'] in written:
+            merged = dict(item)
+            merged.update(written[operation['name']])
+            merged.pop('reason', None)
+            probed[key] = merged
 
     documented = [item for item in api['operations'] if _note_key(item) in notes]
     undocumented = [item for item in api['operations'] if _note_key(item) not in notes]
@@ -228,7 +264,9 @@ def build():
     lines.append('| Endpoint | `%s` |' % probe['endpoint'])
     lines.append('| 方法總數 | %d |' % api['operationCount'])
     lines.append('| 已寫下語意 | %d |' % len(documented))
-    lines.append('| 實測成功 | %d |' % probe['summary'].get('ok', 0))
+    ok_count = sum(1 for operation in api['operations']
+                   if (probed.get(operation['inputMessage']) or {}).get('status') == 'ok')
+    lines.append('| 實測成功 | %d |' % ok_count)
     lines.append('| 實測時間 | %s |' % probe['probedAt'])
     lines.append('')
     lines.append('本手冊由 `build_manual.py` 合成，勿直接編輯 ——')
@@ -264,17 +302,20 @@ def build():
     lines.append('')
     lines.append('## 尚未分析的方法')
     lines.append('')
-    lines.append('以下 %d 支只有介面契約，沒有經過驗證的用途說明。' % len(undocumented))
-    lines.append('多數是有副作用的方法（開單、簽核、轉派、作廢），需要可拋棄的測試單才能驗。')
-    lines.append('')
-    lines.append('| 方法 | 參數 | 回傳 | 未實測原因 |')
-    lines.append('|:---|:---|:---|:---|')
-    for operation in undocumented:
-        item = probed.get(operation['inputMessage']) or {}
-        args = ', '.join('`%s`' % part['name'] for part in operation['parameters']) or '（無）'
-        returns = operation['returns'][0]['type'] if operation['returns'] else 'void'
-        lines.append('| `%s` | %s | `%s` | %s |' % (
-            operation['name'], args, returns, item.get('reason', '—')))
+    if undocumented:
+        lines.append('以下 %d 支只有介面契約，沒有經過驗證的用途說明。' % len(undocumented))
+        lines.append('')
+        lines.append('| 方法 | 參數 | 回傳 | 未實測原因 |')
+        lines.append('|:---|:---|:---|:---|')
+        for operation in undocumented:
+            item = probed.get(operation['inputMessage']) or {}
+            args = ', '.join('`%s`' % part['name']
+                             for part in operation['parameters']) or '（無）'
+            returns = operation['returns'][0]['type'] if operation['returns'] else 'void'
+            lines.append('| `%s` | %s | `%s` | %s |' % (
+                operation['name'], args, returns, item.get('reason', '—')))
+    else:
+        lines.append('（無 —— 65 支方法都已寫下用途與參數語意。）')
     lines.append('')
 
     if not os.path.isdir(DOCS_DIR):

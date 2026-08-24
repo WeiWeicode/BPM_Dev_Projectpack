@@ -144,6 +144,7 @@ onMounted(loadOperations);
           <select v-model="filterConfidence" class="mini-select">
             <option value="all">全部信心水準</option>
             <option value="verified">✅ 已實測</option>
+            <option value="verified_write">✅ 已實測（副作用已驗證）</option>
             <option value="external">☑️ 既有服務驗證</option>
             <option value="guess">⚠️ 僅推測</option>
             <option value="none">⚠️ 尚未分析</option>
@@ -155,6 +156,7 @@ onMounted(loadOperations);
             <option value="soft_error">假成功</option>
             <option value="error">連線錯誤</option>
             <option value="skipped">未實測</option>
+            <option value="refused">刻意未執行</option>
           </select>
         </div>
       </div>
@@ -344,7 +346,8 @@ onMounted(loadOperations);
 .manual-layout {
   display: flex;
   flex: 1;
-  height: calc(100vh - 53px);
+  height: 100%;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -355,6 +358,7 @@ onMounted(loadOperations);
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
 }
 
 .filter-bar {
@@ -364,6 +368,7 @@ onMounted(loadOperations);
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .filter-pills {
@@ -401,7 +406,9 @@ onMounted(loadOperations);
 
 .op-list {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
+  padding-bottom: 60px;
 }
 
 .op-item {
@@ -465,8 +472,10 @@ onMounted(loadOperations);
 
 .detail-container {
   flex: 1;
+  min-height: 0;
+  height: 100%;
   overflow-y: auto;
-  padding: 24px 32px;
+  padding: 24px 32px 60px;
 }
 
 .detail-header {

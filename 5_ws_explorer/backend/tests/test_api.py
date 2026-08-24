@@ -45,8 +45,8 @@ def test_api_overview():
     assert res.status_code == 200
     data = res.json()
     assert data['operationCount'] == 65
-    assert data['verifiedCount'] >= 29
-    assert data['documentedCount'] >= 39
+    assert data['verifiedCount'] >= 60
+    assert data['documentedCount'] == 65
     assert 'read' in data['levelCounts']
     assert 'write' in data['levelCounts']
 

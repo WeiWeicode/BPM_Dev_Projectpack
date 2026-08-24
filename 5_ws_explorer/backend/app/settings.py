@@ -15,6 +15,7 @@ if PROJECT_DIR not in sys.path:
 # 檔案路徑
 API_JSON_PATH = os.path.join(PROJECT_DIR, 'out', 'WorkflowServiceService.json')
 PROBE_JSON_PATH = os.path.join(PROJECT_DIR, 'out', 'probe_result.json')
+WRITE_PROBE_JSON_PATH = os.path.join(PROJECT_DIR, 'out', 'write_probe_result.json')
 NOTES_JSON_PATH = os.path.join(PROJECT_DIR, 'notes.json')
 SEEDS_JSON_PATH = os.path.join(PROJECT_DIR, 'seeds.json')
 PAYLOAD_DIR = os.path.join(PROJECT_DIR, 'out', 'payloads')

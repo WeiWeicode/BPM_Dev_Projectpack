@@ -287,6 +287,12 @@
 - **`invokeProcess` 不驗證表單欄位 id**，錯的欄位靜默寫入，
   之後 `fetchUniFormatFormInstance*` 讀取時才炸。
   組 `pFormFieldValue` 前先用 `getFormFieldTemplate` 對過欄位。
+- **使用者 OID 要取 `Users.OID`，不是 `Employee.OID`**。同一個人在兩張表都有，
+  OID 只差一個字元（`4db90e2c…` vs `4db90e2d…`），餵錯會得到
+  `Can't find User. By OID = …`。所有 `pUserOID` / `pAcceptorOID` /
+  `pRequesterOID` 都是前者。
+- **簽核前必須先 `acceptWorkItem`**，否則 `completeWorkItem` 回
+  `The workitem is not running state`。WSDL 上看不出這個順序。
 
 ---
 

@@ -3,33 +3,41 @@
   "_信心": {
     "verified": "本工具實測成功，out/payloads/ 有回傳樣本",
     "external": "由 bpmbackXmlController.js 的實際使用驗證",
-    "guess": "僅由名稱與參數推測，未實測"
+    "guess": "僅由名稱與參數推測，未實測",
+    "verified_write": "有副作用的方法，已在 191 測試區實際執行成功並清理"
   },
-
   "findFormOIDsOfProcess": {
     "用途": "由流程 ID 取得該流程掛的表單定義 OID。開單前的第一步。",
-    "參數": { "pProcessPackageId": "流程 ID，非 OID。例如 SP_DetectionOPProcess" },
+    "參數": {
+      "pProcessPackageId": "流程 ID，非 OID。例如 SP_DetectionOPProcess"
+    },
     "回傳": "32 碼表單定義 OID 字串。多張表單時的分隔方式未驗證（測試流程只有一張）。",
     "信心": "external",
     "備註": "bpmbackXmlController.js 的 testCreateProcess 就是先呼叫它拿 pFormDefOID。"
   },
   "getFormFieldTemplate": {
     "用途": "取得表單的空白欄位模板 —— **這是欄位 id 的權威來源**。",
-    "參數": { "pFormDefinitionOID": "findFormOIDsOfProcess 的回傳值" },
+    "參數": {
+      "pFormDefinitionOID": "findFormOIDsOfProcess 的回傳值"
+    },
     "回傳": "<表單ID> 底下每個欄位一個標籤，帶 id / dataType / perDataProId 屬性。",
     "信心": "verified",
     "備註": "組 pFormFieldValue 前應先呼叫它對欄位 id，否則錯的欄位會被靜默寫入（見手冊「已知地雷」）。"
   },
   "getProcessPackage": {
     "用途": "取整包流程定義，含關卡、參與者、流程變數（RelevantDataDefinition）。",
-    "參數": { "pProcessPackageId": "流程 ID" },
+    "參數": {
+      "pProcessPackageId": "流程 ID"
+    },
     "回傳": "Hibernate/OJB 物件圖的 XStream 序列化，實測 45 萬字元。",
     "信心": "verified",
     "備註": "回傳量極大且含 PersistentSet、SET__PROXY__CLASS__NAME 等 ORM 雜訊。只為了查流程變數 id 的話，撈 RelevantDataDefinition.id 即可，不要整包塞進前端。"
   },
   "fetchOrgUnitOfUserId": {
     "用途": "查使用者所屬部門，開單要用的 pOrgUnitId 從這裡來。",
-    "參數": { "pUserId": "員工編號" },
+    "參數": {
+      "pUserId": "員工編號"
+    },
     "回傳": "OrganizationUnitCollection，內含 OID / id / name / orgUnitType / orgName / isMain。",
     "信心": "external"
   },
@@ -57,59 +65,77 @@
   },
   "fetchProcInstanceWithSerialNo": {
     "用途": "以單號取單頭資料（不含表單欄位與簽核歷程）。",
-    "參數": { "pProcessInstanceSerialNo": "單號，例如 SP_DetectionOPProcess00000030" },
+    "參數": {
+      "pProcessInstanceSerialNo": "單號，例如 SP_DetectionOPProcess00000030"
+    },
     "回傳": "單筆 ProcessInfo，實測 517 字元。",
     "信心": "verified"
   },
   "fetchProcInstanceWithOID": {
     "用途": "同 fetchProcInstanceWithSerialNo，改用 OID 查。",
-    "參數": { "pProcessInstanceOID": "流程實例 OID" },
+    "參數": {
+      "pProcessInstanceOID": "流程實例 OID"
+    },
     "回傳": "與單號版完全相同（實測兩者位元組一致）。",
     "信心": "verified"
   },
   "fetchFullProcInstanceWithSerialNo": {
     "用途": "取完整流程單：單頭 + 表單欄位值 + 每個關卡的簽核歷程。",
-    "參數": { "pProcessInstanceSerialNo": "單號" },
+    "參數": {
+      "pProcessInstanceSerialNo": "單號"
+    },
     "回傳": "ProcessInfo > forms(FormInfo) + ActInstanceInfo > PerformInfo > PerformDetail，含 activityId、performerName、performedTime、comment、state。",
     "信心": "verified",
     "備註": "要一次拿到「誰簽的、簽了什麼」就用這支。關卡狀態實測值：closed.completed、open.running.not_performed。"
   },
   "fetchFullProcInstanceWithOID": {
     "用途": "同上，改用 OID 查。",
-    "參數": { "pProcessInstanceOID": "流程實例 OID" },
+    "參數": {
+      "pProcessInstanceOID": "流程實例 OID"
+    },
     "回傳": "與單號版相同。",
     "信心": "verified"
   },
   "fetchFullProcInstanceWithSerialNoShowReferences": {
     "用途": "同 fetchFullProcInstanceWithSerialNo，多一個 pShowReferences 開關。",
-    "參數": { "pShowReferences": "boolean。實測傳 true 時回傳與不帶此參數的版本完全相同" },
+    "參數": {
+      "pShowReferences": "boolean。實測傳 true 時回傳與不帶此參數的版本完全相同"
+    },
     "回傳": "同上。",
     "信心": "verified",
     "備註": "pShowReferences 的實際作用在測試流程上看不出差異 —— 可能要有跨流程引用的單子才會有分別。未確認。"
   },
   "fetchFormInstanceWithProcSerlNo": {
     "用途": "只取表單欄位值，不含簽核歷程。",
-    "參數": { "pProcessInstanceSerialNo": "單號" },
+    "參數": {
+      "pProcessInstanceSerialNo": "單號"
+    },
     "回傳": "FormInfo，fieldValues 內是逸出後的 <表單ID><欄位 id=... >值</欄位></表單ID>。",
     "信心": "verified",
     "備註": "fieldValues 是「XML 字串包在 XML 裡」，要解兩層。"
   },
   "fetchFormInstanceWithProcOID": {
     "用途": "同上，改用 OID。",
-    "參數": { "pProcessInstanceOID": "流程實例 OID" },
+    "參數": {
+      "pProcessInstanceOID": "流程實例 OID"
+    },
     "回傳": "與單號版相同。",
     "信心": "verified"
   },
   "fetchUniFormatFormInstanceWithProcSerlNo": {
     "用途": "取統一格式的表單資料（FormCollection），欄位以標準結構列出而非原始字串。",
-    "參數": { "pProcessInstanceSerialNo": "單號" },
+    "參數": {
+      "pProcessInstanceSerialNo": "單號"
+    },
     "回傳": "FormCollection > forms > FormInfo。",
     "信心": "verified",
     "備註": "**會驗證欄位 id**。若單子裡存有表單定義中不存在的欄位，這支會拋 IllegalArgumentException 而 fetchFormInstance* 不會。見手冊「已知地雷」。"
   },
   "fetchUniFormatFormInstanceWithProcOID": {
     "用途": "同上，改用 OID。",
-    "參數": { "pProcessInstanceOID": "流程實例 OID" },
+    "參數": {
+      "pProcessInstanceOID": "流程實例 OID"
+    },
     "回傳": "同上。",
     "信心": "verified"
   },
@@ -136,14 +162,19 @@
   },
   "checkWorkItemState": {
     "用途": "查工作項目狀態。",
-    "參數": { "pWorkItemOID": "由 fetchToDoWorkItem 取得" },
+    "參數": {
+      "pWorkItemOID": "由 fetchToDoWorkItem 取得"
+    },
     "回傳": "int。待簽中的工作項目實測回 0。",
     "信心": "verified",
     "備註": "其餘狀態碼對應的意義未驗證 —— 需要已完成／已轉派的工作項目才測得出來。"
   },
   "isPerformerOfProcessInstance": {
     "用途": "判斷某人是否為該單的簽核者之一。",
-    "參數": { "pUserId": "員工編號", "pProcessInstanceSerialNo": "單號" },
+    "參數": {
+      "pUserId": "員工編號",
+      "pProcessInstanceSerialNo": "單號"
+    },
     "回傳": "WSDL 宣告 string，實測回 \"1\"。回 \"0\" 的情境未驗證。",
     "信心": "verified"
   },
@@ -159,7 +190,10 @@
   },
   "fetchCanTraceProcSN": {
     "用途": "查某人有權追蹤（檢視）的單號清單。",
-    "參數": { "pProcessIds": "流程 ID", "pUserId": "員工編號" },
+    "參數": {
+      "pProcessIds": "流程 ID",
+      "pUserId": "員工編號"
+    },
     "回傳": "**逗號分隔的單號字串**，不是 XML。實測末尾帶逗號。",
     "信心": "verified",
     "備註": "回傳格式與其他 fetch* 完全不同，解析時要特判。"
@@ -177,14 +211,19 @@
   },
   "fetchProcessAbortOrTerminateComment": {
     "用途": "取單子被作廢或終止時填的意見。",
-    "參數": { "pProcessSerialNo": "單號" },
+    "參數": {
+      "pProcessSerialNo": "單號"
+    },
     "回傳": "純文字意見。實測格式為「意見內容(員工編號-姓名)」，操作者資訊由 BPM 自動附加。",
     "信心": "verified",
     "備註": "單子仍在跑時會拋例外並明講原因，不是回空字串。查詢前應先確認 state 為 closed.terminated。"
   },
   "getSubstituteState": {
     "用途": "查使用者在指定時間點的代理狀態。",
-    "參數": { "pUserId": "員工編號", "pCheckTime": "檢查時間點" },
+    "參數": {
+      "pUserId": "員工編號",
+      "pCheckTime": "檢查時間點"
+    },
     "回傳": "<SubstituteState isAbsence=\"Y\" isSettingSubstitute=\"N\" substituteId=\"\"/>。",
     "信心": "verified",
     "備註": "屬性式 XML，與其他方法的 XStream 元素式風格不同。"
@@ -204,14 +243,12 @@
   "countWorkingDays": {
     "用途": "依工作行事曆計算區間內的工作日數。",
     "參數": {
-      "pUserId": "員工編號",
-      "pStartDateTime": "起",
-      "pEndDateTime": "迄",
+      "pUserId": "員工編號，必須有掛工作行事曆",
       "pDateFormat": "Java SimpleDateFormat 語法，例如 yyyy/MM/dd HH:mm:ss"
     },
     "回傳": "int。",
     "信心": "verified",
-    "備註": "實測 S112009 在 2026/08/01～08/24 回 0，且同參數的 countWorkingTime 拋 NotFoundException —— 研判是該帳號沒有掛工作行事曆，不是方法壞掉。要驗證需先找一個有行事曆的帳號。"
+    "備註": "沒掛行事曆時**不拋例外而是回 0** —— 與 countWorkingTime 的行為不一致，呼叫端不能把 0 當成「這段期間沒有工作日」。"
   },
   "getSysintegrationServer": {
     "用途": "取系統整合伺服器設定。",
@@ -222,71 +259,343 @@
   },
   "getProjectsWithOrganizationId": {
     "用途": "依公司別查專案清單。",
-    "參數": { "pOrganizationId": "**公司別 id，不是部門 id**" },
-    "回傳": "未驗證。",
-    "信心": "guess",
-    "備註": "傳部門 id S1800 與猜測值 SOLAR 都得到 Organization cannot be found。正確值待查（可查資料庫 Organization 表）。"
+    "參數": {
+      "pOrganizationId": "**Organization.id**（GIGASOLAR、WHOLEMAX…），不是部門 id"
+    },
+    "回傳": "ProjectCollection > projects > Project。查無專案時 projects 為空元素。",
+    "信心": "verified",
+    "備註": "實測 GIGASOLAR 有專案、WHOLEMAX 回空清單。公司別清單查資料庫 Organization 表。"
   },
   "countWorkingTime": {
-    "用途": "依工作行事曆計算區間內的工作時數。",
-    "參數": { "pDateFormat": "同 countWorkingDays" },
-    "回傳": "string。",
-    "信心": "guess",
-    "備註": "實測拋 NotFoundException，與 countWorkingDays 回 0 相互印證是帳號無行事曆。未取得成功樣本。"
+    "用途": "依工作行事曆計算區間內的工作時間。",
+    "參數": {
+      "pUserId": "員工編號，**必須有掛工作行事曆**",
+      "pDateFormat": "Java SimpleDateFormat 語法"
+    },
+    "回傳": "數字字串。實測 S094009 在 2026/08/01～08/24 回 460800（同期間 countWorkingDays 回 15）。單位推測為秒，未確認。",
+    "信心": "verified",
+    "備註": "使用者沒掛行事曆（Users.referCalendarOID 為 NULL）時拋 NotFoundException。全庫 8080 人中有 1872 人沒掛，呼叫前要有心理準備。"
   },
   "fetchDueDate": {
     "用途": "依工作行事曆推算到期日。",
-    "參數": { "pBaseDate": "基準日", "pDueDays": "天數", "pDateFormat": "日期格式" },
-    "回傳": "string。",
-    "信心": "guess",
-    "備註": "同上，拋 NotFoundException。"
+    "參數": {
+      "pUserId": "員工編號，必須有掛工作行事曆",
+      "pBaseDate": "基準日",
+      "pDueDays": "工作天數",
+      "pDateFormat": "日期格式"
+    },
+    "回傳": "日期字串。實測 2026/08/24 起算 3 個工作天回 2026/08/27 00:00:00。",
+    "信心": "verified",
+    "備註": "沒掛行事曆時拋 NotFoundException。"
   },
   "findManagerByAppLvl": {
-    "用途": "依簽核層級查主管。",
+    "用途": "依職務層級往上找主管。",
     "參數": {
       "pUserId": "員工編號",
-      "pOrgUnitOID": "部門 OID，非部門 id",
-      "pLevelName": "簽核層級名稱，有效值未知",
-      "pApprovalLevelType": "簽核層級類型，有效值未知",
+      "pOrgUnitOID": "部門 OID（OrganizationUnit.OID），由 fetchOrgUnitOfUserId 取得",
+      "pLevelName": "**FunctionLevel.functionLevelName**（職務層級，例如「副總經理級」）。不是 OrganizationUnitLevel 的組織層級名稱",
+      "pApprovalLevelType": "實測傳 0、1、DEFAULT、空字串，錯誤訊息一律顯示 Type:null，看不出這個參數有被使用",
       "pIsDeptManager": "boolean"
     },
-    "回傳": "string。",
-    "信心": "guess",
-    "備註": "**這支會把例外包在回傳字串裡**：傳空的層級名稱得到 HTTP 200 與 <NotFoundException>Can not found ApprovelLevel by Name:, and Type:null</NotFoundException>。呼叫端只判斷有無丟例外會誤收。有效層級名稱待查。"
+    "回傳": "<com.dsc.nana.user_interface.web.webservice.WorkflowService> 內含 userOID / userId / userEmail。",
+    "信心": "verified",
+    "備註": "**這支會把例外包在回傳字串裡**：層級名稱查不到時回 HTTP 200 加 <NotFoundException>Can not found ApprovelLevel by Name:...</NotFoundException>（ApprovelLevel 是原廠拼字）。呼叫端只判斷有無丟例外會誤收。「一般人員」這種最低層級查不到主管，也走同一條回傳路徑。"
   },
-
   "invokeProcess": {
-    "用途": "開單。六參數版可同時帶入表單欄位值，四參數版只開單不填值。",
+    "用途": "開單。四參數版只開單，六參數版同時帶入表單欄位值。",
     "參數": {
       "pProcessPackageId": "流程 ID",
       "pRequesterId": "申請人員工編號",
-      "pOrgUnitId": "申請人部門 id，由 fetchOrgUnitOfUserId 取得",
+      "pOrgUnitId": "申請人部門 id（OrganizationUnit.id，例如 S1800）",
       "pFormDefOID": "表單定義 OID，由 findFormOIDsOfProcess 取得",
-      "pFormFieldValue": "表單欄位值 XML 字串，格式見手冊",
-      "pSubject": "單據主旨"
+      "pFormFieldValue": "表單欄位值 XML，格式見手冊「呼叫前必讀」",
+      "pSubject": "單據主旨。實測發現最終主旨由流程的主旨範本決定，這裡送的值不一定會出現"
     },
-    "回傳": "實測環境已由 bpmbackXmlController.js 驗證可開單成功，回傳值為單號或 OID（本工具未重複開單驗證）。",
-    "信心": "external",
-    "備註": "有副作用，會產生真實簽核單。pFormFieldValue 的欄位 id 不會被驗證，錯的欄位照收 —— 送出前務必用 getFormFieldTemplate 對過。"
+    "回傳": "新單號字串（例如 SP_DetectionOPProcess00000056），非 XML。",
+    "信心": "verified_write",
+    "備註": "**四參數版（不帶表單）實測開單失敗**，回 EJBTransactionRolledbackException；六參數版成功。研判此流程的表單有必要欄位，不帶表單值就過不了。開單失敗仍會消耗單號（實測 31、37、39、44 等號碼被吃掉且無對應單據）。欄位 id 不會被驗證，錯的欄位靜默寫入，務必先用 getFormFieldTemplate 對過。"
   },
   "invokeProcessByOrg": {
-    "用途": "推測為指定公司別開單，與 invokeProcess 的差別在組織參數。",
-    "參數": {},
-    "回傳": "未驗證。",
-    "信心": "guess"
+    "用途": "同 invokeProcess，多一個公司別參數。",
+    "參數": {
+      "pOrgId": "**Organization.id**（例如 GIGASOLAR），不是部門 id"
+    },
+    "回傳": "新單號字串。",
+    "信心": "verified_write",
+    "備註": "七參數版（帶表單）成功、五參數版（不帶表單）同樣 rollback，與 invokeProcess 一致。實測比較過：帶不帶 pOrgId 對後續簽核的群組解析沒有影響。"
   },
   "abortProcessForSerialNo": {
-    "用途": "作廢流程單。",
-    "參數": { "pProcessInstanceSerialNo": "單號", "pAbortComment": "作廢原因" },
+    "用途": "作廢流程單。與終止的差別在 state（closed.aborted vs closed.terminated）。",
+    "參數": {
+      "pProcessInstanceSerialNo": "單號",
+      "pAbortComment": "作廢原因"
+    },
     "回傳": "void。",
-    "信心": "guess",
-    "備註": "作廢後的意見可由 fetchProcessAbortOrTerminateComment 讀回（該方法已實測到「取回重辦」這類文字）。"
+    "信心": "verified_write",
+    "備註": "不需要傳操作者，比 terminatedProcessForSerialNo 少一個參數。實測用它清理了 20 餘張測試單。"
   },
   "completeWorkItem": {
-    "用途": "簽核完成一個工作項目。",
-    "參數": { "pWorkItemOID": "工作項目 OID", "pUserId": "簽核者", "pComment": "簽核意見" },
-    "回傳": "void。",
+    "用途": "簽核完成，推動流程往下一關。",
+    "參數": {
+      "pWorkItemOID": "工作項目 OID",
+      "pUserId": "簽核者",
+      "pComment": "簽核意見"
+    },
+    "回傳": "void。**未取得成功樣本。**",
     "信心": "guess",
-    "備註": "會推動流程往下一關，需搭配可拋棄的測試單驗證。"
+    "備註": "在測試流程上一律失敗於 GroupOID cannot be found。已追查到根因：SP_DetectionOPProcess 的參與者設定引用群組 SPDetectionOPGroup，但 Groups 表（581 筆）裡沒有這個群組 —— 是測試區的資料缺漏，不是 API 問題。帶不帶公司別都一樣。要驗證這支方法必須換一支群組設定完整的流程。"
+  },
+  "invokeProcessAndAddCustAct": {
+    "用途": "開單的同時追加自訂關卡。",
+    "參數": {
+      "pPostPSActDefsAsXML": "java.util.List 的 XStream 序列化。空清單寫 <list/>，實測被接受"
+    },
+    "回傳": "新單號字串。",
+    "信心": "verified_write",
+    "備註": "送 <list/>（空清單）時等同一般開單。清單元素的類別名尚未確認，見 addCustomActivity 的備註。"
+  },
+  "invokeProcessAndAddCustActByOrg": {
+    "用途": "同上，多指定公司別。",
+    "參數": {
+      "pOrgId": "Organization.id"
+    },
+    "回傳": "新單號字串。",
+    "信心": "verified_write"
+  },
+  "invokeProcessByParameter": {
+    "用途": "以流程參數啟動流程。",
+    "參數": {
+      "pParameterId": "流程變數（RelevantData）id，非任意字串",
+      "pInvokeParameter": "對應的值"
+    },
+    "回傳": "string。**未取得成功樣本。**",
+    "信心": "guess",
+    "備註": "兩段錯誤訊息把限制講清楚了：亂填 id 回「ProcessDefinition error. If first activity is requester, please set variable as RelevantData.」，改用真實變數 id（isSeparateByVerNo）則 rollback。研判此流程的第一關是申請人、未設定成可用參數啟動，要換流程才驗得出來。"
+  },
+  "invokeProcessByParameterByOrg": {
+    "用途": "同上，多指定公司別。",
+    "參數": {
+      "pOrgId": "Organization.id"
+    },
+    "回傳": "string。未取得成功樣本，錯誤同上。",
+    "信心": "guess"
+  },
+  "acceptWorkItem": {
+    "用途": "簽收待辦。**簽核前必須先簽收**，否則 completeWorkItem 會回 \"The workitem is not running state\"。",
+    "參數": {
+      "pWorkItemOID": "由 fetchToDoWorkItem 取得",
+      "pUserId": "必須是該待辦目前的擁有者，傳別人會被拒絕"
+    },
+    "回傳": "void。",
+    "信心": "verified_write",
+    "備註": "實測先 accept 再 complete 是必要順序，這在 WSDL 上完全看不出來。"
+  },
+  "increaseViewTimesOfWorkAssignment": {
+    "用途": "累加待辦的檢視次數。",
+    "參數": {
+      "pUserId": "員工編號",
+      "pWorkItemOID": "工作項目 OID"
+    },
+    "回傳": "void。",
+    "信心": "verified_write"
+  },
+  "addLabelToNoticeWorkItem": {
+    "用途": "為知會項目加標籤。",
+    "參數": {
+      "pWorkItemOID": "工作項目 OID",
+      "pUserOID": "**Users.OID**，不是 Employee.OID",
+      "pLabelOID": "Labels.OID。測試區只有一個標籤 SEALED（封存）"
+    },
+    "回傳": "boolean。",
+    "信心": "verified_write",
+    "備註": "對一般待辦實測**恆回 false**（呼叫成功但沒作用）。方法名的 Notice 是關鍵：對象要是知會項目而非待辦。回 false 不會拋例外，呼叫端要自己判斷。"
+  },
+  "removeLabelFromNoticeWorkItem": {
+    "用途": "移除知會項目的標籤。",
+    "參數": {
+      "pUserOID": "Users.OID",
+      "pLabelOID": "Labels.OID"
+    },
+    "回傳": "boolean。對一般待辦同樣恆回 false。",
+    "信心": "verified_write"
+  },
+  "assignRelevantDataBySerialNo": {
+    "用途": "設定流程變數（RelevantData）的執行期值。",
+    "參數": {
+      "pProcessInstanceSerialNo": "單號",
+      "pRelevantDataId": "變數 id，來源見 fetchProcessContextVariable",
+      "pRelevantDataValue": "值"
+    },
+    "回傳": "void。",
+    "信心": "verified_write",
+    "備註": "實測寫入後以 fetchProcessContextVariable 讀回確認為新值，來回驗證通過。"
+  },
+  "updateFormValueBySerialNember": {
+    "用途": "改寫已開單的表單欄位值（方法名的 Nember 是原廠拼字錯誤）。",
+    "參數": {
+      "serialNumber": "單號。注意這支的參數名沒有 p 前綴，與其他方法不同",
+      "pFormValue": "表單欄位值 XML，格式同 pFormFieldValue"
+    },
+    "回傳": "void。",
+    "信心": "verified_write",
+    "備註": "實測改寫後以 fetchFormInstanceWithProcSerlNo 讀回確認為新值。同樣不驗證欄位 id。"
+  },
+  "addCustomActivity": {
+    "用途": "在待辦之後追加自訂串簽關卡。",
+    "參數": {
+      "pWorkItmeOID": "工作項目 OID（原廠把 WorkItem 拼成 WorkItme）",
+      "pPostActDefsAsXML": "**java.util.List 的 XStream 序列化**，空清單寫 <list/>"
+    },
+    "回傳": "void。",
+    "信心": "verified_write",
+    "備註": "參數格式是靠錯誤訊息反推出來的：送 <invalid/> 回 CannotResolveClassException，送 ActivityDefinition 類別回 \"cannot be cast to java.util.List\"，送 <list/> 才通過。**清單元素的類別名仍未確認**，因此只驗證了「空清單」這條路徑，實際加關卡還需要知道元素類別。"
+  },
+  "addCustomParallelActivity": {
+    "用途": "追加自訂並簽關卡。",
+    "參數": {
+      "pPostParallelActDefsAsXML": "同上，java.util.List 的 XStream 序列化"
+    },
+    "回傳": "void。",
+    "信心": "verified_write",
+    "備註": "同 addCustomActivity，只驗證過空清單。"
+  },
+  "addCustomParallelAndSerialActivity": {
+    "用途": "追加並簽 + 串簽混合關卡。兩參數版指定工作項目，四參數版指定單號與關卡。",
+    "參數": {
+      "pProcessInstanceSN": "單號（四參數版）",
+      "pActId": "關卡 id",
+      "pRefActId": "參考關卡 id",
+      "pPostPSActDefsAsXML": "java.util.List 的 XStream 序列化"
+    },
+    "回傳": "void。",
+    "信心": "verified_write",
+    "備註": "兩個多載都以空清單實測通過。"
+  },
+  "addCloneSerialActivity": {
+    "用途": "複製既有關卡並插入流程。",
+    "參數": {
+      "pProcessInstanceSN": "單號",
+      "pActId": "關卡 id",
+      "pRefActId": "參考關卡 id"
+    },
+    "回傳": "string。**未取得成功樣本。**",
+    "信心": "guess",
+    "備註": "把 pActId 與 pRefActId 都指向目前關卡時回 ARJUNA016053 交易無法提交。推測兩者不能相同，或被複製的關卡必須處於特定狀態。未進一步確認。"
+  },
+  "assigneeReassignWorkItem": {
+    "用途": "簽核者自行把待辦轉派給他人。",
+    "參數": {
+      "pRequesterOID": "**待辦目前擁有者**的 Users.OID。不是原申請人",
+      "pAcceptorOID": "接收者的 Users.OID",
+      "pWorkItemOID": "工作項目 OID",
+      "pReassignComment": "轉派意見"
+    },
+    "回傳": "void。",
+    "信心": "verified_write",
+    "備註": "pRequesterOID 不是待辦目前擁有者時回 \"Requester can not reassign this WorkItem.\"。實測順序：先用 managementReassignWorkItem 把待辦轉到自己名下，才有資格自行轉派。"
+  },
+  "managementReassignWorkItem": {
+    "用途": "管理者強制轉派待辦，不需要目前擁有者同意。",
+    "參數": {
+      "pAcceptorOID": "接收者的 **Users.OID**",
+      "pWorkItemOID": "工作項目 OID",
+      "pReassignComment": "轉派意見"
+    },
+    "回傳": "void。",
+    "信心": "verified_write",
+    "備註": "傳 Employee.OID 會回 \"Can't find User. By OID = ...\"。兩張表的 OID 只差一個字元，極容易混淆。"
+  },
+  "managementChangeWorkItemOwner": {
+    "用途": "管理者變更待辦的擁有者。",
+    "參數": {
+      "pAcceptorOID": "新擁有者的 Users.OID",
+      "pWorkItemOID": "工作項目 OID",
+      "pReassignComment": "意見"
+    },
+    "回傳": "void。",
+    "信心": "verified_write",
+    "備註": "與 managementReassignWorkItem 參數完全相同，語意差別（轉派 vs 換擁有者）在單筆實測中看不出來，未進一步區分。"
+  },
+  "bypassActivity": {
+    "用途": "讓關卡跳過，不簽直接放行。",
+    "參數": {
+      "pActivityInstanceOID": "關卡實例 OID。查 ParticipantActivityInstance 表，條件 bypassable=1 且 bypassed=0"
+    },
+    "回傳": "void。",
+    "信心": "verified_write",
+    "備註": "這個 OID 沒有任何 API 查得到，只能查資料庫。關卡是否可跳關由流程定義的 bypassable 決定。"
+  },
+  "reexecuteActivity": {
+    "用途": "取回重辦：把已簽核的關卡叫回來重新處理。",
+    "參數": {
+      "pProcessSerialNo": "單號",
+      "pAskReexecuteUserId": "提出取回的人",
+      "pReexecuteActivityId": "要重辦的關卡 id",
+      "pReexecuteComment": "取回意見"
+    },
+    "回傳": "void。",
+    "信心": "verified_write",
+    "備註": "取回後的意見可由 fetchProcessAbortOrTerminateComment 讀到，格式為「意見內容(員工編號-姓名)」。"
+  },
+  "addUserAbsence": {
+    "用途": "新增請假（不在辦公室）記錄。",
+    "參數": {
+      "pUserId": "員工編號",
+      "pStartTime": "起始時間",
+      "pEndTime": "結束時間"
+    },
+    "回傳": "void。",
+    "信心": "verified_write",
+    "備註": "實測新增後以 getSubstituteState 讀回，isAbsence 由 N 變 Y，驗證通過。"
+  },
+  "removeAbsenceRecord": {
+    "用途": "刪除請假記錄。",
+    "參數": {
+      "pUserId": "員工編號",
+      "pStartDateTime": "起始時間（要與新增時相同）",
+      "pEndDateTime": "結束時間"
+    },
+    "回傳": "void。",
+    "信心": "verified_write",
+    "備註": "實測可把 addUserAbsence 新增的記錄還原。"
+  },
+  "updateDefaultSubstitute": {
+    "用途": "設定預設代理人。",
+    "參數": {
+      "pUserId": "員工編號",
+      "pDefaultSubstitutesId": "代理人員工編號。多筆的分隔方式未驗證"
+    },
+    "回傳": "void。",
+    "信心": "verified_write",
+    "備註": "呼叫成功，但隨後 fetchDefaultSubstituteInfo 仍回 no default substitute found，**寫入是否真的生效未能確認**。可能需要額外的生效時間設定。"
+  },
+  "reserveNoCmDocument": {
+    "用途": "向文件伺服器預留一個附件位置，取得實體路徑與檔名。",
+    "參數": {
+      "pOriginalFullFileName": "原始檔名"
+    },
+    "回傳": "ReserveNoCmDocInfo，含 docServerId、filePathToSave、OID、physicalName。",
+    "信心": "verified_write",
+    "備註": "上傳附件的前置步驟。實際的檔案上傳不走這個 SOAP 服務。"
+  },
+  "terminatedProcessForSerialNo": {
+    "用途": "終止流程單。",
+    "參數": {
+      "pProcessInstanceSerialNo": "單號",
+      "pUserId": "操作者",
+      "pTerminatedComment": "終止原因"
+    },
+    "回傳": "void。",
+    "信心": "verified_write",
+    "備註": "終止後 state 變 closed.terminated，意見可由 fetchProcessAbortOrTerminateComment 讀回。"
+  },
+  "importOrganizationData": {
+    "用途": "匯入組織資料。",
+    "參數": {
+      "pXMLData": "組織資料 XML，格式未知"
+    },
+    "回傳": "string。**刻意未執行。**",
+    "信心": "guess",
+    "備註": "本專案唯一刻意不實測的方法。組織是所有流程的根基，匯入內容不完整就等同刪除既有部門，與「不刪測試區資料」的約定牴觸。要驗證請在獨立環境進行。"
   }
 }

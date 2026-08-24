@@ -463,7 +463,8 @@ onMounted(loadOperations);
 .workbench-layout {
   display: flex;
   flex: 1;
-  height: calc(100vh - 53px);
+  height: 100%;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -474,8 +475,9 @@ onMounted(loadOperations);
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
   overflow-y: auto;
-  padding: 16px 20px;
+  padding: 16px 20px 60px;
   gap: 14px;
 }
 
@@ -714,6 +716,7 @@ onMounted(loadOperations);
   display: flex;
   flex-direction: column;
   height: 100%;
+  min-height: 0;
   overflow: hidden;
   background: var(--panel);
 }
@@ -767,8 +770,9 @@ onMounted(loadOperations);
 
 .result-body {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  padding: 16px 20px;
+  padding: 16px 20px 60px;
 }
 
 .tab-pane {

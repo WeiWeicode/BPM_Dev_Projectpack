@@ -51,7 +51,8 @@ BPM快速開發/
     ├── frontend/              Vue 3 + Vite 前端（手冊檢視與即時實測工作台）
     ├── wsdl_dump.py           抓 WSDL → 方法與參數清單
     ├── ws_client.py           手刻 rpc/encoded SOAP 客戶端
-    ├── probe_api.py           對 191 測試區實測（唯讀方法才自動跑）
+    ├── probe_api.py           唯讀方法實測
+    ├── probe_write.py         有副作用方法的情境式實測（會開單、跑完自動收單）
     ├── build_manual.py        合成 API 手冊
     ├── seeds.json             實測用參數值（人維護）
     ├── notes.json             ★ 各方法的語意註記（人維護）
@@ -169,15 +170,17 @@ python wsdl_dump.py && python probe_api.py && python build_manual.py
 [API 手冊](5_ws_explorer/docs/WorkflowService_API手冊.md)。
 語意註記寫在 `notes.json`，與程式分離；手冊自動產生，不要手改。
 
-**進度**：65 支中 29 支實測成功並留下回傳樣本，39 支已寫下用途與參數語意，
-其餘多為有副作用的方法（開單、簽核、作廢），需要可拋棄的測試單才能驗。
+**進度**：65 支方法全部都有用途與參數語意的記錄。實測執行成功 58 支
+（唯讀 33、有副作用 25 —— 實際開單、簽收、轉派、跳關、取回重辦、作廢），
+失敗 6 支原因均已查明，1 支（`importOrganizationData`）刻意不測。
 
-**操作邊界**：191 測試區可自由呼叫；**190 正式區一律不連**
-（`probe_api.py` 會直接拒絕）。唯讀方法自動跑，有副作用的方法必須指名。
+**操作邊界**：191 測試區可自由呼叫；**190 正式區一律不連**（程式直接拒絕）。
+`probe_write.py` 開出的單在跑完後全部作廢或終止，不留待辦。
 
 WSDL 型別在這裡幫助有限 —— 41 支宣告回傳 `string`，實際塞的是 XStream
 序列化的 Java 物件。這類只有實測才問得出來的事都記在手冊的「呼叫前必讀」，
-包含一個會延後爆炸的地雷：`invokeProcess` 不驗證表單欄位 id。
+包含兩個會延後爆炸的地雷：`invokeProcess` 不驗證表單欄位 id，
+以及使用者 OID 必須取 `Users.OID` 而非 `Employee.OID`（兩者只差一個字元）。
 
 
 ---

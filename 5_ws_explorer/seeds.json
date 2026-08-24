@@ -11,14 +11,18 @@
     "pWorkItemOID": "fetchToDoWorkItem('SP_DetectionOPProcess','S094009') 實測取得，屬 30 號單待簽的關卡",
     "pActId": "fetchFullProcInstanceWithSerialNo 的 activityId（原流程拼字即為 InitatorManagerTask，非筆誤）",
     "pVariableId": "getProcessPackage 內 RelevantDataDefinition.id",
-    "pAccessCondition": "實測列舉：只接受 0 或 1，其餘拋 IllegalArgumentException"
+    "pAccessCondition": "實測列舉：只接受 0 或 1，其餘拋 IllegalArgumentException",
+    "pUserOID": "Users.OID（**不是** Employee.OID，兩者只差一個字元）",
+    "pOrganizationId": "Organization.id，實測 GIGASOLAR 有專案、WHOLEMAX 回空清單",
+    "行事曆類方法": "S112009 的 Users.referCalendarOID 為 NULL，改用有掛行事曆的 S094009（全庫 8080 人中 1872 人沒掛）",
+    "pLevelName": "FunctionLevel.functionLevelName（職務層級），**不是** OrganizationUnitLevel"
   },
   "pUserId": "S112009",
   "pUserID": "S112009",
   "pRequesterId": "S112009",
   "pOrgUnitId": "S1800",
-  "pOrganizationId": "S1800",
-  "pOrgId": "S1800",
+  "pOrganizationId": "GIGASOLAR",
+  "pOrgId": "GIGASOLAR",
   "pOrgUnitOID": "ccd87ba4eb5e10048148b6a7c61bc3af",
   "pProcessId": "SP_DetectionOPProcess",
   "pProcessIds": "SP_DetectionOPProcess",
@@ -75,6 +79,15 @@
     },
     "checkWorkItemState": {
       "pWorkItemOID": "cd632419f9e91004851cac97a977dbbf"
+    },
+    "countWorkingTime": {
+      "pUserId": "S094009"
+    },
+    "countWorkingDays": {
+      "pUserId": "S094009"
+    },
+    "fetchDueDate": {
+      "pUserId": "S094009"
     }
   },
   "_覆寫理由": {
@@ -84,6 +97,16 @@
     "fetchProcSNMatchCurrtentPerformer": "30 號單目前待簽者是 S094009，不是 S112009",
     "fetchToDoWorkItem": "S112009 已簽完，待辦為空；用實際待簽者才看得到結構",
     "fetchWorkItemCount": "同上",
-    "checkWorkItemState": "工作項目屬 S094009 的關卡"
-  }
+    "checkWorkItemState": "工作項目屬 S094009 的關卡",
+    "countWorkingTime": "S112009 沒掛工作行事曆，會拋 NotFoundException；S094009 有",
+    "countWorkingDays": "S112009 沒掛工作行事曆，會拋 NotFoundException；S094009 有",
+    "fetchDueDate": "S112009 沒掛工作行事曆，會拋 NotFoundException；S094009 有"
+  },
+  "pUserOID": "4db90e2cf0151004808a451881bdf758",
+  "pAcceptorOID": "35345d84d6d4100482071bce21009000",
+  "pRequesterOID": "4db90e2cf0151004808a451881bdf758",
+  "pLabelOID": "000000000000000000000LabelSealed",
+  "pOriginalFullFileName": "api_probe.txt",
+  "pLevelName": "副總經理級",
+  "pApprovalLevelType": "0"
 }

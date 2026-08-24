@@ -15,9 +15,9 @@ export interface OperationSummary {
   name: string;
   inputMessage: string;
   level: 'read' | 'write';
-  confidence: 'verified' | 'external' | 'guess' | 'none';
+  confidence: 'verified' | 'verified_write' | 'external' | 'guess' | 'none';
   confidenceLabel: string;
-  status: 'ok' | 'fault' | 'error' | 'soft_error' | 'skipped';
+  status: 'ok' | 'fault' | 'error' | 'soft_error' | 'skipped' | 'refused';
   statusLabel: string;
   elapsedMs?: number | null;
   purpose?: string | null;
@@ -33,9 +33,9 @@ export interface OperationDetail {
   portType: string;
   parameterOrder: string[];
   level: 'read' | 'write';
-  confidence: 'verified' | 'external' | 'guess' | 'none';
+  confidence: 'verified' | 'verified_write' | 'external' | 'guess' | 'none';
   confidenceLabel: string;
-  status: 'ok' | 'fault' | 'error' | 'soft_error' | 'skipped';
+  status: 'ok' | 'fault' | 'error' | 'soft_error' | 'skipped' | 'refused';
   statusLabel: string;
   elapsedMs?: number | null;
   purpose?: string | null;

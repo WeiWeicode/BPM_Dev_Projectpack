@@ -21,6 +21,7 @@ from .schemas import (
 
 CONFIDENCE_LABELS = {
     'verified': '✅ 已實測',
+    'verified_write': '✅ 已實測（副作用已驗證）',
     'external': '☑️ 既有服務驗證',
     'guess': '⚠️ 僅推測',
     'none': '⚠️ 尚未分析',
@@ -32,6 +33,7 @@ STATUS_LABELS = {
     'error': '連線失敗',
     'soft_error': '假成功',
     'skipped': '未實測',
+    'refused': '刻意未執行',
 }
 
 READ_VERBS = ('fetch', 'get', 'find', 'count', 'is', 'check')
@@ -69,12 +71,44 @@ class WsExplorerService(object):
     def __init__(self):
         self._api: Optional[Dict[str, Any]] = None
         self._probe: Optional[Dict[str, Any]] = None
+        self._write_probe: Dict[str, Any] = {}
         self._notes: Optional[Dict[str, Any]] = None
         self._seeds: Optional[Dict[str, Any]] = None
+        self._mtimes: Dict[str, float] = {}
         self.reload()
 
+    def _check_and_reload_if_needed(self):
+        """檢查底層 JSON 檔案是否有更新，有變更時自動重載。"""
+        paths = [
+            settings.API_JSON_PATH,
+            settings.PROBE_JSON_PATH,
+            settings.WRITE_PROBE_JSON_PATH,
+            settings.NOTES_JSON_PATH,
+            settings.SEEDS_JSON_PATH,
+        ]
+        changed = False
+        for p in paths:
+            if os.path.exists(p):
+                mtime = os.path.getmtime(p)
+                if self._mtimes.get(p) != mtime:
+                    changed = True
+                    break
+        if changed:
+            self.reload()
+
     def reload(self):
-        """重新載入檔案資料。"""
+        """重新載入所有檔案資料。"""
+        paths = [
+            settings.API_JSON_PATH,
+            settings.PROBE_JSON_PATH,
+            settings.WRITE_PROBE_JSON_PATH,
+            settings.NOTES_JSON_PATH,
+            settings.SEEDS_JSON_PATH,
+        ]
+        for p in paths:
+            if os.path.exists(p):
+                self._mtimes[p] = os.path.getmtime(p)
+
         if os.path.exists(settings.API_JSON_PATH):
             with open(settings.API_JSON_PATH, 'r', encoding='utf-8') as handle:
                 self._api = json.load(handle)
@@ -86,6 +120,23 @@ class WsExplorerService(object):
                 self._probe = json.load(handle)
         else:
             self._probe = {'results': [], 'summary': {}, 'endpoint': settings.DEFAULT_ENDPOINT}
+
+        self._write_probe = {}
+        if os.path.exists(settings.WRITE_PROBE_JSON_PATH):
+            try:
+                with open(settings.WRITE_PROBE_JSON_PATH, 'r', encoding='utf-8') as handle:
+                    wdata = json.load(handle)
+                for step in wdata.get('steps', []):
+                    name = step['method']
+                    st = step['status']
+                    if name not in self._write_probe or st == 'ok':
+                        self._write_probe[name] = {
+                            'status': st,
+                            'fault': step.get('fault') or step.get('reason'),
+                            'elapsedMs': step.get('elapsedMs'),
+                        }
+            except Exception:
+                self._write_probe = {}
 
         if os.path.exists(settings.NOTES_JSON_PATH):
             with open(settings.NOTES_JSON_PATH, 'r', encoding='utf-8') as handle:
@@ -105,12 +156,27 @@ class WsExplorerService(object):
         return self._notes.get(name)
 
     def _get_probe_record(self, input_message: str, name: str) -> Optional[Dict[str, Any]]:
-        if not self._probe or 'results' not in self._probe:
-            return None
-        for item in self._probe['results']:
-            if item.get('inputMessage') == input_message or item.get('name') == name:
-                return item
-        return None
+        record = None
+        if self._probe and 'results' in self._probe:
+            for item in self._probe['results']:
+                if item.get('inputMessage') == input_message or item.get('name') == name:
+                    record = dict(item)
+                    break
+
+        if not record:
+            record = {'name': name, 'inputMessage': input_message, 'status': 'skipped'}
+
+        # 若唯讀實測為 skipped，合併寫入實測結果
+        if record.get('status') == 'skipped' and name in self._write_probe:
+            w_item = self._write_probe[name]
+            record['status'] = w_item.get('status', 'skipped')
+            if w_item.get('fault'):
+                record['faultString'] = w_item['fault']
+            if w_item.get('elapsedMs'):
+                record['elapsedMs'] = w_item['elapsedMs']
+            record.pop('reason', None)
+
+        return record
 
     def _get_seed_value(self, op_name: str, param_name: str) -> Any:
         if not self._seeds:
@@ -121,29 +187,29 @@ class WsExplorerService(object):
         return self._seeds.get(param_name)
 
     def get_overview(self) -> OverviewSummary:
+        self._check_and_reload_if_needed()
         operations = self._api.get('operations', []) if self._api else []
         notes = self._notes or {}
         documented = [op for op in operations if op['name'] in notes and not op['name'].startswith('_')]
-        
-        probe_results = self._probe.get('results', []) if self._probe else []
-        verified_count = sum(1 for item in probe_results if item.get('status') == 'ok')
 
         status_counts: Dict[str, int] = {}
-        for op in operations:
-            probe_rec = self._get_probe_record(op.get('inputMessage', ''), op['name'])
-            st = probe_rec.get('status', 'skipped') if probe_rec else 'skipped'
-            status_counts[st] = status_counts.get(st, 0) + 1
-
         confidence_counts: Dict[str, int] = {}
-        for op in operations:
-            note = self._get_note(op['name'])
-            conf = note.get('信心', 'none') if note else 'none'
-            confidence_counts[conf] = confidence_counts.get(conf, 0) + 1
-
         level_counts = {'read': 0, 'write': 0}
+        verified_count = 0
+
         for op in operations:
             lvl = classify_level(op['name'])
             level_counts[lvl] = level_counts.get(lvl, 0) + 1
+
+            probe_rec = self._get_probe_record(op.get('inputMessage', ''), op['name'])
+            st = probe_rec.get('status', 'skipped') if probe_rec else 'skipped'
+            status_counts[st] = status_counts.get(st, 0) + 1
+            if st == 'ok':
+                verified_count += 1
+
+            note = self._get_note(op['name'])
+            conf = note.get('信心', 'none') if note else 'none'
+            confidence_counts[conf] = confidence_counts.get(conf, 0) + 1
 
         return OverviewSummary(
             endpoint=self._probe.get('endpoint', settings.DEFAULT_ENDPOINT) if self._probe else settings.DEFAULT_ENDPOINT,
@@ -158,6 +224,7 @@ class WsExplorerService(object):
         )
 
     def get_seeds(self) -> SeedsData:
+        self._check_and_reload_if_needed()
         if not self._seeds:
             return SeedsData()
         sources = self._seeds.get('_來源', {})
@@ -172,6 +239,7 @@ class WsExplorerService(object):
         confidence: Optional[str] = None,
         status: Optional[str] = None,
     ) -> List[OperationSummary]:
+        self._check_and_reload_if_needed()
         if not self._api:
             return []
 
@@ -253,6 +321,7 @@ class WsExplorerService(object):
         return items
 
     def get_operation_detail(self, name: str, input_message: Optional[str] = None) -> Optional[OperationDetail]:
+        self._check_and_reload_if_needed()
         if not self._api:
             return None
 

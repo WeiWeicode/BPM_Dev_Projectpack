@@ -31,4 +31,5 @@ __pycache__/
 /5_ws_explorer/out/payloads/
 /5_ws_explorer/out/probe_result.json
 /5_ws_explorer/out/probe_result.md
+/5_ws_explorer/out/write_probe_result.json
 
