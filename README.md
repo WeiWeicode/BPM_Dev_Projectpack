@@ -1,8 +1,8 @@
 # 鼎新 BPM 快速開發工具集 —— 專案地圖
 
-四個各自獨立、但共用同一套解析核心的工具，對應 BPM 開發的四個階段：
+六個各自獨立、但共用同一套解析核心與資料庫模組的工具，涵蓋 BPM 開發、API 整合與日常流程查詢：
 **改造既有檔案 → 設定權限 → 理解線上現況 → 隨時查閱與快速調整**，
-外加一個獨立的 ⑤ `5_ws_explorer`，記錄 BPM 對外的 SOAP API 清單。
+外加 ⑤ `5_ws_explorer`（SOAP API 擷取與實測工作台）與 ⑥ `6_todo_viewer`（個人待辦與單據查詢器）。
 
 > **資料庫預設一律唯讀。** 全工具集只有一個地方會寫資料庫
 > （`4_db_viewer/backend/app/writer.py`），且預設關閉、正式區永久禁寫。
@@ -18,7 +18,7 @@ BPM快速開發/
 ├── 1_xml_tool/            ① 萃取表單與流程
 │   ├── PRD.md
 │   ├── bpm_tool.py            終端互動主程式
-│   └── core/                  ★ 解析核心，1／3／4 共用，2 有對應的 JS 實作
+│   └── core/                  ★ 解析核心，1／3／4／6 共用，2 有對應的 JS 實作
 │       ├── xml_utils.py           XML 區塊定位與無損編輯
 │       ├── form_handler.py        .form 萃取／回寫
 │       └── bpmn_handler.py        .bpmn 萃取／回寫
@@ -45,20 +45,29 @@ BPM快速開發/
 │   │   └── backups/              寫入前的自動備份與稽核紀錄（不進版控）
 │   └── frontend/              Vue 3 + Vite
 │
-└── 5_ws_explorer/         ⑤ BPM SOAP API 擷取與實測
-    ├── README.md              使用說明與操作邊界
-    ├── backend/               FastAPI 後端（提供 API 檢視與實測代理）
-    ├── frontend/              Vue 3 + Vite 前端（手冊檢視與即時實測工作台）
-    ├── wsdl_dump.py           抓 WSDL → 方法與參數清單
-    ├── ws_client.py           手刻 rpc/encoded SOAP 客戶端
-    ├── probe_api.py           唯讀方法實測
-    ├── probe_write.py         有副作用方法的情境式實測（會開單、跑完自動收單）
-    ├── build_manual.py        合成 API 手冊
-    ├── seeds.json             實測用參數值（人維護）
-    ├── notes.json             ★ 各方法的語意註記（人維護）
+├── 5_ws_explorer/         ⑤ BPM SOAP API 擷取與實測
+│   ├── README.md              使用說明與操作邊界
+│   ├── backend/               FastAPI 後端（提供 API 檢視與實測代理）
+│   ├── frontend/              Vue 3 + Vite 前端（手冊檢視與即時實測工作台）
+│   ├── wsdl_dump.py           抓 WSDL → 方法與參數清單
+│   ├── ws_client.py           手刻 rpc/encoded SOAP 客戶端
+│   ├── probe_api.py           唯讀方法實測
+│   ├── probe_write.py         有副作用方法的情境式實測（會開單、跑完自動收單）
+│   ├── build_manual.py        合成 API 手冊
+│   ├── seeds.json             實測用參數值（人維護）
+│   ├── notes.json             ★ 各方法的語意註記（人維護）
+│   ├── docs/
+│   │   └── WorkflowService_API手冊.md   主產出
+│   └── out/                   WSDL 原檔、API 清單、實測結果與回傳樣本
+│
+└── 6_todo_viewer/         ⑥ BPM 待辦與流程查詢器
+    ├── PLAN.md                計畫書與決策記錄
+    ├── README.md              使用說明與防雷手冊
+    ├── probe_todo.py          待辦狀態與深連結實測腳本
     ├── docs/
-    │   └── WorkflowService_API手冊.md   主產出
-    └── out/                   WSDL 原檔、API 清單、實測結果與回傳樣本
+    │   └── 待辦狀態語意.md        ★ 待辦收件匣與狀態碼實測
+    ├── backend/               FastAPI（待辦/經辦/申請查詢 + 欄位中文名即時解析）
+    └── frontend/              Vue 3 + Vite（三頁籤清單 + 詳情抽屜 + BPM 深連結）
 ```
 
 ---
@@ -185,7 +194,33 @@ WSDL 型別在這裡幫助有限 —— 41 支宣告回傳 `string`，實際塞�
 
 ---
 
-## 四者的關係
+## ⑥ 6_todo_viewer —— BPM 待辦與流程查詢器
+
+輸入**員工編號或姓名**，查出這個人的待簽核、我申請的、我經辦過的三類單據，
+點單號看表單內容（即時解析各版本欄位中文名稱）與簽核歷程，每筆都附深連結直接跳回 BPM ——
+待簽核提供「簽核」（`PerformWorkFromMail`），三個分頁皆提供「追蹤」（`TraceProcessMain`）。
+
+```bash
+cd 6_todo_viewer/backend
+pip install -r requirements.txt
+python -m uvicorn app.main:app --port 8100
+```
+
+前端建置過（`cd frontend && npm install && npm run build`）後，
+只需跑 uvicorn 一個服務，開 <http://127.0.0.1:8100> 即可（開發模式跑 `npm run dev`）。
+
+**特色與防雷設計**：
+- **待辦收件匣精準定位**：待辦關聯查詢 `LocalToDoWorkItem`（而非未完成時必為 NULL 的 `WorkItem.performerOID`）。
+- **同人多帳號處理**：不同公司別為不同帳號，查詢一律回候選清單讓人明確挑選。
+- **表單關聯防掉單**：`LocalRelevantData` 採單獨查詢並 `JOIN FormInstance`，避免多流程變數列造成隨機抓不到表單。
+- **BPM 深連結跟著主機走**：依查詢來源（191 測試區／190 正式區）動態產生深連結，點擊即可直達 BPM。
+- **欄位中文名即時解析**：經由 `FormDefinition.defSerialize` 解析當時版本的元件定義並快取，準確還原欄位中文名。
+
+詳見 [6_todo_viewer/README.md](6_todo_viewer/README.md) 與 [PLAN.md](6_todo_viewer/PLAN.md)。
+
+---
+
+## 六者的關係
 
 ```
         鼎新 BPM 設計師                        BPM 資料庫
@@ -194,31 +229,28 @@ WSDL 型別在這裡幫助有限 —— 41 支宣告回傳 `string`，實際塞�
         samples/*.form                        3_db_explorer
         samples/*.bpmn                     （撈定義、組流程圖）
               │                                     │
-      ┌───────┴───────┐                             │
-      ↓               ↓                             │
-  1_xml_tool     2_web_builder                      │
- （改 ID）      （設權限、建新單）                      │
-      │               │                             │
-      └───────┬───────┘                             │
-              ↓                                     ↓
-        改好的 XML ──匯入──→ 鼎新 BPM ──→ docs/BPM_知識重點.md
-                                              （驗證結果、留下說明）
-                                                    │
-                                                    ↓
-                                              4_db_viewer
-                                          （網頁瀏覽 + 權限微調）
-                                                    ╎
-                                        只有權限值可直接寫回資料庫
-                                        （預設關閉，正式區永久禁寫）
+      ┌───────┴───────┐                             ├─────────────────┐
+      ↓               ↓                             ↓                 ↓
+  1_xml_tool     2_web_builder                 4_db_viewer       6_todo_viewer
+ （改 ID）      （設權限、建新單）          （結構瀏覽+權限微調）  （個人待辦/單據查詢）
+      │               │                             ╎                 │
+      └───────┬───────┘                 只有權限值可直接寫回資料庫    附深連結跳回 BPM
+              ↓                         （預設關閉，正式區永久禁寫）          │
+        改好的 XML ──匯入──→ 鼎新 BPM ──────────────────────────────────────┘
+                                ▲
+                                │ SOAP 呼叫
+                                │
+                          5_ws_explorer
+                      （API 擷取、實測工作台）
 ```
 
-`1_xml_tool/core/` 是共用的解析核心：`3_db_explorer` 直接 import 它來解析
-撈下來的 XML，`4_db_viewer` 再經由 `bpm_kb` 間接使用同一套；
-`2_web_builder` 則是它的 JavaScript 對應實作（邏輯一致，
-以 `test_core.mjs` 對同一批範例檔交叉驗證）。
-
-**分工界線**：結構性變更（加減元件、改關卡、改流程）走 ②，
-純權限值的微調才走 ④。這條線要守住，否則版本控制會失控。
+- `1_xml_tool/core/` 是共用的解析核心：`3_db_explorer` 直接 import 它來解析撈下來的 XML，`4_db_viewer` 與 `6_todo_viewer` 亦透過 `bpm_kb` / `core` 解析表單定義與欄位中文名；`2_web_builder` 則是其 JavaScript 對應實作（以 `test_core.mjs` 交叉驗證）。
+- **分工界線**：
+  - 離線檔案結構性變更（改 ID、加減元件、改關卡、改流程）走 ①、②。
+  - 線上定義查詢與文件萃取走 ③。
+  - 線上結構與權限矩陣檢視、純權限值微調走 ④。
+  - 外部系統整合與 SOAP WebService 呼叫、實測工作台走 ⑤。
+  - 日常作業、待簽單據追蹤、個人申請/經辦歷史查閱與深連結跳轉走 ⑥。
 
 ---
 
@@ -289,10 +321,12 @@ WSDL 型別在這裡幫助有限 —— 41 支宣告回傳 `string`，實際塞�
 
 | 元件 | 資料庫存取 |
 | --- | --- |
-| `bpm_kb.db.Database`（1／3／4 共用） | **`readonly=True`**，永遠唯讀 |
+| `bpm_kb.db.Database`（1／3／4／6 共用） | **`readonly=True`**，永遠唯讀 |
 | `3_db_explorer` CLI 的 `sql` 指令 | 只接受 `SELECT` / `WITH` |
 | `4_db_viewer` 唯讀端點 | 全為 `GET`，參數化查詢，不接受 SQL 片段 |
 | `4_db_viewer/backend/app/writer.py` | **唯一的寫入路徑**，另開連線，不與唯讀共用 |
+| `5_ws_explorer` | SOAP 呼叫，**190 正式區永久拒絕連線**；副作用方法需明確授權 |
+| `6_todo_viewer` 查詢端點 | 全為 `GET`，永遠唯讀，純 SQL 查詢不呼叫 SOAP |
 
 寫入路徑的十道防護（共用列偵測、預設關閉、流程白名單、主機白名單、
 強制備份、稽核紀錄、兩段式 preview／apply、值白名單、rowcount 驗證、
@@ -316,6 +350,7 @@ WSDL 型別在這裡幫助有限 —— 41 支宣告回傳 `string`，實際塞�
 | 3_db_explorer | Python 3.x + `pyodbc`，以及 SQL Server ODBC 驅動 |
 | 4_db_viewer | 後端 Python 3.x + FastAPI（需 3_db_explorer 的環境）；前端 Node.js + Vite |
 | 5_ws_explorer | 後端 Python 3.x + FastAPI；前端 Node.js + Vite |
+| 6_todo_viewer | 後端 Python 3.x + FastAPI（需 3_db_explorer 的環境）；前端 Node.js + Vite |
 
 已驗證組合：Python 3.14.3、FastAPI 0.141.1、Pydantic 2.13.4、
 Node v24.14.0、npm 11.12.0、ODBC Driver 18 for SQL Server、SQL Server 2019。
@@ -327,7 +362,10 @@ Node v24.14.0、npm 11.12.0、ODBC Driver 18 for SQL Server、SQL Server 2019。
 | 1_xml_tool ／ 2_web_builder | `cd 2_web_builder && node test_core.mjs` | 62 項通過 |
 | 4_db_viewer 後端 | `cd 4_db_viewer/backend && python -m pytest tests -q` | 33 通過、2 跳過 |
 | 4_db_viewer 前端 | `cd 4_db_viewer/frontend && npx vue-tsc --noEmit` | 無錯誤 |
+| 5_ws_explorer 後端 | `cd 5_ws_explorer/backend && python -m pytest tests -q` | 8 項通過 |
 | 5_ws_explorer 前端 | `cd 5_ws_explorer/frontend && npx vue-tsc --noEmit` | 無錯誤 |
+| 6_todo_viewer 後端 | `cd 6_todo_viewer/backend && python -m pytest tests -q` | 23 項（14 純邏輯通過、9 整合視連線狀況） |
+| 6_todo_viewer 前端 | `cd 6_todo_viewer/frontend && npx vue-tsc --noEmit` | 無錯誤 |
 
 那 2 個跳過的是**真的會寫資料庫**的整合測試，需三個環境變數同時設齊才會執行；
 跳過時會說明原因，不會假裝通過。
