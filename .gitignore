@@ -11,6 +11,7 @@
 /3_db_explorer/docs/schema/*.json
 
 __pycache__/
+.pytest_cache/
 
 # 4_db_viewer 前後端建置產物
 /4_db_viewer/frontend/node_modules/
@@ -20,3 +21,14 @@ __pycache__/
 /4_db_viewer/backend/openapi.json
 
 /4_db_viewer/backend/backups/
+
+# 5_ws_explorer 前端建置產物
+/5_ws_explorer/frontend/node_modules/
+/5_ws_explorer/frontend/dist/
+
+# 5_ws_explorer 實測產出含真實單據內容與員工姓名，不進版控
+# （WSDL 原檔與 API 清單只有介面契約，可保留）
+/5_ws_explorer/out/payloads/
+/5_ws_explorer/out/probe_result.json
+/5_ws_explorer/out/probe_result.md
+

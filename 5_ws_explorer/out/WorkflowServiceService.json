@@ -1,0 +1,1916 @@
+{
+  "service": "WorkflowServiceService",
+  "port": "WorkflowService",
+  "location": "http://10.10.130.191:8080/NaNaWeb/services/WorkflowService",
+  "source": "http://10.10.130.191:8080/NaNaWeb/services/WorkflowService?wsdl",
+  "fetchedAt": "2026-08-24T08:55:54",
+  "targetNamespace": "http://webservice.nana.dsc.com/",
+  "style": "rpc",
+  "use": "encoded",
+  "operationCount": 65,
+  "operations": [
+    {
+      "name": "abortProcessForSerialNo",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessInstanceSerialNo",
+        "pAbortComment"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessInstanceSerialNo",
+          "type": "string"
+        },
+        {
+          "name": "pAbortComment",
+          "type": "string"
+        }
+      ],
+      "returns": [],
+      "inputMessage": "abortProcessForSerialNoRequest",
+      "outputMessage": "abortProcessForSerialNoResponse"
+    },
+    {
+      "name": "acceptWorkItem",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pWorkItemOID",
+        "pUserId"
+      ],
+      "parameters": [
+        {
+          "name": "pWorkItemOID",
+          "type": "string"
+        },
+        {
+          "name": "pUserId",
+          "type": "string"
+        }
+      ],
+      "returns": [],
+      "inputMessage": "acceptWorkItemRequest",
+      "outputMessage": "acceptWorkItemResponse"
+    },
+    {
+      "name": "addCloneSerialActivity",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessInstanceSN",
+        "pActId",
+        "pRefActId"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessInstanceSN",
+          "type": "string"
+        },
+        {
+          "name": "pActId",
+          "type": "string"
+        },
+        {
+          "name": "pRefActId",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "addCloneSerialActivityReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "addCloneSerialActivityRequest",
+      "outputMessage": "addCloneSerialActivityResponse"
+    },
+    {
+      "name": "addCustomActivity",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pWorkItmeOID",
+        "pPostActDefsAsXML"
+      ],
+      "parameters": [
+        {
+          "name": "pWorkItmeOID",
+          "type": "string"
+        },
+        {
+          "name": "pPostActDefsAsXML",
+          "type": "string"
+        }
+      ],
+      "returns": [],
+      "inputMessage": "addCustomActivityRequest",
+      "outputMessage": "addCustomActivityResponse"
+    },
+    {
+      "name": "addCustomParallelActivity",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pWorkItmeOID",
+        "pPostParallelActDefsAsXML"
+      ],
+      "parameters": [
+        {
+          "name": "pWorkItmeOID",
+          "type": "string"
+        },
+        {
+          "name": "pPostParallelActDefsAsXML",
+          "type": "string"
+        }
+      ],
+      "returns": [],
+      "inputMessage": "addCustomParallelActivityRequest",
+      "outputMessage": "addCustomParallelActivityResponse"
+    },
+    {
+      "name": "addCustomParallelAndSerialActivity",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessInstanceSN",
+        "pActId",
+        "pRefActId",
+        "pPostPSActDefsAsXML"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessInstanceSN",
+          "type": "string"
+        },
+        {
+          "name": "pActId",
+          "type": "string"
+        },
+        {
+          "name": "pRefActId",
+          "type": "string"
+        },
+        {
+          "name": "pPostPSActDefsAsXML",
+          "type": "string"
+        }
+      ],
+      "returns": [],
+      "inputMessage": "addCustomParallelAndSerialActivityRequest",
+      "outputMessage": "addCustomParallelAndSerialActivityResponse"
+    },
+    {
+      "name": "addCustomParallelAndSerialActivity",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pWorkItmeOID",
+        "pPostPSActDefsAsXML"
+      ],
+      "parameters": [
+        {
+          "name": "pWorkItmeOID",
+          "type": "string"
+        },
+        {
+          "name": "pPostPSActDefsAsXML",
+          "type": "string"
+        }
+      ],
+      "returns": [],
+      "inputMessage": "addCustomParallelAndSerialActivityRequest1",
+      "outputMessage": "addCustomParallelAndSerialActivityResponse1"
+    },
+    {
+      "name": "addLabelToNoticeWorkItem",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pWorkItemOID",
+        "pUserOID",
+        "pLabelOID"
+      ],
+      "parameters": [
+        {
+          "name": "pWorkItemOID",
+          "type": "string"
+        },
+        {
+          "name": "pUserOID",
+          "type": "string"
+        },
+        {
+          "name": "pLabelOID",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "addLabelToNoticeWorkItemReturn",
+          "type": "boolean"
+        }
+      ],
+      "inputMessage": "addLabelToNoticeWorkItemRequest",
+      "outputMessage": "addLabelToNoticeWorkItemResponse"
+    },
+    {
+      "name": "addUserAbsence",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pUserId",
+        "pStartTime",
+        "pEndTime"
+      ],
+      "parameters": [
+        {
+          "name": "pUserId",
+          "type": "string"
+        },
+        {
+          "name": "pStartTime",
+          "type": "string"
+        },
+        {
+          "name": "pEndTime",
+          "type": "string"
+        }
+      ],
+      "returns": [],
+      "inputMessage": "addUserAbsenceRequest",
+      "outputMessage": "addUserAbsenceResponse"
+    },
+    {
+      "name": "assignRelevantDataBySerialNo",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessInstanceSerialNo",
+        "pRelevantDataId",
+        "pRelevantDataValue"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessInstanceSerialNo",
+          "type": "string"
+        },
+        {
+          "name": "pRelevantDataId",
+          "type": "string"
+        },
+        {
+          "name": "pRelevantDataValue",
+          "type": "string"
+        }
+      ],
+      "returns": [],
+      "inputMessage": "assignRelevantDataBySerialNoRequest",
+      "outputMessage": "assignRelevantDataBySerialNoResponse"
+    },
+    {
+      "name": "assigneeReassignWorkItem",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pRequesterOID",
+        "pAcceptorOID",
+        "pWorkItemOID",
+        "pReassignComment"
+      ],
+      "parameters": [
+        {
+          "name": "pRequesterOID",
+          "type": "string"
+        },
+        {
+          "name": "pAcceptorOID",
+          "type": "string"
+        },
+        {
+          "name": "pWorkItemOID",
+          "type": "string"
+        },
+        {
+          "name": "pReassignComment",
+          "type": "string"
+        }
+      ],
+      "returns": [],
+      "inputMessage": "assigneeReassignWorkItemRequest",
+      "outputMessage": "assigneeReassignWorkItemResponse"
+    },
+    {
+      "name": "bypassActivity",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pActivityInstanceOID"
+      ],
+      "parameters": [
+        {
+          "name": "pActivityInstanceOID",
+          "type": "string"
+        }
+      ],
+      "returns": [],
+      "inputMessage": "bypassActivityRequest",
+      "outputMessage": "bypassActivityResponse"
+    },
+    {
+      "name": "checkWorkItemState",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pWorkItemOID"
+      ],
+      "parameters": [
+        {
+          "name": "pWorkItemOID",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "checkWorkItemStateReturn",
+          "type": "int"
+        }
+      ],
+      "inputMessage": "checkWorkItemStateRequest",
+      "outputMessage": "checkWorkItemStateResponse"
+    },
+    {
+      "name": "completeWorkItem",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pWorkItemOID",
+        "pUserId",
+        "pComment"
+      ],
+      "parameters": [
+        {
+          "name": "pWorkItemOID",
+          "type": "string"
+        },
+        {
+          "name": "pUserId",
+          "type": "string"
+        },
+        {
+          "name": "pComment",
+          "type": "string"
+        }
+      ],
+      "returns": [],
+      "inputMessage": "completeWorkItemRequest",
+      "outputMessage": "completeWorkItemResponse"
+    },
+    {
+      "name": "countWorkingDays",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pUserId",
+        "pStartDateTime",
+        "pEndDateTime",
+        "pDateFormat"
+      ],
+      "parameters": [
+        {
+          "name": "pUserId",
+          "type": "string"
+        },
+        {
+          "name": "pStartDateTime",
+          "type": "string"
+        },
+        {
+          "name": "pEndDateTime",
+          "type": "string"
+        },
+        {
+          "name": "pDateFormat",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "countWorkingDaysReturn",
+          "type": "int"
+        }
+      ],
+      "inputMessage": "countWorkingDaysRequest",
+      "outputMessage": "countWorkingDaysResponse"
+    },
+    {
+      "name": "countWorkingTime",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pUserId",
+        "pStartDateTime",
+        "pEndDateTime",
+        "pDateFormat"
+      ],
+      "parameters": [
+        {
+          "name": "pUserId",
+          "type": "string"
+        },
+        {
+          "name": "pStartDateTime",
+          "type": "string"
+        },
+        {
+          "name": "pEndDateTime",
+          "type": "string"
+        },
+        {
+          "name": "pDateFormat",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "countWorkingTimeReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "countWorkingTimeRequest",
+      "outputMessage": "countWorkingTimeResponse"
+    },
+    {
+      "name": "fetchCanTraceProcSN",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessIds",
+        "pUserId"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessIds",
+          "type": "string"
+        },
+        {
+          "name": "pUserId",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchCanTraceProcSNReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchCanTraceProcSNRequest",
+      "outputMessage": "fetchCanTraceProcSNResponse"
+    },
+    {
+      "name": "fetchClosedProcInstances",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessId",
+        "pProcessClosedStartTime",
+        "pProcessClosedEndTime",
+        "pProcInstanceClosedState"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessId",
+          "type": "string"
+        },
+        {
+          "name": "pProcessClosedStartTime",
+          "type": "string"
+        },
+        {
+          "name": "pProcessClosedEndTime",
+          "type": "string"
+        },
+        {
+          "name": "pProcInstanceClosedState",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchClosedProcInstancesReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchClosedProcInstancesRequest",
+      "outputMessage": "fetchClosedProcInstancesResponse"
+    },
+    {
+      "name": "fetchDefaultSubstituteInfo",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pUserId",
+        "pStartSeq",
+        "pEndSeq",
+        "pDate"
+      ],
+      "parameters": [
+        {
+          "name": "pUserId",
+          "type": "string"
+        },
+        {
+          "name": "pStartSeq",
+          "type": "int"
+        },
+        {
+          "name": "pEndSeq",
+          "type": "int"
+        },
+        {
+          "name": "pDate",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchDefaultSubstituteInfoReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchDefaultSubstituteInfoRequest",
+      "outputMessage": "fetchDefaultSubstituteInfoResponse"
+    },
+    {
+      "name": "fetchDefaultSubstituteInfo",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pUserId",
+        "pStartSeq",
+        "pEndSeq"
+      ],
+      "parameters": [
+        {
+          "name": "pUserId",
+          "type": "string"
+        },
+        {
+          "name": "pStartSeq",
+          "type": "int"
+        },
+        {
+          "name": "pEndSeq",
+          "type": "int"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchDefaultSubstituteInfoReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchDefaultSubstituteInfoRequest1",
+      "outputMessage": "fetchDefaultSubstituteInfoResponse1"
+    },
+    {
+      "name": "fetchDueDate",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pUserId",
+        "pBaseDate",
+        "pDueDays",
+        "pDateFormat"
+      ],
+      "parameters": [
+        {
+          "name": "pUserId",
+          "type": "string"
+        },
+        {
+          "name": "pBaseDate",
+          "type": "string"
+        },
+        {
+          "name": "pDueDays",
+          "type": "string"
+        },
+        {
+          "name": "pDateFormat",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchDueDateReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchDueDateRequest",
+      "outputMessage": "fetchDueDateResponse"
+    },
+    {
+      "name": "fetchFormInstanceWithProcOID",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessInstanceOID"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessInstanceOID",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchFormInstanceWithProcOIDReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchFormInstanceWithProcOIDRequest",
+      "outputMessage": "fetchFormInstanceWithProcOIDResponse"
+    },
+    {
+      "name": "fetchFormInstanceWithProcSerlNo",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessInstanceSerialNo"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessInstanceSerialNo",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchFormInstanceWithProcSerlNoReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchFormInstanceWithProcSerlNoRequest",
+      "outputMessage": "fetchFormInstanceWithProcSerlNoResponse"
+    },
+    {
+      "name": "fetchFullProcInstanceWithOID",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessInstanceOID"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessInstanceOID",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchFullProcInstanceWithOIDReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchFullProcInstanceWithOIDRequest",
+      "outputMessage": "fetchFullProcInstanceWithOIDResponse"
+    },
+    {
+      "name": "fetchFullProcInstanceWithSerialNo",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessInstanceSerialNo"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessInstanceSerialNo",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchFullProcInstanceWithSerialNoReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchFullProcInstanceWithSerialNoRequest",
+      "outputMessage": "fetchFullProcInstanceWithSerialNoResponse"
+    },
+    {
+      "name": "fetchFullProcInstanceWithSerialNoShowReferences",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessInstanceSerialNo",
+        "pShowReferences"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessInstanceSerialNo",
+          "type": "string"
+        },
+        {
+          "name": "pShowReferences",
+          "type": "boolean"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchFullProcInstanceWithSerialNoShowReferencesReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchFullProcInstanceWithSerialNoShowReferencesRequest",
+      "outputMessage": "fetchFullProcInstanceWithSerialNoShowReferencesResponse"
+    },
+    {
+      "name": "fetchOrgUnitOfUserId",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pUserId"
+      ],
+      "parameters": [
+        {
+          "name": "pUserId",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchOrgUnitOfUserIdReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchOrgUnitOfUserIdRequest",
+      "outputMessage": "fetchOrgUnitOfUserIdResponse"
+    },
+    {
+      "name": "fetchProcInstanceWithOID",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessInstanceOID"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessInstanceOID",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchProcInstanceWithOIDReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchProcInstanceWithOIDRequest",
+      "outputMessage": "fetchProcInstanceWithOIDResponse"
+    },
+    {
+      "name": "fetchProcInstanceWithSerialNo",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessInstanceSerialNo"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessInstanceSerialNo",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchProcInstanceWithSerialNoReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchProcInstanceWithSerialNoRequest",
+      "outputMessage": "fetchProcInstanceWithSerialNoResponse"
+    },
+    {
+      "name": "fetchProcInstances",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessId",
+        "pProcessInitialStartTime",
+        "pProcessInitialEndTime",
+        "pProcInstanceState"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessId",
+          "type": "string"
+        },
+        {
+          "name": "pProcessInitialStartTime",
+          "type": "string"
+        },
+        {
+          "name": "pProcessInitialEndTime",
+          "type": "string"
+        },
+        {
+          "name": "pProcInstanceState",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchProcInstancesReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchProcInstancesRequest",
+      "outputMessage": "fetchProcInstancesResponse"
+    },
+    {
+      "name": "fetchProcSNMatchCurrtentPerformer",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessId",
+        "pActId",
+        "pUserId"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessId",
+          "type": "string"
+        },
+        {
+          "name": "pActId",
+          "type": "string"
+        },
+        {
+          "name": "pUserId",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchProcSNMatchCurrtentPerformerReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchProcSNMatchCurrtentPerformerRequest",
+      "outputMessage": "fetchProcSNMatchCurrtentPerformerResponse"
+    },
+    {
+      "name": "fetchProcessAbortOrTerminateComment",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessSerialNo"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessSerialNo",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchProcessAbortOrTerminateCommentReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchProcessAbortOrTerminateCommentRequest",
+      "outputMessage": "fetchProcessAbortOrTerminateCommentResponse"
+    },
+    {
+      "name": "fetchProcessContextVariable",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessSerialNo",
+        "pVariableId",
+        "pOnlyTextValue"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessSerialNo",
+          "type": "string"
+        },
+        {
+          "name": "pVariableId",
+          "type": "string"
+        },
+        {
+          "name": "pOnlyTextValue",
+          "type": "boolean"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchProcessContextVariableReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchProcessContextVariableRequest",
+      "outputMessage": "fetchProcessContextVariableResponse"
+    },
+    {
+      "name": "fetchProcessContextVariable",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessSerialNo",
+        "pVariableId"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessSerialNo",
+          "type": "string"
+        },
+        {
+          "name": "pVariableId",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchProcessContextVariableReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchProcessContextVariableRequest1",
+      "outputMessage": "fetchProcessContextVariableResponse1"
+    },
+    {
+      "name": "fetchToDoWorkItem",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessIds",
+        "pUserId"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessIds",
+          "type": "string"
+        },
+        {
+          "name": "pUserId",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchToDoWorkItemReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchToDoWorkItemRequest",
+      "outputMessage": "fetchToDoWorkItemResponse"
+    },
+    {
+      "name": "fetchUniFormatFormInstanceWithProcOID",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessInstanceOID"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessInstanceOID",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchUniFormatFormInstanceWithProcOIDReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchUniFormatFormInstanceWithProcOIDRequest",
+      "outputMessage": "fetchUniFormatFormInstanceWithProcOIDResponse"
+    },
+    {
+      "name": "fetchUniFormatFormInstanceWithProcSerlNo",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessInstanceSerialNo"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessInstanceSerialNo",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchUniFormatFormInstanceWithProcSerlNoReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "fetchUniFormatFormInstanceWithProcSerlNoRequest",
+      "outputMessage": "fetchUniFormatFormInstanceWithProcSerlNoResponse"
+    },
+    {
+      "name": "fetchWorkItemCount",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pUserID",
+        "pAccessCondition",
+        "pViewTimesType"
+      ],
+      "parameters": [
+        {
+          "name": "pUserID",
+          "type": "string"
+        },
+        {
+          "name": "pAccessCondition",
+          "type": "int"
+        },
+        {
+          "name": "pViewTimesType",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "fetchWorkItemCountReturn",
+          "type": "int"
+        }
+      ],
+      "inputMessage": "fetchWorkItemCountRequest",
+      "outputMessage": "fetchWorkItemCountResponse"
+    },
+    {
+      "name": "findFormOIDsOfProcess",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessPackageId"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessPackageId",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "findFormOIDsOfProcessReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "findFormOIDsOfProcessRequest",
+      "outputMessage": "findFormOIDsOfProcessResponse"
+    },
+    {
+      "name": "findManagerByAppLvl",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pUserId",
+        "pOrgUnitOID",
+        "pLevelName",
+        "pApprovalLevelType",
+        "pIsDeptManager"
+      ],
+      "parameters": [
+        {
+          "name": "pUserId",
+          "type": "string"
+        },
+        {
+          "name": "pOrgUnitOID",
+          "type": "string"
+        },
+        {
+          "name": "pLevelName",
+          "type": "string"
+        },
+        {
+          "name": "pApprovalLevelType",
+          "type": "string"
+        },
+        {
+          "name": "pIsDeptManager",
+          "type": "boolean"
+        }
+      ],
+      "returns": [
+        {
+          "name": "findManagerByAppLvlReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "findManagerByAppLvlRequest",
+      "outputMessage": "findManagerByAppLvlResponse"
+    },
+    {
+      "name": "getFormFieldTemplate",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pFormDefinitionOID"
+      ],
+      "parameters": [
+        {
+          "name": "pFormDefinitionOID",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "getFormFieldTemplateReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "getFormFieldTemplateRequest",
+      "outputMessage": "getFormFieldTemplateResponse"
+    },
+    {
+      "name": "getProcessPackage",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessPackageId"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessPackageId",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "getProcessPackageReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "getProcessPackageRequest",
+      "outputMessage": "getProcessPackageResponse"
+    },
+    {
+      "name": "getProjectsWithOrganizationId",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pOrganizationId"
+      ],
+      "parameters": [
+        {
+          "name": "pOrganizationId",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "getProjectsWithOrganizationIdReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "getProjectsWithOrganizationIdRequest",
+      "outputMessage": "getProjectsWithOrganizationIdResponse"
+    },
+    {
+      "name": "getSubstituteState",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pUserId",
+        "pCheckTime"
+      ],
+      "parameters": [
+        {
+          "name": "pUserId",
+          "type": "string"
+        },
+        {
+          "name": "pCheckTime",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "getSubstituteStateReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "getSubstituteStateRequest",
+      "outputMessage": "getSubstituteStateResponse"
+    },
+    {
+      "name": "getSysintegrationServer",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [],
+      "parameters": [],
+      "returns": [
+        {
+          "name": "getSysintegrationServerReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "getSysintegrationServerRequest",
+      "outputMessage": "getSysintegrationServerResponse"
+    },
+    {
+      "name": "importOrganizationData",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pXMLData"
+      ],
+      "parameters": [
+        {
+          "name": "pXMLData",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "importOrganizationDataReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "importOrganizationDataRequest",
+      "outputMessage": "importOrganizationDataResponse"
+    },
+    {
+      "name": "increaseViewTimesOfWorkAssignment",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pUserId",
+        "pWorkItemOID"
+      ],
+      "parameters": [
+        {
+          "name": "pUserId",
+          "type": "string"
+        },
+        {
+          "name": "pWorkItemOID",
+          "type": "string"
+        }
+      ],
+      "returns": [],
+      "inputMessage": "increaseViewTimesOfWorkAssignmentRequest",
+      "outputMessage": "increaseViewTimesOfWorkAssignmentResponse"
+    },
+    {
+      "name": "invokeProcess",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessPackageId",
+        "pRequesterId",
+        "pOrgUnitId",
+        "pSubject"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessPackageId",
+          "type": "string"
+        },
+        {
+          "name": "pRequesterId",
+          "type": "string"
+        },
+        {
+          "name": "pOrgUnitId",
+          "type": "string"
+        },
+        {
+          "name": "pSubject",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "invokeProcessReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "invokeProcessRequest",
+      "outputMessage": "invokeProcessResponse"
+    },
+    {
+      "name": "invokeProcess",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessPackageId",
+        "pRequesterId",
+        "pOrgUnitId",
+        "pFormDefOID",
+        "pFormFieldValue",
+        "pSubject"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessPackageId",
+          "type": "string"
+        },
+        {
+          "name": "pRequesterId",
+          "type": "string"
+        },
+        {
+          "name": "pOrgUnitId",
+          "type": "string"
+        },
+        {
+          "name": "pFormDefOID",
+          "type": "string"
+        },
+        {
+          "name": "pFormFieldValue",
+          "type": "string"
+        },
+        {
+          "name": "pSubject",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "invokeProcessReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "invokeProcessRequest1",
+      "outputMessage": "invokeProcessResponse1"
+    },
+    {
+      "name": "invokeProcessAndAddCustAct",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessPackageId",
+        "pRequesterId",
+        "pOrgUnitId",
+        "pFormDefOID",
+        "pFormFieldValue",
+        "pSubject",
+        "pPostPSActDefsAsXML"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessPackageId",
+          "type": "string"
+        },
+        {
+          "name": "pRequesterId",
+          "type": "string"
+        },
+        {
+          "name": "pOrgUnitId",
+          "type": "string"
+        },
+        {
+          "name": "pFormDefOID",
+          "type": "string"
+        },
+        {
+          "name": "pFormFieldValue",
+          "type": "string"
+        },
+        {
+          "name": "pSubject",
+          "type": "string"
+        },
+        {
+          "name": "pPostPSActDefsAsXML",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "invokeProcessAndAddCustActReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "invokeProcessAndAddCustActRequest",
+      "outputMessage": "invokeProcessAndAddCustActResponse"
+    },
+    {
+      "name": "invokeProcessAndAddCustActByOrg",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessPackageId",
+        "pRequesterId",
+        "pOrgUnitId",
+        "pOrgId",
+        "pFormDefOID",
+        "pFormFieldValue",
+        "pSubject",
+        "pPostPSActDefsAsXML"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessPackageId",
+          "type": "string"
+        },
+        {
+          "name": "pRequesterId",
+          "type": "string"
+        },
+        {
+          "name": "pOrgUnitId",
+          "type": "string"
+        },
+        {
+          "name": "pOrgId",
+          "type": "string"
+        },
+        {
+          "name": "pFormDefOID",
+          "type": "string"
+        },
+        {
+          "name": "pFormFieldValue",
+          "type": "string"
+        },
+        {
+          "name": "pSubject",
+          "type": "string"
+        },
+        {
+          "name": "pPostPSActDefsAsXML",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "invokeProcessAndAddCustActByOrgReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "invokeProcessAndAddCustActByOrgRequest",
+      "outputMessage": "invokeProcessAndAddCustActByOrgResponse"
+    },
+    {
+      "name": "invokeProcessByOrg",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessPackageId",
+        "pRequesterId",
+        "pOrgUnitId",
+        "pOrgId",
+        "pSubject"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessPackageId",
+          "type": "string"
+        },
+        {
+          "name": "pRequesterId",
+          "type": "string"
+        },
+        {
+          "name": "pOrgUnitId",
+          "type": "string"
+        },
+        {
+          "name": "pOrgId",
+          "type": "string"
+        },
+        {
+          "name": "pSubject",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "invokeProcessByOrgReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "invokeProcessByOrgRequest",
+      "outputMessage": "invokeProcessByOrgResponse"
+    },
+    {
+      "name": "invokeProcessByOrg",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessPackageId",
+        "pRequesterId",
+        "pOrgUnitId",
+        "pOrgId",
+        "pFormDefOID",
+        "pFormFieldValue",
+        "pSubject"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessPackageId",
+          "type": "string"
+        },
+        {
+          "name": "pRequesterId",
+          "type": "string"
+        },
+        {
+          "name": "pOrgUnitId",
+          "type": "string"
+        },
+        {
+          "name": "pOrgId",
+          "type": "string"
+        },
+        {
+          "name": "pFormDefOID",
+          "type": "string"
+        },
+        {
+          "name": "pFormFieldValue",
+          "type": "string"
+        },
+        {
+          "name": "pSubject",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "invokeProcessByOrgReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "invokeProcessByOrgRequest1",
+      "outputMessage": "invokeProcessByOrgResponse1"
+    },
+    {
+      "name": "invokeProcessByParameter",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessPackageId",
+        "pRequesterId",
+        "pOrgUnitId",
+        "pParameterId",
+        "pInvokeParameter",
+        "pSubject"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessPackageId",
+          "type": "string"
+        },
+        {
+          "name": "pRequesterId",
+          "type": "string"
+        },
+        {
+          "name": "pOrgUnitId",
+          "type": "string"
+        },
+        {
+          "name": "pParameterId",
+          "type": "string"
+        },
+        {
+          "name": "pInvokeParameter",
+          "type": "string"
+        },
+        {
+          "name": "pSubject",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "invokeProcessByParameterReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "invokeProcessByParameterRequest",
+      "outputMessage": "invokeProcessByParameterResponse"
+    },
+    {
+      "name": "invokeProcessByParameterByOrg",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessPackageId",
+        "pRequesterId",
+        "pOrgUnitId",
+        "pOrgId",
+        "pParameterId",
+        "pInvokeParameter",
+        "pSubject"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessPackageId",
+          "type": "string"
+        },
+        {
+          "name": "pRequesterId",
+          "type": "string"
+        },
+        {
+          "name": "pOrgUnitId",
+          "type": "string"
+        },
+        {
+          "name": "pOrgId",
+          "type": "string"
+        },
+        {
+          "name": "pParameterId",
+          "type": "string"
+        },
+        {
+          "name": "pInvokeParameter",
+          "type": "string"
+        },
+        {
+          "name": "pSubject",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "invokeProcessByParameterByOrgReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "invokeProcessByParameterByOrgRequest",
+      "outputMessage": "invokeProcessByParameterByOrgResponse"
+    },
+    {
+      "name": "isPerformerOfProcessInstance",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pUserId",
+        "pProcessInstanceSerialNo"
+      ],
+      "parameters": [
+        {
+          "name": "pUserId",
+          "type": "string"
+        },
+        {
+          "name": "pProcessInstanceSerialNo",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "isPerformerOfProcessInstanceReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "isPerformerOfProcessInstanceRequest",
+      "outputMessage": "isPerformerOfProcessInstanceResponse"
+    },
+    {
+      "name": "managementChangeWorkItemOwner",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pAcceptorOID",
+        "pWorkItemOID",
+        "pReassignComment"
+      ],
+      "parameters": [
+        {
+          "name": "pAcceptorOID",
+          "type": "string"
+        },
+        {
+          "name": "pWorkItemOID",
+          "type": "string"
+        },
+        {
+          "name": "pReassignComment",
+          "type": "string"
+        }
+      ],
+      "returns": [],
+      "inputMessage": "managementChangeWorkItemOwnerRequest",
+      "outputMessage": "managementChangeWorkItemOwnerResponse"
+    },
+    {
+      "name": "managementReassignWorkItem",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pAcceptorOID",
+        "pWorkItemOID",
+        "pReassignComment"
+      ],
+      "parameters": [
+        {
+          "name": "pAcceptorOID",
+          "type": "string"
+        },
+        {
+          "name": "pWorkItemOID",
+          "type": "string"
+        },
+        {
+          "name": "pReassignComment",
+          "type": "string"
+        }
+      ],
+      "returns": [],
+      "inputMessage": "managementReassignWorkItemRequest",
+      "outputMessage": "managementReassignWorkItemResponse"
+    },
+    {
+      "name": "reexecuteActivity",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessSerialNo",
+        "pAskReexecuteUserId",
+        "pReexecuteActivityId",
+        "pReexecuteComment"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessSerialNo",
+          "type": "string"
+        },
+        {
+          "name": "pAskReexecuteUserId",
+          "type": "string"
+        },
+        {
+          "name": "pReexecuteActivityId",
+          "type": "string"
+        },
+        {
+          "name": "pReexecuteComment",
+          "type": "string"
+        }
+      ],
+      "returns": [],
+      "inputMessage": "reexecuteActivityRequest",
+      "outputMessage": "reexecuteActivityResponse"
+    },
+    {
+      "name": "removeAbsenceRecord",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pUserId",
+        "pStartDateTime",
+        "pEndDateTime"
+      ],
+      "parameters": [
+        {
+          "name": "pUserId",
+          "type": "string"
+        },
+        {
+          "name": "pStartDateTime",
+          "type": "string"
+        },
+        {
+          "name": "pEndDateTime",
+          "type": "string"
+        }
+      ],
+      "returns": [],
+      "inputMessage": "removeAbsenceRecordRequest",
+      "outputMessage": "removeAbsenceRecordResponse"
+    },
+    {
+      "name": "removeLabelFromNoticeWorkItem",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pWorkItemOID",
+        "pUserOID",
+        "pLabelOID"
+      ],
+      "parameters": [
+        {
+          "name": "pWorkItemOID",
+          "type": "string"
+        },
+        {
+          "name": "pUserOID",
+          "type": "string"
+        },
+        {
+          "name": "pLabelOID",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "removeLabelFromNoticeWorkItemReturn",
+          "type": "boolean"
+        }
+      ],
+      "inputMessage": "removeLabelFromNoticeWorkItemRequest",
+      "outputMessage": "removeLabelFromNoticeWorkItemResponse"
+    },
+    {
+      "name": "reserveNoCmDocument",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pOriginalFullFileName"
+      ],
+      "parameters": [
+        {
+          "name": "pOriginalFullFileName",
+          "type": "string"
+        }
+      ],
+      "returns": [
+        {
+          "name": "reserveNoCmDocumentReturn",
+          "type": "string"
+        }
+      ],
+      "inputMessage": "reserveNoCmDocumentRequest",
+      "outputMessage": "reserveNoCmDocumentResponse"
+    },
+    {
+      "name": "terminatedProcessForSerialNo",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pProcessInstanceSerialNo",
+        "pUserId",
+        "pTerminatedComment"
+      ],
+      "parameters": [
+        {
+          "name": "pProcessInstanceSerialNo",
+          "type": "string"
+        },
+        {
+          "name": "pUserId",
+          "type": "string"
+        },
+        {
+          "name": "pTerminatedComment",
+          "type": "string"
+        }
+      ],
+      "returns": [],
+      "inputMessage": "terminatedProcessForSerialNoRequest",
+      "outputMessage": "terminatedProcessForSerialNoResponse"
+    },
+    {
+      "name": "updateDefaultSubstitute",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "pUserId",
+        "pDefaultSubstitutesId"
+      ],
+      "parameters": [
+        {
+          "name": "pUserId",
+          "type": "string"
+        },
+        {
+          "name": "pDefaultSubstitutesId",
+          "type": "string"
+        }
+      ],
+      "returns": [],
+      "inputMessage": "updateDefaultSubstituteRequest",
+      "outputMessage": "updateDefaultSubstituteResponse"
+    },
+    {
+      "name": "updateFormValueBySerialNember",
+      "portType": "WorkflowService",
+      "soapAction": "",
+      "parameterOrder": [
+        "serialNumber",
+        "pFormValue"
+      ],
+      "parameters": [
+        {
+          "name": "serialNumber",
+          "type": "string"
+        },
+        {
+          "name": "pFormValue",
+          "type": "string"
+        }
+      ],
+      "returns": [],
+      "inputMessage": "updateFormValueBySerialNemberRequest",
+      "outputMessage": "updateFormValueBySerialNemberResponse"
+    }
+  ]
+}

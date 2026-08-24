@@ -1,0 +1,89 @@
+{
+  "_說明": "實測用的參數種子值。key 為 WSDL 參數名，所有方法共用同名參數。來源見 _來源，改主機或換測試流程時要重抓。",
+  "_來源": {
+    "pUserId": "測試帳號，與 bpmbackXmlController.js 一致",
+    "pOrgUnitOID": "fetchOrgUnitOfUserId('S112009') 實測取得",
+    "pProcessPackageId": "測試流程，與 流程發送測試.json 一致",
+    "pProcessInstanceOID": "fetchProcInstances 實測取得，state=open.running（2026-08-24 08:39 建立）",
+    "pProcessInstanceSerialNo": "同上，open.running 的單號，才驗得到未結案才有的欄位",
+    "pFormDefinitionOID": "findFormOIDsOfProcess('SP_DetectionOPProcess') 實測取得",
+    "pDateFormat": "Java SimpleDateFormat 語法，非 Python strftime",
+    "pWorkItemOID": "fetchToDoWorkItem('SP_DetectionOPProcess','S094009') 實測取得，屬 30 號單待簽的關卡",
+    "pActId": "fetchFullProcInstanceWithSerialNo 的 activityId（原流程拼字即為 InitatorManagerTask，非筆誤）",
+    "pVariableId": "getProcessPackage 內 RelevantDataDefinition.id",
+    "pAccessCondition": "實測列舉：只接受 0 或 1，其餘拋 IllegalArgumentException"
+  },
+  "pUserId": "S112009",
+  "pUserID": "S112009",
+  "pRequesterId": "S112009",
+  "pOrgUnitId": "S1800",
+  "pOrganizationId": "S1800",
+  "pOrgId": "S1800",
+  "pOrgUnitOID": "ccd87ba4eb5e10048148b6a7c61bc3af",
+  "pProcessId": "SP_DetectionOPProcess",
+  "pProcessIds": "SP_DetectionOPProcess",
+  "pProcessPackageId": "SP_DetectionOPProcess",
+  "pProcessInstanceOID": "cd61f87df9e91004851cac97a977dbbf",
+  "pProcessInstanceSerialNo": "SP_DetectionOPProcess00000030",
+  "pProcessSerialNo": "SP_DetectionOPProcess00000030",
+  "pProcessInstanceSN": "SP_DetectionOPProcess00000030",
+  "pFormDefinitionOID": "83bba98cf6d510048ef7d5b27cfdf37a",
+  "pFormDefOID": "83bba98cf6d510048ef7d5b27cfdf37a",
+  "pDateFormat": "yyyy/MM/dd HH:mm:ss",
+  "pStartDateTime": "2026/08/01 00:00:00",
+  "pEndDateTime": "2026/08/24 23:59:59",
+  "pProcessInitialStartTime": "2020/01/01 00:00:00",
+  "pProcessInitialEndTime": "2026/12/31 23:59:59",
+  "pProcessClosedStartTime": "2020/01/01 00:00:00",
+  "pProcessClosedEndTime": "2026/12/31 23:59:59",
+  "pBaseDate": "2026/08/24 00:00:00",
+  "pDate": "2026/08/24 00:00:00",
+  "pCheckTime": "2026/08/24 00:00:00",
+  "pDueDays": "3",
+  "pProcInstanceState": "",
+  "pProcInstanceClosedState": "",
+  "pStartSeq": 1,
+  "pEndSeq": 10,
+  "pOnlyTextValue": "true",
+  "pShowReferences": "true",
+  "_覆寫說明": "同名參數在不同方法需要不同狀態的單子（例如作廢註記只有已終止的單才有），以 _overrides 依方法名覆寫。",
+  "pWorkItemOID": "cd632419f9e91004851cac97a977dbbf",
+  "pWorkItmeOID": "cd632419f9e91004851cac97a977dbbf",
+  "pActId": "InitatorManagerTask",
+  "pVariableId": "isSeparateByVerNo",
+  "pAccessCondition": 0,
+  "pViewTimesType": "0",
+  "pIsDeptManager": "false",
+  "_overrides": {
+    "fetchProcessAbortOrTerminateComment": {
+      "pProcessSerialNo": "SP_DetectionOPProcess00000028"
+    },
+    "fetchUniFormatFormInstanceWithProcSerlNo": {
+      "pProcessInstanceSerialNo": "SP_DetectionOPProcess00000029"
+    },
+    "fetchUniFormatFormInstanceWithProcOID": {
+      "pProcessInstanceOID": "95d6d195f6d710048ef7d5b27cfdf37a"
+    },
+    "fetchProcSNMatchCurrtentPerformer": {
+      "pUserId": "S094009"
+    },
+    "fetchToDoWorkItem": {
+      "pUserId": "S094009"
+    },
+    "fetchWorkItemCount": {
+      "pUserID": "S094009"
+    },
+    "checkWorkItemState": {
+      "pWorkItemOID": "cd632419f9e91004851cac97a977dbbf"
+    }
+  },
+  "_覆寫理由": {
+    "fetchProcessAbortOrTerminateComment": "30 號單仍在跑，服務會明確拒答；改用已終止的 28 號單",
+    "fetchUniFormatFormInstanceWithProcSerlNo": "30 號單的欄位 id 與表單定義不符會拋例外，改用欄位正常的 29 號單",
+    "fetchUniFormatFormInstanceWithProcOID": "同上，29 號單的 OID",
+    "fetchProcSNMatchCurrtentPerformer": "30 號單目前待簽者是 S094009，不是 S112009",
+    "fetchToDoWorkItem": "S112009 已簽完，待辦為空；用實際待簽者才看得到結構",
+    "fetchWorkItemCount": "同上",
+    "checkWorkItemState": "工作項目屬 S094009 的關卡"
+  }
+}

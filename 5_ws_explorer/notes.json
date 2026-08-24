@@ -1,0 +1,292 @@
+{
+  "_說明": "各方法的語意註記，由 build_manual.py 併入 API 手冊。與程式分離，補充註記不必改程式。",
+  "_信心": {
+    "verified": "本工具實測成功，out/payloads/ 有回傳樣本",
+    "external": "由 bpmbackXmlController.js 的實際使用驗證",
+    "guess": "僅由名稱與參數推測，未實測"
+  },
+
+  "findFormOIDsOfProcess": {
+    "用途": "由流程 ID 取得該流程掛的表單定義 OID。開單前的第一步。",
+    "參數": { "pProcessPackageId": "流程 ID，非 OID。例如 SP_DetectionOPProcess" },
+    "回傳": "32 碼表單定義 OID 字串。多張表單時的分隔方式未驗證（測試流程只有一張）。",
+    "信心": "external",
+    "備註": "bpmbackXmlController.js 的 testCreateProcess 就是先呼叫它拿 pFormDefOID。"
+  },
+  "getFormFieldTemplate": {
+    "用途": "取得表單的空白欄位模板 —— **這是欄位 id 的權威來源**。",
+    "參數": { "pFormDefinitionOID": "findFormOIDsOfProcess 的回傳值" },
+    "回傳": "<表單ID> 底下每個欄位一個標籤，帶 id / dataType / perDataProId 屬性。",
+    "信心": "verified",
+    "備註": "組 pFormFieldValue 前應先呼叫它對欄位 id，否則錯的欄位會被靜默寫入（見手冊「已知地雷」）。"
+  },
+  "getProcessPackage": {
+    "用途": "取整包流程定義，含關卡、參與者、流程變數（RelevantDataDefinition）。",
+    "參數": { "pProcessPackageId": "流程 ID" },
+    "回傳": "Hibernate/OJB 物件圖的 XStream 序列化，實測 45 萬字元。",
+    "信心": "verified",
+    "備註": "回傳量極大且含 PersistentSet、SET__PROXY__CLASS__NAME 等 ORM 雜訊。只為了查流程變數 id 的話，撈 RelevantDataDefinition.id 即可，不要整包塞進前端。"
+  },
+  "fetchOrgUnitOfUserId": {
+    "用途": "查使用者所屬部門，開單要用的 pOrgUnitId 從這裡來。",
+    "參數": { "pUserId": "員工編號" },
+    "回傳": "OrganizationUnitCollection，內含 OID / id / name / orgUnitType / orgName / isMain。",
+    "信心": "external"
+  },
+  "fetchProcInstances": {
+    "用途": "依流程 ID 與建立時間區間查流程單，可再依狀態篩選。",
+    "參數": {
+      "pProcessId": "流程 ID",
+      "pProcessInitialStartTime": "建立時間起，yyyy/MM/dd HH:mm:ss",
+      "pProcessInitialEndTime": "建立時間迄",
+      "pProcInstanceState": "空字串表示全部。實測看到的值：open.running、closed.completed、closed.terminated"
+    },
+    "回傳": "SimpleProcesses > SimpleProcessInfo，含 OID、serialNo、state、requesterId、subject、createdTime。",
+    "信心": "verified",
+    "備註": "取單號與 OID 的主要入口。回傳的 createdTime 是 yyyy-MM-dd HH:mm:ss.S（橫線），與輸入的斜線格式不同。"
+  },
+  "fetchClosedProcInstances": {
+    "用途": "同上，但時間區間比對的是結案時間。",
+    "參數": {
+      "pProcessClosedStartTime": "結案時間起",
+      "pProcessClosedEndTime": "結案時間迄",
+      "pProcInstanceClosedState": "空字串為全部"
+    },
+    "回傳": "同 fetchProcInstances 的結構。",
+    "信心": "verified"
+  },
+  "fetchProcInstanceWithSerialNo": {
+    "用途": "以單號取單頭資料（不含表單欄位與簽核歷程）。",
+    "參數": { "pProcessInstanceSerialNo": "單號，例如 SP_DetectionOPProcess00000030" },
+    "回傳": "單筆 ProcessInfo，實測 517 字元。",
+    "信心": "verified"
+  },
+  "fetchProcInstanceWithOID": {
+    "用途": "同 fetchProcInstanceWithSerialNo，改用 OID 查。",
+    "參數": { "pProcessInstanceOID": "流程實例 OID" },
+    "回傳": "與單號版完全相同（實測兩者位元組一致）。",
+    "信心": "verified"
+  },
+  "fetchFullProcInstanceWithSerialNo": {
+    "用途": "取完整流程單：單頭 + 表單欄位值 + 每個關卡的簽核歷程。",
+    "參數": { "pProcessInstanceSerialNo": "單號" },
+    "回傳": "ProcessInfo > forms(FormInfo) + ActInstanceInfo > PerformInfo > PerformDetail，含 activityId、performerName、performedTime、comment、state。",
+    "信心": "verified",
+    "備註": "要一次拿到「誰簽的、簽了什麼」就用這支。關卡狀態實測值：closed.completed、open.running.not_performed。"
+  },
+  "fetchFullProcInstanceWithOID": {
+    "用途": "同上，改用 OID 查。",
+    "參數": { "pProcessInstanceOID": "流程實例 OID" },
+    "回傳": "與單號版相同。",
+    "信心": "verified"
+  },
+  "fetchFullProcInstanceWithSerialNoShowReferences": {
+    "用途": "同 fetchFullProcInstanceWithSerialNo，多一個 pShowReferences 開關。",
+    "參數": { "pShowReferences": "boolean。實測傳 true 時回傳與不帶此參數的版本完全相同" },
+    "回傳": "同上。",
+    "信心": "verified",
+    "備註": "pShowReferences 的實際作用在測試流程上看不出差異 —— 可能要有跨流程引用的單子才會有分別。未確認。"
+  },
+  "fetchFormInstanceWithProcSerlNo": {
+    "用途": "只取表單欄位值，不含簽核歷程。",
+    "參數": { "pProcessInstanceSerialNo": "單號" },
+    "回傳": "FormInfo，fieldValues 內是逸出後的 <表單ID><欄位 id=... >值</欄位></表單ID>。",
+    "信心": "verified",
+    "備註": "fieldValues 是「XML 字串包在 XML 裡」，要解兩層。"
+  },
+  "fetchFormInstanceWithProcOID": {
+    "用途": "同上，改用 OID。",
+    "參數": { "pProcessInstanceOID": "流程實例 OID" },
+    "回傳": "與單號版相同。",
+    "信心": "verified"
+  },
+  "fetchUniFormatFormInstanceWithProcSerlNo": {
+    "用途": "取統一格式的表單資料（FormCollection），欄位以標準結構列出而非原始字串。",
+    "參數": { "pProcessInstanceSerialNo": "單號" },
+    "回傳": "FormCollection > forms > FormInfo。",
+    "信心": "verified",
+    "備註": "**會驗證欄位 id**。若單子裡存有表單定義中不存在的欄位，這支會拋 IllegalArgumentException 而 fetchFormInstance* 不會。見手冊「已知地雷」。"
+  },
+  "fetchUniFormatFormInstanceWithProcOID": {
+    "用途": "同上，改用 OID。",
+    "參數": { "pProcessInstanceOID": "流程實例 OID" },
+    "回傳": "同上。",
+    "信心": "verified"
+  },
+  "fetchToDoWorkItem": {
+    "用途": "查某人在指定流程上的待辦工作項目，**取得 pWorkItemOID 的唯一實測途徑**。",
+    "參數": {
+      "pProcessIds": "流程 ID，多筆的分隔方式未驗證",
+      "pUserId": "員工編號"
+    },
+    "回傳": "list > SimpleWorkItem，含 processSerialNumber、activityId、workItemOID。無待辦時回 <list/>。",
+    "信心": "verified",
+    "備註": "查非當前簽核者會得到空清單，不是錯誤。"
+  },
+  "fetchWorkItemCount": {
+    "用途": "計算某人的工作項目數量。",
+    "參數": {
+      "pUserID": "員工編號（注意大寫 ID，與其他方法的 pUserId 不同）",
+      "pAccessCondition": "int，**只接受 0 或 1**，其餘拋 IllegalArgumentException。實測 0→9、1→405，推測 0 為待辦、1 為全部或已辦",
+      "pViewTimesType": "string。實測傳 0、1、X 結果皆同，作用不明"
+    },
+    "回傳": "int。",
+    "信心": "verified",
+    "備註": "pAccessCondition 的 0/1 語意由數量差推測，未經確認。"
+  },
+  "checkWorkItemState": {
+    "用途": "查工作項目狀態。",
+    "參數": { "pWorkItemOID": "由 fetchToDoWorkItem 取得" },
+    "回傳": "int。待簽中的工作項目實測回 0。",
+    "信心": "verified",
+    "備註": "其餘狀態碼對應的意義未驗證 —— 需要已完成／已轉派的工作項目才測得出來。"
+  },
+  "isPerformerOfProcessInstance": {
+    "用途": "判斷某人是否為該單的簽核者之一。",
+    "參數": { "pUserId": "員工編號", "pProcessInstanceSerialNo": "單號" },
+    "回傳": "WSDL 宣告 string，實測回 \"1\"。回 \"0\" 的情境未驗證。",
+    "信心": "verified"
+  },
+  "fetchProcSNMatchCurrtentPerformer": {
+    "用途": "查某人目前在指定關卡待簽的單號（方法名的 Currtent 是原廠拼字錯誤）。",
+    "參數": {
+      "pProcessId": "流程 ID",
+      "pActId": "關卡 id，取自 fetchFullProcInstance* 的 activityId",
+      "pUserId": "員工編號"
+    },
+    "回傳": "單號字串。實測回單一單號，多筆時的分隔方式未驗證。",
+    "信心": "verified"
+  },
+  "fetchCanTraceProcSN": {
+    "用途": "查某人有權追蹤（檢視）的單號清單。",
+    "參數": { "pProcessIds": "流程 ID", "pUserId": "員工編號" },
+    "回傳": "**逗號分隔的單號字串**，不是 XML。實測末尾帶逗號。",
+    "信心": "verified",
+    "備註": "回傳格式與其他 fetch* 完全不同，解析時要特判。"
+  },
+  "fetchProcessContextVariable": {
+    "用途": "讀流程變數（RelevantData）的執行期值。",
+    "參數": {
+      "pProcessSerialNo": "單號",
+      "pVariableId": "變數 id，來源為 getProcessPackage 內的 RelevantDataDefinition.id",
+      "pOnlyTextValue": "三參數多載才有。true 回純文字值，不帶此參數則回完整物件"
+    },
+    "回傳": "三參數版：純文字（實測 \"false\"）。兩參數版：StringWorkflowRuntimeValue 的 XStream 物件，值在 stringValue。",
+    "信心": "verified",
+    "備註": "兩個多載的差別已實測確認，取值請優先用三參數版。"
+  },
+  "fetchProcessAbortOrTerminateComment": {
+    "用途": "取單子被作廢或終止時填的意見。",
+    "參數": { "pProcessSerialNo": "單號" },
+    "回傳": "純文字意見。實測格式為「意見內容(員工編號-姓名)」，操作者資訊由 BPM 自動附加。",
+    "信心": "verified",
+    "備註": "單子仍在跑時會拋例外並明講原因，不是回空字串。查詢前應先確認 state 為 closed.terminated。"
+  },
+  "getSubstituteState": {
+    "用途": "查使用者在指定時間點的代理狀態。",
+    "參數": { "pUserId": "員工編號", "pCheckTime": "檢查時間點" },
+    "回傳": "<SubstituteState isAbsence=\"Y\" isSettingSubstitute=\"N\" substituteId=\"\"/>。",
+    "信心": "verified",
+    "備註": "屬性式 XML，與其他方法的 XStream 元素式風格不同。"
+  },
+  "fetchDefaultSubstituteInfo": {
+    "用途": "查預設代理人設定。",
+    "參數": {
+      "pUserId": "員工編號",
+      "pStartSeq": "int，序號起",
+      "pEndSeq": "int，序號迄",
+      "pDate": "四參數多載才有，指定查詢基準日"
+    },
+    "回傳": "DefaultSubstituteList，含 description 與 defSubs。",
+    "信心": "verified",
+    "備註": "查無資料時 description 是英文說明句（no default substitute found in range...），不是空值 —— 呼叫端不要把它當資料顯示。"
+  },
+  "countWorkingDays": {
+    "用途": "依工作行事曆計算區間內的工作日數。",
+    "參數": {
+      "pUserId": "員工編號",
+      "pStartDateTime": "起",
+      "pEndDateTime": "迄",
+      "pDateFormat": "Java SimpleDateFormat 語法，例如 yyyy/MM/dd HH:mm:ss"
+    },
+    "回傳": "int。",
+    "信心": "verified",
+    "備註": "實測 S112009 在 2026/08/01～08/24 回 0，且同參數的 countWorkingTime 拋 NotFoundException —— 研判是該帳號沒有掛工作行事曆，不是方法壞掉。要驗證需先找一個有行事曆的帳號。"
+  },
+  "getSysintegrationServer": {
+    "用途": "取系統整合伺服器設定。",
+    "參數": {},
+    "回傳": "實測為字串 \"[]\"（空清單）。",
+    "信心": "verified",
+    "備註": "測試區沒有設定整合伺服器，因此看不出非空時的結構。"
+  },
+  "getProjectsWithOrganizationId": {
+    "用途": "依公司別查專案清單。",
+    "參數": { "pOrganizationId": "**公司別 id，不是部門 id**" },
+    "回傳": "未驗證。",
+    "信心": "guess",
+    "備註": "傳部門 id S1800 與猜測值 SOLAR 都得到 Organization cannot be found。正確值待查（可查資料庫 Organization 表）。"
+  },
+  "countWorkingTime": {
+    "用途": "依工作行事曆計算區間內的工作時數。",
+    "參數": { "pDateFormat": "同 countWorkingDays" },
+    "回傳": "string。",
+    "信心": "guess",
+    "備註": "實測拋 NotFoundException，與 countWorkingDays 回 0 相互印證是帳號無行事曆。未取得成功樣本。"
+  },
+  "fetchDueDate": {
+    "用途": "依工作行事曆推算到期日。",
+    "參數": { "pBaseDate": "基準日", "pDueDays": "天數", "pDateFormat": "日期格式" },
+    "回傳": "string。",
+    "信心": "guess",
+    "備註": "同上，拋 NotFoundException。"
+  },
+  "findManagerByAppLvl": {
+    "用途": "依簽核層級查主管。",
+    "參數": {
+      "pUserId": "員工編號",
+      "pOrgUnitOID": "部門 OID，非部門 id",
+      "pLevelName": "簽核層級名稱，有效值未知",
+      "pApprovalLevelType": "簽核層級類型，有效值未知",
+      "pIsDeptManager": "boolean"
+    },
+    "回傳": "string。",
+    "信心": "guess",
+    "備註": "**這支會把例外包在回傳字串裡**：傳空的層級名稱得到 HTTP 200 與 <NotFoundException>Can not found ApprovelLevel by Name:, and Type:null</NotFoundException>。呼叫端只判斷有無丟例外會誤收。有效層級名稱待查。"
+  },
+
+  "invokeProcess": {
+    "用途": "開單。六參數版可同時帶入表單欄位值，四參數版只開單不填值。",
+    "參數": {
+      "pProcessPackageId": "流程 ID",
+      "pRequesterId": "申請人員工編號",
+      "pOrgUnitId": "申請人部門 id，由 fetchOrgUnitOfUserId 取得",
+      "pFormDefOID": "表單定義 OID，由 findFormOIDsOfProcess 取得",
+      "pFormFieldValue": "表單欄位值 XML 字串，格式見手冊",
+      "pSubject": "單據主旨"
+    },
+    "回傳": "實測環境已由 bpmbackXmlController.js 驗證可開單成功，回傳值為單號或 OID（本工具未重複開單驗證）。",
+    "信心": "external",
+    "備註": "有副作用，會產生真實簽核單。pFormFieldValue 的欄位 id 不會被驗證，錯的欄位照收 —— 送出前務必用 getFormFieldTemplate 對過。"
+  },
+  "invokeProcessByOrg": {
+    "用途": "推測為指定公司別開單，與 invokeProcess 的差別在組織參數。",
+    "參數": {},
+    "回傳": "未驗證。",
+    "信心": "guess"
+  },
+  "abortProcessForSerialNo": {
+    "用途": "作廢流程單。",
+    "參數": { "pProcessInstanceSerialNo": "單號", "pAbortComment": "作廢原因" },
+    "回傳": "void。",
+    "信心": "guess",
+    "備註": "作廢後的意見可由 fetchProcessAbortOrTerminateComment 讀回（該方法已實測到「取回重辦」這類文字）。"
+  },
+  "completeWorkItem": {
+    "用途": "簽核完成一個工作項目。",
+    "參數": { "pWorkItemOID": "工作項目 OID", "pUserId": "簽核者", "pComment": "簽核意見" },
+    "回傳": "void。",
+    "信心": "guess",
+    "備註": "會推動流程往下一關，需搭配可拋棄的測試單驗證。"
+  }
+}

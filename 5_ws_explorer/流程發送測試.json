@@ -1,0 +1,136 @@
+{
+    "pProcessId": "SP_DetectionOPProcess",
+    "pUserId": "S112009",
+    "pOrgUnitId": "S1800",
+    "pFormFieldValue": {
+        "SP_DetectionOPForm": {
+            "EmailSubjectTextBox": [
+                {
+                    "_": "郵件主旨",
+                    "$": {
+                        "id": "EmailSubjectTextBox",
+                        "dataType": "java.lang.String",
+                        "perDataProId": ""
+                    }
+                }
+            ],
+            "PersonFillingFormTextBox": [
+                {
+                    "_": "填表人員",
+                    "$": {
+                        "id": "PersonFillingFormTextBox",
+                        "dataType": "java.lang.String",
+                        "perDataProId": ""
+                    }
+                }
+            ],
+            "PersonNotifyingTextBox": [
+                {
+                    "_": "通知人員",
+                    "$": {
+                        "id": "PersonNotifyingTextBox",
+                        "dataType": "java.lang.String",
+                        "perDataProId": ""
+                    }
+                }
+            ],
+            "NotifyingGroupTextBox": [
+                {
+                    "_": "通知群組",
+                    "$": {
+                        "id": "NotifyingGroupTextBox",
+                        "dataType": "java.lang.String",
+                        "perDataProId": ""
+                    }
+                }
+            ],
+            "GuidelineDocTextBox": [
+                {
+                    "_": "指導文件名稱",
+                    "$": {
+                        "id": "GuidelineDocTextBox",
+                        "dataType": "java.lang.String",
+                        "perDataProId": ""
+                    }
+                }
+            ],
+            "EditionNoTextBox": [
+                {
+                    "_": "版次",
+                    "$": {
+                        "id": "EditionNoTextBox",
+                        "dataType": "java.lang.String",
+                        "perDataProId": ""
+                    }
+                }
+            ],
+            "ApplicationDateTextBox": [
+                {
+                    "_": "申請日期",
+                    "$": {
+                        "id": "ApplicationDateTextBox",
+                        "dataType": "java.lang.String",
+                        "perDataProId": ""
+                    }
+                }
+            ],
+            "ValidityOrExpirationTextBox": [
+                {
+                    "_": "生/失效",
+                    "$": {
+                        "id": "ValidityOrExpirationTextBox",
+                        "dataType": "java.lang.String",
+                        "perDataProId": ""
+                    }
+                }
+            ],
+            "AttachedFilesTextBox": [
+                {
+                    "_": "附加文件",
+                    "$": {
+                        "id": "AttachedFilesTextBox",
+                        "dataType": "java.lang.String",
+                        "perDataProId": ""
+                    }
+                }
+            ],
+            "EmailContentTextArea": [
+                {
+                    "_": "郵件內容",
+                    "$": {
+                        "id": "EmailContentTextArea",
+                        "dataType": "java.lang.String",
+                        "perDataProId": ""
+                    }
+                }
+            ],
+            "SPSNHiddenTextBox": [
+                {
+                    "_": "1234",
+                    "$": {
+                        "id": "SPSNHiddenTextBox",
+                        "dataType": "java.lang.String",
+                        "perDataProId": ""
+                    }
+                }
+            ],
+            "EmailContentHiddenTextBox": [
+                {
+                    "_": "隱藏郵件內容",
+                    "$": {
+                        "id": "EmailContentHiddenTextBox",
+                        "dataType": "java.lang.String",
+                        "perDataProId": ""
+                    }
+                }
+            ]
+        }
+    },
+    "pSubject": "特用膠材管制計畫CP後端發送流程測試"
+}
+
+
+
+
+
+

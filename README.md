@@ -1,7 +1,8 @@
 # 鼎新 BPM 快速開發工具集 —— 專案地圖
 
 四個各自獨立、但共用同一套解析核心的工具，對應 BPM 開發的四個階段：
-**改造既有檔案 → 設定權限 → 理解線上現況 → 隨時查閱與快速調整**。
+**改造既有檔案 → 設定權限 → 理解線上現況 → 隨時查閱與快速調整**，
+外加一個獨立的 ⑤ `5_ws_explorer`，記錄 BPM 對外的 SOAP API 清單。
 
 > **資料庫預設一律唯讀。** 全工具集只有一個地方會寫資料庫
 > （`4_db_viewer/backend/app/writer.py`），且預設關閉、正式區永久禁寫。
@@ -36,13 +37,27 @@ BPM快速開發/
 │   │   └── schema/                資料表快照
 │   └── out/                   撈下來的 .form / .bpmn / .json
 │
-└── 4_db_viewer/           ④ 線上結構檢視器 + 權限快速開發
-    ├── PLAN.md                專案計劃書（含寫入可行性實測記錄）
-    ├── README.md              使用說明
-    ├── backend/               FastAPI，沿用 3 的關聯邏輯
-    │   ├── app/writer.py          ★ 全工具集唯一的寫入路徑
-    │   └── backups/              寫入前的自動備份與稽核紀錄（不進版控）
-    └── frontend/              Vue 3 + Vite
+├── 4_db_viewer/           ④ 線上結構檢視器 + 權限快速開發
+│   ├── PLAN.md                專案計劃書（含寫入可行性實測記錄）
+│   ├── README.md              使用說明
+│   ├── backend/               FastAPI，沿用 3 的關聯邏輯
+│   │   ├── app/writer.py          ★ 全工具集唯一的寫入路徑
+│   │   └── backups/              寫入前的自動備份與稽核紀錄（不進版控）
+│   └── frontend/              Vue 3 + Vite
+│
+└── 5_ws_explorer/         ⑤ BPM SOAP API 擷取與實測
+    ├── README.md              使用說明與操作邊界
+    ├── backend/               FastAPI 後端（提供 API 檢視與實測代理）
+    ├── frontend/              Vue 3 + Vite 前端（手冊檢視與即時實測工作台）
+    ├── wsdl_dump.py           抓 WSDL → 方法與參數清單
+    ├── ws_client.py           手刻 rpc/encoded SOAP 客戶端
+    ├── probe_api.py           對 191 測試區實測（唯讀方法才自動跑）
+    ├── build_manual.py        合成 API 手冊
+    ├── seeds.json             實測用參數值（人維護）
+    ├── notes.json             ★ 各方法的語意註記（人維護）
+    ├── docs/
+    │   └── WorkflowService_API手冊.md   主產出
+    └── out/                   WSDL 原檔、API 清單、實測結果與回傳樣本
 ```
 
 ---
@@ -137,6 +152,33 @@ BPM_VIEWER_ENABLE_WRITE=1 BPM_VIEWER_WRITABLE_PROCESSES=流程ID python -m uvico
 
 詳見 [4_db_viewer/README.md](4_db_viewer/README.md) 與
 [PLAN.md](4_db_viewer/PLAN.md)（含寫入可行性的實測記錄）。
+
+---
+
+## ⑤ 5_ws_explorer —— BPM SOAP API 擷取與實測
+
+前四個工具都走資料庫與 XML 檔案，這一個走**對外介面**：NaNaWeb 的
+`WorkflowService`（Apache Axis 1.3、`rpc`/`encoded`、65 支方法）。
+
+```bash
+cd 5_ws_explorer
+python wsdl_dump.py && python probe_api.py && python build_manual.py
+```
+
+抓 WSDL → 對 191 測試區實測 → 合成
+[API 手冊](5_ws_explorer/docs/WorkflowService_API手冊.md)。
+語意註記寫在 `notes.json`，與程式分離；手冊自動產生，不要手改。
+
+**進度**：65 支中 29 支實測成功並留下回傳樣本，39 支已寫下用途與參數語意，
+其餘多為有副作用的方法（開單、簽核、作廢），需要可拋棄的測試單才能驗。
+
+**操作邊界**：191 測試區可自由呼叫；**190 正式區一律不連**
+（`probe_api.py` 會直接拒絕）。唯讀方法自動跑，有副作用的方法必須指名。
+
+WSDL 型別在這裡幫助有限 —— 41 支宣告回傳 `string`，實際塞的是 XStream
+序列化的 Java 物件。這類只有實測才問得出來的事都記在手冊的「呼叫前必讀」，
+包含一個會延後爆炸的地雷：`invokeProcess` 不驗證表單欄位 id。
+
 
 ---
 
@@ -270,6 +312,7 @@ BPM_VIEWER_ENABLE_WRITE=1 BPM_VIEWER_WRITABLE_PROCESSES=流程ID python -m uvico
 | 2_web_builder | 瀏覽器即可；跑測試需 Node.js |
 | 3_db_explorer | Python 3.x + `pyodbc`，以及 SQL Server ODBC 驅動 |
 | 4_db_viewer | 後端 Python 3.x + FastAPI（需 3_db_explorer 的環境）；前端 Node.js + Vite |
+| 5_ws_explorer | 後端 Python 3.x + FastAPI；前端 Node.js + Vite |
 
 已驗證組合：Python 3.14.3、FastAPI 0.141.1、Pydantic 2.13.4、
 Node v24.14.0、npm 11.12.0、ODBC Driver 18 for SQL Server、SQL Server 2019。
@@ -281,6 +324,7 @@ Node v24.14.0、npm 11.12.0、ODBC Driver 18 for SQL Server、SQL Server 2019。
 | 1_xml_tool ／ 2_web_builder | `cd 2_web_builder && node test_core.mjs` | 62 項通過 |
 | 4_db_viewer 後端 | `cd 4_db_viewer/backend && python -m pytest tests -q` | 33 通過、2 跳過 |
 | 4_db_viewer 前端 | `cd 4_db_viewer/frontend && npx vue-tsc --noEmit` | 無錯誤 |
+| 5_ws_explorer 前端 | `cd 5_ws_explorer/frontend && npx vue-tsc --noEmit` | 無錯誤 |
 
 那 2 個跳過的是**真的會寫資料庫**的整合測試，需三個環境變數同時設齊才會執行；
 跳過時會說明原因，不會假裝通過。
