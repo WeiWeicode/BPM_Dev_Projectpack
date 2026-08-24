@@ -1,0 +1,21 @@
+{
+  "name": "bpm-todo-viewer",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5175",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview --port 5175",
+    "gen:types": "openapi-typescript ../backend/openapi.json -o src/api/types.ts"
+  },
+  "dependencies": {
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.2.1",
+    "openapi-typescript": "^7.5.0",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5",
+    "vue-tsc": "^2.2.0"
+  }
+}
