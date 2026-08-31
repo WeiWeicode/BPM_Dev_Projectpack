@@ -130,6 +130,30 @@ def set_field_value(form_xml: str, tag: str, value: str) -> str:
     return form_xml[:start] + escape(value) + form_xml[end:]
 
 
+def classify_readback(expected: Dict[str, str],
+                      actual: Dict[str, str]) -> Tuple[List[Dict[str, Any]],
+                                                       List[Dict[str, Any]]]:
+    """把讀回結果分成「寫入失敗」與「系統回填」兩類。
+
+    實測發現的差別：送出空值給 SerialNumber 這種欄位，BPM 會自己配號
+    （送 '' 回 'SPCP202608_0027'）。那是流程該做的事，不是寫入失敗。
+    但送出有內容的值卻讀回不同，就真的是問題。
+
+    兩類都要回報 —— 把系統回填靜默吃掉，等於騙人說「完全照你送的寫進去了」。
+    """
+    mismatches = []
+    system_filled = []
+    for tag, value in expected.items():
+        got = actual.get(tag)
+        if got == value:
+            continue
+        if not value and got:
+            system_filled.append({'tag': tag, 'expected': value, 'actual': got})
+        else:
+            mismatches.append({'tag': tag, 'expected': value, 'actual': got})
+    return mismatches, system_filled
+
+
 # ── 欄位中文名稱（唯讀資料庫，取不到就降級）──────────────────────
 
 class LabelIndex(object):
@@ -443,11 +467,7 @@ def submit_changes(serial_no: str,
     # 這支回 void，不讀回等於沒驗證
     after = load_instance(serial_no, endpoint)
     after_values = dict((f['tag'], f['value']) for f in after['fields'])
-    mismatches = [
-        {'tag': tag, 'expected': value, 'actual': after_values.get(tag)}
-        for tag, value in expected.items()
-        if after_values.get(tag) != value
-    ]
+    mismatches, system_filled = classify_readback(expected, after_values)
 
     return {
         'status': 'ok' if not mismatches else 'mismatch',
@@ -455,6 +475,7 @@ def submit_changes(serial_no: str,
         'diff': diff,
         'verified': not mismatches,
         'mismatches': mismatches,
+        'systemFilled': system_filled,
         'backupFormXml': backup_xml,
         'pFormValue': payload,
         'fieldCountBefore': len(current['fields']),
@@ -463,4 +484,183 @@ def submit_changes(serial_no: str,
         'elapsedMs': int((time.time() - started) * 1000),
         'message': ('已寫入並讀回驗證通過。' if not mismatches else
                     '已寫入，但讀回比對有 %d 欄對不上，請檢查。' % len(mismatches)),
+    }
+
+
+# ── 建立新單（開單）────────────────────────────────────────────
+
+def list_org_units(user_id: str,
+                   endpoint: Optional[str] = None) -> Dict[str, Any]:
+    """查申請人所屬部門。開單的 pOrgUnitId 要的是 OrganizationUnit.id（如 S1800）。"""
+    if not user_id or not user_id.strip():
+        raise FormEditError('請輸入申請人員工編號')
+
+    service = _client(endpoint)
+    try:
+        raw = service.call('fetchOrgUnitOfUserId', pUserId=user_id.strip())
+    except ws_client.SoapFault as fault:
+        raise FormEditError('查不到 %s 的部門：%s' % (user_id, fault.message))
+
+    units = []
+    for element in ET.fromstring(raw).iter():
+        if not element.tag.endswith('OrganizationUnitForInvokingListDTO'):
+            continue
+        units.append({
+            'oid': element.findtext('OID'),
+            'id': element.findtext('id'),
+            'name': element.findtext('name'),
+            'orgName': element.findtext('orgName'),
+            'isMain': (element.findtext('isMain') or '').strip().lower() == 'true',
+        })
+    if not units:
+        raise FormEditError('%s 沒有任何所屬部門，無法開單' % user_id)
+    return {'userId': user_id.strip(), 'orgUnits': units}
+
+
+def _form_oid_of(service: ws_client.WorkflowService, process_id: str) -> str:
+    """取流程掛的表單定義 OID。
+
+    findFormOIDsOfProcess 在測試流程上只回單一 OID，多張表單時的分隔方式
+    未經驗證。回傳值不像單一 32 碼 OID 時就明講，不自己挑一個當答案。
+    """
+    oid = (service.call('findFormOIDsOfProcess', pProcessPackageId=process_id) or '').strip()
+    if not oid:
+        raise FormEditError('流程 %s 查不到表單定義 OID，可能未掛表單。' % process_id)
+    if len(oid) != 32 or not all(c in '0123456789abcdefABCDEF' for c in oid):
+        raise FormEditError(
+            '流程 %s 的 findFormOIDsOfProcess 回傳 %r，不是單一 32 碼 OID。'
+            '多表單流程的分隔格式尚未驗證，本工具不猜，請改用通用實測工作台。'
+            % (process_id, oid[:80]))
+    return oid
+
+
+def load_new_form(process_id: str,
+                  endpoint: Optional[str] = None) -> Dict[str, Any]:
+    """取空白表單範本，供建立新單時填值。
+
+    欄位結構一律以 getFormFieldTemplate 為準 —— invokeProcess 不驗證欄位 id，
+    自己拼的欄位會被靜默寫入，等到 fetchUniFormatFormInstance* 讀取才爆
+    （AGENTS.md 8.1）。
+    """
+    if not process_id or not process_id.strip():
+        raise FormEditError('請先選一支流程')
+    process_id = process_id.strip()
+
+    service = _client(endpoint)
+    started = time.time()
+    form_oid = _form_oid_of(service, process_id)
+    template = (service.call('getFormFieldTemplate', pFormDefinitionOID=form_oid) or '').strip()
+    if not template:
+        raise FormEditError('流程 %s 的表單範本是空的。' % process_id)
+
+    form_id, fields = parse_form_xml(template)
+    labels, label_source = label_index.labels_for(form_id)
+    for field in fields:
+        meta = labels.get(field['id']) or {}
+        field['name'] = meta.get('name')
+        field['fieldType'] = meta.get('type')
+        field['attrBacked'] = meta.get('type') in ATTR_BACKED_TYPES
+        field['extraAttributes'] = dict(
+            (k, v) for k, v in field['attributes'].items()
+            if k not in ('id', 'dataType'))
+
+    return {
+        'processId': process_id,
+        'formOid': form_oid,
+        'formId': form_id,
+        'fields': fields,
+        'rawFormXml': template,
+        'labelSource': label_source,
+        'labelsAvailable': bool(labels),
+        'elapsedMs': int((time.time() - started) * 1000),
+    }
+
+
+def create_instance(process_id: str,
+                    requester_id: str,
+                    org_unit_id: str,
+                    subject: str = '',
+                    values: Optional[Dict[str, str]] = None,
+                    org_id: Optional[str] = None,
+                    confirm: bool = False,
+                    endpoint: Optional[str] = None) -> Dict[str, Any]:
+    """開一張新單，然後讀回確認欄位值真的進去了。
+
+    一律走「帶表單值」的多載：實測不帶表單的四／五參數版會
+    EJBTransactionRolledbackException（此流程的表單有必要欄位），
+    而且**開單失敗仍然會消耗單號**，所以不做「先試不帶表單」這種試探。
+
+    pSubject 送出的值不一定會出現在最終主旨上 —— 流程若設了主旨範本，
+    以範本為準。因此回傳同時帶 requestedSubject 與 actualSubject 讓人自己比對。
+    """
+    if not confirm:
+        raise FormEditError('開單會在 191 測試區產生真實單據與待辦，必須確認後才能送出。')
+    for label, value in (('流程 id', process_id), ('申請人', requester_id),
+                         ('部門 id', org_unit_id)):
+        if not value or not str(value).strip():
+            raise FormEditError('缺少必要參數：%s' % label)
+
+    process_id = process_id.strip()
+    requester_id = requester_id.strip()
+    org_unit_id = org_unit_id.strip()
+
+    service = _client(endpoint)
+    started = time.time()
+
+    # 範本重新取一次，不吃前端手上的快照
+    form_oid = _form_oid_of(service, process_id)
+    payload = (service.call('getFormFieldTemplate', pFormDefinitionOID=form_oid) or '').strip()
+    _, template_fields = parse_form_xml(payload)
+    known = set(f['tag'] for f in template_fields)
+
+    filled = {}
+    for tag, value in (values or {}).items():
+        if tag not in known:
+            raise FormEditError('表單沒有欄位 %s' % tag)
+        payload = set_field_value(payload, tag, value)
+        filled[tag] = value
+
+    params = {
+        'pProcessPackageId': process_id,
+        'pRequesterId': requester_id,
+        'pOrgUnitId': org_unit_id,
+        'pFormDefOID': form_oid,
+        'pFormFieldValue': payload,
+        'pSubject': subject or '',
+    }
+    method = 'invokeProcess'
+    if org_id and org_id.strip():
+        params['pOrgId'] = org_id.strip()
+        method = 'invokeProcessByOrg'
+
+    try:
+        serial_no = (service.call(method, **params) or '').strip()
+    except ws_client.SoapFault as fault:
+        raise FormEditError(
+            '開單失敗：%s（注意：失敗仍會消耗一個單號）' % fault.message)
+    if not serial_no:
+        raise FormEditError('%s 沒有回傳單號，開單結果不明，請到 BPM 確認。' % method)
+
+    # 開單同樣不驗證欄位 id，不讀回就不知道值有沒有真的進去
+    created = load_instance(serial_no, endpoint)
+    after = dict((f['tag'], f['value']) for f in created['fields'])
+    mismatches, system_filled = classify_readback(filled, after)
+
+    return {
+        'status': 'ok' if not mismatches else 'mismatch',
+        'method': method,
+        'serialNo': serial_no,
+        'requestedSubject': subject or '',
+        'actualSubject': created['header'].get('subject'),
+        'subjectOverridden': bool(subject) and created['header'].get('subject') != subject,
+        'formOid': form_oid,
+        'fieldCount': len(created['fields']),
+        'verified': not mismatches,
+        'mismatches': mismatches,
+        'systemFilled': system_filled,
+        'pFormFieldValue': payload,
+        'elapsedMs': int((time.time() - started) * 1000),
+        'message': ('已開單 %s，讀回驗證通過。' % serial_no if not mismatches else
+                    '已開單 %s，但有 %d 欄讀回對不上，請檢查。'
+                    % (serial_no, len(mismatches))),
     }

@@ -10,12 +10,16 @@ from fastapi import APIRouter, HTTPException, Query
 
 from .. import form_edit
 from ..schemas import (
+    CreateInstanceRequest,
+    CreateInstanceResult,
     FormEditPreviewRequest,
     FormEditPreviewResult,
     FormEditSubmitRequest,
     FormEditSubmitResult,
     InstanceDetail,
     InstanceListResult,
+    NewFormTemplate,
+    OrgUnitListResult,
     ProcessListResult,
 )
 
@@ -70,3 +74,29 @@ def submit(req: FormEditSubmitRequest):
     """寫回表單值並讀回驗證。必須 confirm=true。"""
     return _guard(form_edit.submit_changes, req.serialNo, req.changes,
                   req.rawFormXml, req.confirm, req.endpoint)
+
+
+@router.get('/org-units', response_model=OrgUnitListResult)
+def list_org_units(
+    userId: str = Query(..., description='申請人員工編號'),
+    endpoint: Optional[str] = Query(None),
+):
+    """查申請人所屬部門，開單的 pOrgUnitId 從這裡挑。"""
+    return _guard(form_edit.list_org_units, userId, endpoint)
+
+
+@router.get('/new-form', response_model=NewFormTemplate)
+def load_new_form(
+    processId: str = Query(..., description='流程 id'),
+    endpoint: Optional[str] = Query(None),
+):
+    """取空白表單範本（getFormFieldTemplate），供建立新單填值。"""
+    return _guard(form_edit.load_new_form, processId, endpoint)
+
+
+@router.post('/create', response_model=CreateInstanceResult)
+def create_instance(req: CreateInstanceRequest):
+    """開一張新單並讀回驗證。必須 confirm=true。"""
+    return _guard(form_edit.create_instance, req.processId, req.requesterId,
+                  req.orgUnitId, req.subject, req.values, req.orgId,
+                  req.confirm, req.endpoint)

@@ -50,11 +50,14 @@ npm run dev
 開啟瀏覽器前往 <http://localhost:5174> 即可：
 - 📑 **API 手冊與目錄**：65 支方法多維度篩選（唯讀/副作用/實測狀態/信心）、參數規格與回傳樣本。
 - ⚡ **即時實測工作台**：線上填入參數、一鍵代入種子、發送 SOAP 請求至 191 測試區並即時檢視回傳 XML 與 SOAP 封包。
-- 📝 **改單工作台**：`updateFormValueBySerialNember` 的專用流程 —— 查流程 → 挑單（進行中／已結案）→ 帶出欄位 id、中文名稱、型別與現值 → 逐欄編輯 → 送出後自動讀回逐欄驗證。
+- 📝 **流程工作台**：三種模式共用左邊的流程／單號搜尋。
+  **改既有單** 挑單（進行中／已結案）→ 帶出欄位 id、中文名稱、型別與現值 → 逐欄編輯 → 送出後讀回驗證（`updateFormValueBySerialNember`）。
+  **建立新單** 取空白表單範本 → 填欄位 → 指定申請人與部門 → 開單後讀回驗證（`invokeProcess` / `invokeProcessByOrg`）。
+  **關卡操作** 看簽核歷程 → 以該關卡的待辦人身分 → 簽收、改表單後簽核推進、轉派、取回重辦、收單。
 - 📖 **呼叫前必讀**：視覺化呈現 rpc/encoded、回傳 string 四種型態、假成功防範與欄位 ID 地雷。
 - ⚙️ **種子資料庫**：檢視與複製測試用參數種子出處。
 
-### 改單工作台為什麼要獨立一頁
+### 流程工作台為什麼要獨立一頁
 
 `updateFormValueBySerialNember` 是**整份覆寫**，不是合併。實測：
 
@@ -69,6 +72,45 @@ npm run dev
 其實只是多包了一層。這一頁因此**不讓人手貼 XML**：前端只送「哪個欄位改成什麼」，
 後端在寫入前重讀現值、只替換目標欄位內文、整份送回，再讀回逐欄比對。
 偵測到被包壞的單會直接標紅並提供一鍵修復。
+
+建立新單也是同一個道理：`invokeProcess` **不驗證欄位 id**，自己拼的欄位會被靜默寫入，
+要到之後 `fetchUniFormatFormInstance*` 讀取時才爆，所以欄位結構一律取自
+`getFormFieldTemplate`。另外三件實測到的事會直接顯示在畫面上：
+
+- **開單失敗一樣會消耗單號**，失敗不代表沒留下痕跡。
+- 流程若設了主旨範本，`pSubject` 送的值會被蓋掉 —— 送出後會列出實際主旨供比對。
+- 讀回時「送空值卻被回填」與「送了值卻寫不進去」是兩回事。前者是流程自己該做的
+  （例如 `SerialNumber` 自動配號：送 `''` 回 `SPCP202608_0028`），後者才是問題。
+  兩類分開顯示，不混為一談，也不靜默吃掉。
+
+### 關卡操作與「模擬該關卡的使用者」
+
+這組 API 沒有登入概念，操作者一律由參數指定，而且指定錯了會被擋
+（`acceptWorkItem` 的 pUserId 必須是待辦目前擁有者、`assigneeReassignWorkItem`
+的 pRequesterOID 也是）。所以關卡模式先從簽核歷程解析出目前關卡的待辦人
+（`performerName` 格式是「員工編號_姓名」），列出來讓人挑身分，
+再以那個人送出 —— 不必自己查是誰，也不必記 Users.OID。
+
+實測（`quickDevTestProcessImportWebTool`，2026-08-31）確認的順序與語意：
+
+| 項目 | 實測結果 |
+|:---|:---|
+| `checkWorkItemState` | **0 = 未簽收，1 = 已簽收** |
+| 未簽收就 `completeWorkItem` | 回 `The workitem is not running state` |
+| 已簽收又送 `acceptWorkItem` | 回 `The workitem has been performed` —— 正常情況，先查狀態再決定簽不簽 |
+| `reexecuteActivity` | 目前關卡變 `closed.terminated`，被取回的關卡重新 `open.running` |
+| `terminatedProcessForSerialNo` | **會檢查操作者權限**，回 `The user(id=…) cannot terminat this process` 時改用作廢 |
+
+`completeWorkItem` 先前在 `SP_DetectionOPProcess` 一律失敗，根因是該流程引用的群組
+`SPDetectionOPGroup` 不在測試區 `Groups` 表裡 —— 與 API 無關，換一支流程就正常。
+
+轉派需要 **Users.OID（不是 Employee.OID）**，只能查唯讀資料庫。查不到時
+轉派按鈕會停用並說明原因，其餘操作不受影響。
+
+**新增關卡目前做不到**，原因寫在 `notes.json` 的 `addCustomActivity`：
+清單元素類別已確認是 `com.dsc.nana.data_transfer.ActivityDefinitionForClientListDTO`，
+但元素內容格式沒解出來（`performerId` 既不是子元素也不是 XML 屬性），
+`addCloneSerialActivity` 則不論參數組合一律交易失敗。所以這一頁不提供假的加關卡按鈕。
 
 欄位的中文名稱與型別來自 `3_db_explorer` 的 `bpm_kb`（唯讀連線）。
 沒有 `.env` 或未裝 pyodbc 時這一頁照常可用，只是名稱欄留白並註明原因，不靜默假裝。

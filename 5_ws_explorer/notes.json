@@ -147,7 +147,7 @@
     },
     "回傳": "list > SimpleWorkItem，含 processSerialNumber、activityId、workItemOID。無待辦時回 <list/>。",
     "信心": "verified",
-    "備註": "查非當前簽核者會得到空清單，不是錯誤。"
+    "備註": "查非當前簽核者會得到空清單（`<list/>`），不是錯誤。回傳元素為 SimpleWorkItem，欄位只有三個：processSerialNumber / activityId / workItemOID。"
   },
   "fetchWorkItemCount": {
     "用途": "計算某人的工作項目數量。",
@@ -167,7 +167,7 @@
     },
     "回傳": "int。待簽中的工作項目實測回 0。",
     "信心": "verified",
-    "備註": "其餘狀態碼對應的意義未驗證 —— 需要已完成／已轉派的工作項目才測得出來。"
+    "備註": "實測值：**0 = 未簽收，1 = 已簽收**（acceptWorkItem 前後各查一次確認）。對已簽收的待辦再送 acceptWorkItem 會回 \"The workitem has been performed\"，那是正常情況，不是錯誤 —— 要先查狀態再決定是否簽收。"
   },
   "isPerformerOfProcessInstance": {
     "用途": "判斷某人是否為該單的簽核者之一。",
@@ -342,8 +342,8 @@
       "pComment": "簽核意見"
     },
     "回傳": "void。**未取得成功樣本。**",
-    "信心": "guess",
-    "備註": "在測試流程上一律失敗於 GroupOID cannot be found。已追查到根因：SP_DetectionOPProcess 的參與者設定引用群組 SPDetectionOPGroup，但 Groups 表（581 筆）裡沒有這個群組 —— 是測試區的資料缺漏，不是 API 問題。帶不帶公司別都一樣。要驗證這支方法必須換一支群組設定完整的流程。"
+    "信心": "verified_write",
+    "備註": "**已在 quickDevTestProcessImportWebTool 上實測成功**（2026-08-31）：accept → complete → 流程前進到下一關，簽核意見寫進歷程。先前在 SP_DetectionOPProcess 一律失敗於 GroupOID cannot be found，根因是該流程引用的群組 SPDetectionOPGroup 不存在於測試區 Groups 表，與這支 API 無關 —— 換一支群組設定完整的流程就正常。**必須先 acceptWorkItem**，否則回 \"The workitem is not running state\"。"
   },
   "invokeProcessAndAddCustAct": {
     "用途": "開單的同時追加自訂關卡。",
@@ -448,7 +448,7 @@
     },
     "回傳": "void。",
     "信心": "verified_write",
-    "備註": "參數格式是靠錯誤訊息反推出來的：送 <invalid/> 回 CannotResolveClassException，送 ActivityDefinition 類別回 \"cannot be cast to java.util.List\"，送 <list/> 才通過。**清單元素的類別名仍未確認**，因此只驗證了「空清單」這條路徑，實際加關卡還需要知道元素類別。"
+    "備註": "參數格式是靠錯誤訊息反推的。已確認：pPostActDefsAsXML 是 java.util.List 的 XStream 序列化，**清單元素類別為 com.dsc.nana.data_transfer.ActivityDefinitionForClientListDTO**（送 <string> 進去的 ClassCastException 指名了它）。但**元素內容格式仍未解出**：空元素回 \"The attribute 'performerId' cannot be null or empty.\"，而 <performerId> 當子元素會被 XStream 當成類別名解析失敗（CannotResolveClassException），當 XML 屬性寫也無效。該 DTO 的 converter 表現得像集合型別。因此目前只有「空清單」這條路徑可用，實際加關卡仍做不到。"
   },
   "addCustomParallelActivity": {
     "用途": "追加自訂並簽關卡。",
@@ -480,7 +480,7 @@
     },
     "回傳": "string。**未取得成功樣本。**",
     "信心": "guess",
-    "備註": "把 pActId 與 pRefActId 都指向目前關卡時回 ARJUNA016053 交易無法提交。推測兩者不能相同，或被複製的關卡必須處於特定狀態。未進一步確認。"
+    "備註": "不論 pActId 與 pRefActId 是否相同，實測一律回 ARJUNA016053 交易無法提交（2026-08-31 在 quickDevTestProcessImportWebTool 上試過三組不同組合）。先前推測「兩者不能相同」已被推翻，真正原因仍未查明。"
   },
   "assigneeReassignWorkItem": {
     "用途": "簽核者自行把待辦轉派給他人。",
@@ -535,7 +535,7 @@
     },
     "回傳": "void。",
     "信心": "verified_write",
-    "備註": "取回後的意見可由 fetchProcessAbortOrTerminateComment 讀到，格式為「意見內容(員工編號-姓名)」。"
+    "備註": "取回後的意見可由 fetchProcessAbortOrTerminateComment 讀到，格式為「意見內容(員工編號-姓名)」。**實測效果**：目前進行中的關卡變 closed.terminated，被取回的關卡以新的一筆ActInstanceInfo 重新 open.running，待辦回到原簽核者手上。"
   },
   "addUserAbsence": {
     "用途": "新增請假（不在辦公室）記錄。",
@@ -587,7 +587,7 @@
     },
     "回傳": "void。",
     "信心": "verified_write",
-    "備註": "終止後 state 變 closed.terminated，意見可由 fetchProcessAbortOrTerminateComment 讀回。"
+    "備註": "終止後 state 變 closed.terminated，意見可由 fetchProcessAbortOrTerminateComment 讀回。**會檢查操作者權限**：實測非該關卡相關人員送出會回 \"The user(id=…) cannot terminat this process\"（原廠拼字即為 terminat）。此時改用 abortProcessForSerialNo 通常可行，它不需要操作者參數。"
   },
   "importOrganizationData": {
     "用途": "匯入組織資料。",

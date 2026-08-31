@@ -180,11 +180,140 @@ export interface FormEditSubmitResult {
   diff: FieldDiff[];
   verified: boolean;
   mismatches: FieldMismatch[];
+  systemFilled: FieldMismatch[];
   backupFormXml?: string | null;
   pFormValue?: string | null;
   fieldCountBefore?: number | null;
   fieldCountAfter?: number | null;
   corruptionCleared: boolean;
+  elapsedMs: number;
+  message?: string | null;
+}
+
+export interface OrgUnitOption {
+  oid?: string | null;
+  id?: string | null;
+  name?: string | null;
+  orgName?: string | null;
+  isMain: boolean;
+}
+
+export interface OrgUnitListResult {
+  userId?: string | null;
+  orgUnits: OrgUnitOption[];
+}
+
+export interface NewFormTemplate {
+  processId?: string | null;
+  formOid?: string | null;
+  formId?: string | null;
+  fields: FormFieldInfo[];
+  rawFormXml: string;
+  labelSource?: string | null;
+  labelsAvailable: boolean;
+  elapsedMs: number;
+}
+
+export interface CreateInstanceResult {
+  status: 'ok' | 'mismatch';
+  method?: string | null;
+  serialNo?: string | null;
+  requestedSubject?: string | null;
+  actualSubject?: string | null;
+  subjectOverridden: boolean;
+  formOid?: string | null;
+  fieldCount: number;
+  verified: boolean;
+  mismatches: FieldMismatch[];
+  systemFilled: FieldMismatch[];
+  pFormFieldValue?: string | null;
+  elapsedMs: number;
+  message?: string | null;
+}
+
+// ── 關卡工作台 ──────────────────────────────────────────────────
+
+export interface ActivityInfo {
+  activityId?: string | null;
+  activityName?: string | null;
+  state?: string | null;
+  startedTime?: string | null;
+  performType?: string | null;
+  performerIds: string[];
+  notifiedIds: string[];
+  comments: string[];
+  running: boolean;
+}
+
+export interface CurrentPerformer {
+  userId?: string | null;
+  userName?: string | null;
+  usersOid?: string | null;
+  activityId?: string | null;
+  activityName?: string | null;
+  workItemOID?: string | null;
+  workItemState?: string | null;
+  accepted?: boolean | null;
+}
+
+export interface ActivityBoard {
+  serialNo?: string | null;
+  processId?: string | null;
+  processName?: string | null;
+  subject?: string | null;
+  processState?: string | null;
+  closed: boolean;
+  activities: ActivityInfo[];
+  currentPerformers: CurrentPerformer[];
+  oidSource?: string | null;
+  reassignAvailable: boolean;
+  elapsedMs: number;
+}
+
+export interface StepResult {
+  step: string;
+  ok: boolean;
+  detail?: string | null;
+}
+
+export interface AcceptResult {
+  status: string;
+  workItemState?: string | null;
+  accepted: boolean;
+  elapsedMs: number;
+  message?: string | null;
+}
+
+export interface CompleteResult {
+  status: string;
+  steps: StepResult[];
+  formResult?: FormEditSubmitResult | null;
+  after?: ActivityBoard | null;
+  elapsedMs: number;
+  message?: string | null;
+}
+
+export interface ReassignResult {
+  status: string;
+  method?: string | null;
+  acceptorId?: string | null;
+  acceptorOid?: string | null;
+  elapsedMs: number;
+  message?: string | null;
+}
+
+export interface ReexecuteResult {
+  status: string;
+  after?: ActivityBoard | null;
+  elapsedMs: number;
+  message?: string | null;
+}
+
+export interface CloseProcessResult {
+  status: string;
+  method?: string | null;
+  processState?: string | null;
+  savedComment?: string | null;
   elapsedMs: number;
   message?: string | null;
 }

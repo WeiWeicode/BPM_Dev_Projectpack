@@ -1,20 +1,31 @@
 <script setup lang="ts">
 /**
- * 改單工作台：查流程 → 選單 → 改欄位 → 預覽 → 送出 → 讀回驗證。
+ * 流程工作台，兩種模式共用同一份欄位編輯表：
  *
- * 這一頁刻意不讓人手貼 pFormValue。updateFormValueBySerialNember 是整份覆寫，
- * 手貼錯一層就會把整張單洗成預設值（實測踩過）。XML 一律由後端組。
+ *   改既有單  查流程 → 選單 → 改欄位 → 送出 → 讀回驗證（updateFormValueBySerialNember）
+ *   建立新單  查流程 → 取空白範本 → 填欄位 → 開單 → 讀回驗證（invokeProcess）
+ *
+ * 兩邊都刻意不讓人手貼表單 XML。updateFormValueBySerialNember 是整份覆寫、
+ * invokeProcess 不驗證欄位 id，手拼錯了都會靜默寫入、延後爆炸（實測踩過）。
+ * XML 一律由後端依 getFormFieldTemplate 或現值組出來。
  */
 import { computed, inject, onMounted, ref } from 'vue';
 import { api, ApiError } from '../api/client';
+import WorkItemPanel from './WorkItemPanel.vue';
 import type {
+  CreateInstanceResult,
   FormEditSubmitResult,
   InstanceDetail,
   InstanceSummary,
+  NewFormTemplate,
+  OrgUnitOption,
   ProcessOption,
 } from '../api/types';
 
 const showToast = inject<(m: string) => void>('showToast', () => {});
+
+// 兩種模式共用左邊的流程搜尋，右邊換成不同的編輯面板
+const mode = ref<'edit' | 'create' | 'activity'>('edit');
 
 // ── 步驟一：找流程 ──
 const processKeyword = ref('');
@@ -171,6 +182,104 @@ async function restoreBackup() {
   }
 }
 
+// ── 建立新單 ──
+const template = ref<NewFormTemplate | null>(null);
+const newValues = ref<Record<string, string>>({});
+const requesterId = ref('S112009');
+const orgUnits = ref<OrgUnitOption[]>([]);
+const orgUnitId = ref('');
+const orgId = ref('');
+const newSubject = ref('');
+const confirmCreate = ref(false);
+const creating = ref(false);
+const createResult = ref<CreateInstanceResult | null>(null);
+
+async function loadTemplate(processId?: string) {
+  const pid = processId || selectedProcessId.value;
+  if (!pid) return showToast('請先選一支流程');
+  selectedProcessId.value = pid;
+  loading.value = true;
+  createResult.value = null;
+  try {
+    const data = await api.loadNewForm(pid);
+    template.value = data;
+    newValues.value = {};
+    for (const f of data.fields) newValues.value[f.tag] = f.value;
+    confirmCreate.value = false;
+    if (!orgUnits.value.length) await lookupOrgUnits();
+  } catch (err) {
+    template.value = null;
+    fail(err);
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function lookupOrgUnits() {
+  if (!requesterId.value.trim()) return showToast('請輸入申請人員工編號');
+  try {
+    const res = await api.listOrgUnits(requesterId.value.trim());
+    orgUnits.value = res.orgUnits;
+    const main = res.orgUnits.find((u) => u.isMain) || res.orgUnits[0];
+    orgUnitId.value = main?.id || '';
+  } catch (err) {
+    orgUnits.value = [];
+    orgUnitId.value = '';
+    fail(err);
+  }
+}
+
+async function create() {
+  if (!template.value) return;
+  if (!confirmCreate.value) return showToast('請先勾選確認');
+  creating.value = true;
+  try {
+    const res = await api.createInstance({
+      processId: template.value.processId || selectedProcessId.value,
+      requesterId: requesterId.value.trim(),
+      orgUnitId: orgUnitId.value.trim(),
+      subject: newSubject.value,
+      values: newValues.value,
+      orgId: orgId.value.trim() || undefined,
+      confirm: true,
+    });
+    createResult.value = res;
+    showToast(res.message || '已開單');
+  } catch (err) {
+    fail(err);
+  } finally {
+    creating.value = false;
+  }
+}
+
+function openCreated() {
+  if (!createResult.value?.serialNo) return;
+  mode.value = 'edit';
+  openInstance(createResult.value.serialNo);
+}
+
+function switchMode(next: 'edit' | 'create' | 'activity') {
+  mode.value = next;
+  if (next === 'create' && selectedProcessId.value && !template.value) {
+    loadTemplate();
+  }
+}
+
+// 關卡操作面板改動了流程狀態，改單模式手上的表單快照就過期了
+async function onActivityChanged() {
+  if (detail.value?.header.serialNo) await openInstance(detail.value.header.serialNo);
+}
+
+function pickProcess(processId: string) {
+  if (mode.value === 'create') {
+    template.value = null;
+    loadTemplate(processId);
+  } else {
+    // 改單與關卡操作都要先挑到一張單
+    searchInstances(processId);
+  }
+}
+
 function stateLabel(state?: string | null) {
   if (!state) return '—';
   if (state.startsWith('open.')) return '進行中';
@@ -185,8 +294,41 @@ onMounted(searchProcesses);
 
 <template>
   <div class="edit-layout">
-    <!-- 左欄：找單 -->
+    <!-- 左欄：找流程 -->
     <section class="finder-panel">
+      <div class="step-block mode-block">
+        <div class="mode-switch">
+          <button
+            class="mode-btn"
+            :class="{ active: mode === 'edit' }"
+            @click="switchMode('edit')"
+          >
+            ✏️ 改既有單
+          </button>
+          <button
+            class="mode-btn"
+            :class="{ active: mode === 'create' }"
+            @click="switchMode('create')"
+          >
+            ➕ 建立新單
+          </button>
+          <button
+            class="mode-btn"
+            :class="{ active: mode === 'activity' }"
+            @click="switchMode('activity')"
+          >
+            🔀 關卡操作
+          </button>
+        </div>
+        <div class="hint">
+          {{ mode === 'edit'
+            ? '改已開單的表單欄位值（updateFormValueBySerialNember），不推動流程、不簽核。'
+            : mode === 'create'
+            ? '用流程的空白表單範本開一張新單（invokeProcess），會產生真實單據與待辦。'
+            : '看關卡歷程，以該關卡的待辦人身分簽收、改表單簽核、轉派、取回重辦或收單。' }}
+        </div>
+      </div>
+
       <div class="step-block">
         <div class="step-title"><span class="step-no">1</span> 找流程</div>
         <div class="row">
@@ -205,7 +347,7 @@ onMounted(searchProcesses);
             :key="p.processId || ''"
             class="list-row"
             :class="{ picked: p.processId === selectedProcessId }"
-            @click="searchInstances(p.processId || '')"
+            @click="pickProcess(p.processId || '')"
           >
             <span class="row-main">{{ p.processName || '（無名稱）' }}</span>
             <span class="row-sub mono">{{ p.processId }}</span>
@@ -214,7 +356,7 @@ onMounted(searchProcesses);
         </div>
       </div>
 
-      <div class="step-block">
+      <div v-if="mode !== 'create'" class="step-block">
         <div class="step-title"><span class="step-no">2</span> 找單號</div>
         <div class="row wrap">
           <select v-model="scope" @change="selectedProcessId && searchInstances()">
@@ -253,7 +395,7 @@ onMounted(searchProcesses);
         </div>
       </div>
 
-      <div class="step-block">
+      <div v-if="mode !== 'create'" class="step-block">
         <div class="step-title"><span class="step-no">3</span> 或直接輸入單號</div>
         <div class="row">
           <input
@@ -266,16 +408,183 @@ onMounted(searchProcesses);
           <button class="primary" @click="openInstance(serialInput)">讀取</button>
         </div>
       </div>
+
+      <div v-if="mode === 'create'" class="step-block">
+        <div class="step-title"><span class="step-no">2</span> 開單資訊</div>
+        <label class="mini-label">申請人員工編號（pRequesterId）</label>
+        <div class="row">
+          <input v-model="requesterId" class="mono" type="text" @keyup.enter="lookupOrgUnits" />
+          <button @click="lookupOrgUnits">查部門</button>
+        </div>
+        <label class="mini-label">申請部門（pOrgUnitId）</label>
+        <select v-model="orgUnitId">
+          <option v-if="!orgUnits.length" value="">（先查部門）</option>
+          <option v-for="u in orgUnits" :key="u.id || ''" :value="u.id || ''">
+            {{ u.id }} {{ u.name }}{{ u.isMain ? '（主要）' : '' }} · {{ u.orgName }}
+          </option>
+        </select>
+        <label class="mini-label">公司別（pOrgId，留空則用 invokeProcess）</label>
+        <input v-model="orgId" class="mono" type="text" placeholder="例如 GIGASOLAR" />
+        <label class="mini-label">主旨（pSubject）</label>
+        <input v-model="newSubject" type="text" placeholder="流程若設了主旨範本，這裡送的值會被蓋掉" />
+      </div>
     </section>
 
-    <!-- 右欄：改欄位 -->
+    <!-- 右欄：欄位編輯 -->
     <section class="editor-panel">
-      <div v-if="loading" class="placeholder">讀取中…</div>
+      <!-- 關卡操作：排在 loading 之前，否則改單模式的讀取旗標會把這個面板
+           卸載重建，面板自己的操作紀錄與勾選狀態就跟著消失（實測踩到）。 -->
+      <WorkItemPanel
+        v-if="mode === 'activity'"
+        :serial-no="detail?.header.serialNo || serialInput"
+        @changed="onActivityChanged"
+      />
+
+      <div v-else-if="loading" class="placeholder">讀取中…</div>
+
+      <!-- 建立新單 -->
+      <template v-else-if="mode === 'create'">
+        <div v-if="!template" class="placeholder">
+          <p>從左邊挑一支流程，取出它的空白表單範本。</p>
+          <p class="hint">
+            欄位結構一律取自 <code>getFormFieldTemplate</code> ——
+            <code>invokeProcess</code> 不驗證欄位 id，自己拼的欄位會被靜默寫入，
+            要到之後讀取表單時才爆。
+          </p>
+        </div>
+
+        <template v-else>
+          <div class="doc-header">
+            <div class="doc-title">
+              <span class="badge write">建立新單</span>
+              {{ selectedProcessId }}
+            </div>
+            <div class="doc-meta mono">
+              表單 {{ template.formId }} · OID {{ template.formOid }} ·
+              {{ template.fields.length }} 欄 · 範本讀取 {{ template.elapsedMs }} ms
+            </div>
+          </div>
+
+          <div v-if="!template.labelsAvailable" class="callout warn">
+            <div class="callout-title">欄位中文名稱不可用</div>
+            <p>{{ template.labelSource }}</p>
+          </div>
+
+          <div class="table-scroll">
+            <table class="data-table field-table">
+              <thead>
+                <tr>
+                  <th style="width: 24%">欄位名稱</th>
+                  <th style="width: 26%">欄位 id</th>
+                  <th style="width: 12%">型別</th>
+                  <th>欄位數據</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="f in template.fields" :key="f.tag">
+                  <td>
+                    <span class="field-name">{{ f.name || '—' }}</span>
+                    <span v-if="f.attrBacked" class="attr-flag" title="此欄位另有 label / hidden 屬性存顯示名稱與 OID">
+                      ⚠ 屬性欄位
+                    </span>
+                  </td>
+                  <td class="mono field-id">{{ f.id }}</td>
+                  <td>
+                    <span class="type-chip">{{ f.fieldType || '—' }}</span>
+                    <div class="dtype mono">{{ f.dataType || '' }}</div>
+                  </td>
+                  <td>
+                    <textarea
+                      v-if="f.fieldType === 'TEXTAREA' || (newValues[f.tag] || '').length > 60"
+                      v-model="newValues[f.tag]"
+                      rows="3"
+                      class="mono"
+                    ></textarea>
+                    <input v-else v-model="newValues[f.tag]" type="text" class="mono" />
+                    <div v-if="Object.keys(f.extraAttributes).length" class="attrs mono">
+                      <span v-for="(v, k) in f.extraAttributes" :key="k">{{ k }}="{{ v }}"</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="submit-bar">
+            <div class="callout warn">
+              <div class="callout-title">開單前先知道這三件事</div>
+              <p>
+                1. 會在 191 測試區產生<b>真實單據與待辦</b>，下一關的人會收到。<br />
+                2. <b>開單失敗一樣會消耗單號</b>，失敗不代表沒留下痕跡。<br />
+                3. 主旨若流程設了範本，<code>pSubject</code> 送的值會被蓋掉，
+                送出後會列出實際主旨供比對。
+              </p>
+            </div>
+
+            <div class="safety-box">
+              <label class="safety-check">
+                <input v-model="confirmCreate" type="checkbox" />
+                <span>
+                  我確認要以 {{ requesterId }}／{{ orgUnitId || '（未選部門）' }}
+                  在 191 測試區開一張 {{ selectedProcessId }} 的新單
+                </span>
+              </label>
+              <div class="btn-row">
+                <button
+                  class="primary"
+                  :disabled="creating || !confirmCreate || !orgUnitId"
+                  @click="create"
+                >
+                  {{ creating ? '開單中…' : '開單並讀回驗證' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div v-if="createResult" class="result-box">
+            <div class="result-title">
+              <span class="badge" :class="createResult.verified ? 'st-ok' : 'st-fault'">
+                {{ createResult.verified ? '讀回驗證通過' : '讀回比對有落差' }}
+              </span>
+              {{ createResult.message }}
+              <span class="hint">{{ createResult.method }} · {{ createResult.elapsedMs }} ms</span>
+            </div>
+            <div class="hint">
+              新單號 <code>{{ createResult.serialNo }}</code> ·
+              {{ createResult.fieldCount }} 欄
+              <button class="btn-xs" @click="openCreated">切到改單模式開啟它</button>
+            </div>
+            <div v-if="createResult.subjectOverridden" class="callout info">
+              <div class="callout-title">主旨被流程的主旨範本覆寫</div>
+              <p>
+                送出 <code>{{ createResult.requestedSubject }}</code>，
+                實際 <code>{{ createResult.actualSubject }}</code>。
+              </p>
+            </div>
+            <div v-if="createResult.systemFilled.length" class="callout info">
+              <div class="callout-title">這幾欄由流程自己填入（不是寫入失敗）</div>
+              <ul>
+                <li v-for="s in createResult.systemFilled" :key="s.tag">
+                  <code>{{ s.tag }}</code>：送出空值，BPM 回填 <b>{{ s.actual }}</b>
+                </li>
+              </ul>
+            </div>
+            <div v-if="createResult.mismatches.length" class="callout danger">
+              <div class="callout-title">這幾欄開單後讀回來不一樣</div>
+              <ul>
+                <li v-for="m in createResult.mismatches" :key="m.tag">
+                  <code>{{ m.tag }}</code>：預期 <b>{{ m.expected }}</b>，實際 <b>{{ m.actual }}</b>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </template>
+      </template>
 
       <div v-else-if="!detail" class="placeholder">
         <p>從左邊挑一張單，或直接輸入單號讀取。</p>
         <p class="hint">
-          這一頁只做一件事：把已開單的表單欄位值改掉
+          改單模式只做一件事：把已開單的表單欄位值改掉
           （<code>updateFormValueBySerialNember</code>）。
           它不會推動流程、不會簽核、不會改簽核歷程。
         </p>
@@ -449,6 +758,14 @@ onMounted(searchProcesses);
               </tr>
             </tbody>
           </table>
+          <div v-if="result.systemFilled.length" class="callout info">
+            <div class="callout-title">這幾欄由流程自己填入（不是寫入失敗）</div>
+            <ul>
+              <li v-for="s in result.systemFilled" :key="s.tag">
+                <code>{{ s.tag }}</code>：送出空值，BPM 回填 <b>{{ s.actual }}</b>
+              </li>
+            </ul>
+          </div>
           <div v-if="result.mismatches.length" class="callout danger">
             <div class="callout-title">這幾欄寫進去後讀回來不一樣</div>
             <ul>
@@ -745,6 +1062,38 @@ onMounted(searchProcesses);
   font-size: 13px;
   font-weight: 500;
   margin-bottom: 6px;
+}
+
+.mode-block {
+  padding: 10px 12px;
+}
+
+.mode-switch {
+  display: flex;
+  gap: 6px;
+}
+
+.mode-btn {
+  flex: 1;
+  font-size: 13px;
+}
+
+.mode-btn.active {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+.mini-label {
+  display: block;
+  font-size: 11px;
+  color: var(--text-dim);
+  margin: 8px 0 3px;
+}
+
+.step-block > select,
+.step-block > input {
+  width: 100%;
 }
 
 @media (max-width: 1100px) {

@@ -201,10 +201,196 @@ class FormEditSubmitResult(BaseModel):
     diff: List[FieldDiff] = Field(default_factory=list)
     verified: bool = False
     mismatches: List[FieldMismatch] = Field(default_factory=list)
+    systemFilled: List[FieldMismatch] = Field(default_factory=list)
     backupFormXml: Optional[str] = None
     pFormValue: Optional[str] = None
     fieldCountBefore: Optional[int] = None
     fieldCountAfter: Optional[int] = None
     corruptionCleared: bool = False
+    elapsedMs: int = 0
+    message: Optional[str] = None
+
+
+class OrgUnitOption(BaseModel):
+    oid: Optional[str] = None
+    id: Optional[str] = None
+    name: Optional[str] = None
+    orgName: Optional[str] = None
+    isMain: bool = False
+
+
+class OrgUnitListResult(BaseModel):
+    userId: Optional[str] = None
+    orgUnits: List[OrgUnitOption] = Field(default_factory=list)
+
+
+class NewFormTemplate(BaseModel):
+    processId: Optional[str] = None
+    formOid: Optional[str] = None
+    formId: Optional[str] = None
+    fields: List[FormFieldInfo] = Field(default_factory=list)
+    rawFormXml: str = ''
+    labelSource: Optional[str] = None
+    labelsAvailable: bool = False
+    elapsedMs: int = 0
+
+
+class CreateInstanceRequest(BaseModel):
+    processId: str
+    requesterId: str
+    orgUnitId: str
+    subject: str = ''
+    values: Dict[str, str] = Field(default_factory=dict)
+    orgId: Optional[str] = None
+    confirm: bool = False
+    endpoint: Optional[str] = None
+
+
+class CreateInstanceResult(BaseModel):
+    status: str  # ok / mismatch
+    method: Optional[str] = None
+    serialNo: Optional[str] = None
+    requestedSubject: Optional[str] = None
+    actualSubject: Optional[str] = None
+    subjectOverridden: bool = False
+    formOid: Optional[str] = None
+    fieldCount: int = 0
+    verified: bool = False
+    mismatches: List[FieldMismatch] = Field(default_factory=list)
+    systemFilled: List[FieldMismatch] = Field(default_factory=list)
+    pFormFieldValue: Optional[str] = None
+    elapsedMs: int = 0
+    message: Optional[str] = None
+
+
+# ── 關卡工作台 ──────────────────────────────────────────────────
+
+class ActivityInfo(BaseModel):
+    activityId: Optional[str] = None
+    activityName: Optional[str] = None
+    state: Optional[str] = None
+    startedTime: Optional[str] = None
+    performType: Optional[str] = None
+    performerIds: List[str] = Field(default_factory=list)
+    notifiedIds: List[str] = Field(default_factory=list)
+    comments: List[str] = Field(default_factory=list)
+    running: bool = False
+
+
+class CurrentPerformer(BaseModel):
+    userId: Optional[str] = None
+    userName: Optional[str] = None
+    usersOid: Optional[str] = None
+    activityId: Optional[str] = None
+    activityName: Optional[str] = None
+    workItemOID: Optional[str] = None
+    workItemState: Optional[str] = None
+    accepted: Optional[bool] = None
+
+
+class ActivityBoard(BaseModel):
+    serialNo: Optional[str] = None
+    processId: Optional[str] = None
+    processName: Optional[str] = None
+    subject: Optional[str] = None
+    processState: Optional[str] = None
+    closed: bool = False
+    activities: List[ActivityInfo] = Field(default_factory=list)
+    currentPerformers: List[CurrentPerformer] = Field(default_factory=list)
+    oidSource: Optional[str] = None
+    reassignAvailable: bool = False
+    elapsedMs: int = 0
+
+
+class StepResult(BaseModel):
+    step: str
+    ok: bool
+    detail: Optional[str] = None
+
+
+class AcceptRequest(BaseModel):
+    workItemOID: str
+    userId: str
+    confirm: bool = False
+    endpoint: Optional[str] = None
+
+
+class AcceptResult(BaseModel):
+    status: str
+    workItemState: Optional[str] = None
+    accepted: bool = False
+    elapsedMs: int = 0
+    message: Optional[str] = None
+
+
+class CompleteRequest(BaseModel):
+    serialNo: str
+    workItemOID: str
+    userId: str
+    comment: str = ''
+    changes: Dict[str, str] = Field(default_factory=dict)
+    autoAccept: bool = True
+    confirm: bool = False
+    endpoint: Optional[str] = None
+
+
+class CompleteResult(BaseModel):
+    status: str
+    steps: List[StepResult] = Field(default_factory=list)
+    formResult: Optional[FormEditSubmitResult] = None
+    after: Optional[ActivityBoard] = None
+    elapsedMs: int = 0
+    message: Optional[str] = None
+
+
+class ReassignRequest(BaseModel):
+    workItemOID: str
+    acceptorId: str
+    comment: str = ''
+    mode: str = 'management'  # management / assignee / owner
+    requesterId: str = ''
+    confirm: bool = False
+    endpoint: Optional[str] = None
+
+
+class ReassignResult(BaseModel):
+    status: str
+    method: Optional[str] = None
+    acceptorId: Optional[str] = None
+    acceptorOid: Optional[str] = None
+    elapsedMs: int = 0
+    message: Optional[str] = None
+
+
+class ReexecuteRequest(BaseModel):
+    serialNo: str
+    askUserId: str
+    activityId: str
+    comment: str = ''
+    confirm: bool = False
+    endpoint: Optional[str] = None
+
+
+class ReexecuteResult(BaseModel):
+    status: str
+    after: Optional[ActivityBoard] = None
+    elapsedMs: int = 0
+    message: Optional[str] = None
+
+
+class CloseProcessRequest(BaseModel):
+    serialNo: str
+    mode: str = 'abort'  # abort / terminate
+    userId: str = ''
+    comment: str = ''
+    confirm: bool = False
+    endpoint: Optional[str] = None
+
+
+class CloseProcessResult(BaseModel):
+    status: str
+    method: Optional[str] = None
+    processState: Optional[str] = None
+    savedComment: Optional[str] = None
     elapsedMs: int = 0
     message: Optional[str] = None

@@ -13,7 +13,7 @@ from app.main import app  # noqa: E402
 from app.service import classify_level, extract_shape  # noqa: E402
 # 要排在 app.main 之後：settings 被載入時才會把 5_ws_explorer 根目錄
 # 放進 sys.path，form_edit 匯入的 ws_client 就在那裡。
-from app import form_edit  # noqa: E402
+from app import form_edit, workitem  # noqa: E402
 
 client = TestClient(app)
 
@@ -187,3 +187,75 @@ def test_form_edit_blocks_190():
     })
     assert res.status_code == 400
     assert '190' in res.json()['detail']
+
+
+def test_classify_readback_separates_system_fill():
+    """送空值被 BPM 回填（例如自動配號）不是寫入失敗，要分開回報。"""
+    expected = {'SerialNumber': '', 'Product': '甲', 'Note': '乙'}
+    actual = {'SerialNumber': 'SPCP202608_0027', 'Product': '甲', 'Note': '丙'}
+    mismatches, system_filled = form_edit.classify_readback(expected, actual)
+    assert [m['tag'] for m in mismatches] == ['Note']
+    assert [s['tag'] for s in system_filled] == ['SerialNumber']
+
+
+def test_form_edit_create_requires_confirm():
+    """開單會產生真實單據，沒帶 confirm 必須在連線之前擋下。"""
+    res = client.post('/api/form-edit/create', json={
+        'processId': 'X', 'requesterId': 'S112009', 'orgUnitId': 'S1800',
+    })
+    assert res.status_code == 400
+    assert '確認' in res.json()['detail']
+
+
+def test_form_edit_create_requires_params():
+    """缺申請人或部門要明講缺什麼，不是丟一個含糊的錯誤。"""
+    res = client.post('/api/form-edit/create', json={
+        'processId': 'X', 'requesterId': 'S112009', 'orgUnitId': '',
+        'confirm': True,
+    })
+    assert res.status_code == 400
+    assert '部門' in res.json()['detail']
+
+
+# ── 關卡工作台 ──────────────────────────────────────────────────
+
+def test_performer_ids_parsing():
+    """performerName 是「員工編號_姓名」，並簽時以逗號分隔。"""
+    assert workitem._performer_ids('S093013_林吟霞') == ['S093013']
+    assert workitem._performer_ids('S095006_林正勛, S100026_葉韻綾') == ['S095006', 'S100026']
+    assert workitem._performer_ids('') == []
+    # 沒有底線時整段當成員工編號，不要硬拆
+    assert workitem._performer_ids('S112009') == ['S112009']
+
+
+def test_workitem_writes_require_confirm():
+    """每一支寫入端點都必須在連線之前擋下沒帶 confirm 的請求。"""
+    cases = [
+        ('/api/workitem/accept', {'workItemOID': 'x', 'userId': 'S112009'}),
+        ('/api/workitem/complete', {'serialNo': 'X1', 'workItemOID': 'x', 'userId': 'S112009'}),
+        ('/api/workitem/reassign', {'workItemOID': 'x', 'acceptorId': 'S094009'}),
+        ('/api/workitem/reexecute', {'serialNo': 'X1', 'askUserId': 'S112009', 'activityId': 'A'}),
+        ('/api/workitem/close', {'serialNo': 'X1'}),
+    ]
+    for path, body in cases:
+        res = client.post(path, json=body)
+        assert res.status_code == 400, path
+        assert '確認' in res.json()['detail'], path
+
+
+def test_workitem_blocks_190():
+    """190 正式區在關卡工作台一樣禁止。"""
+    res = client.get('/api/workitem/board/X00000001', params={
+        'endpoint': 'http://10.10.130.190:9090/NaNaWeb/services/WorkflowService',
+    })
+    assert res.status_code == 400
+    assert '190' in res.json()['detail']
+
+
+def test_terminate_requires_operator():
+    """終止需要操作者，缺了要明講，不能丟含糊的錯誤。"""
+    res = client.post('/api/workitem/close', json={
+        'serialNo': 'X1', 'mode': 'terminate', 'confirm': True,
+    })
+    assert res.status_code == 400
+    assert '操作者' in res.json()['detail']

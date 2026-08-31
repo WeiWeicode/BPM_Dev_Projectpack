@@ -1,4 +1,9 @@
 import type {
+  AcceptResult,
+  ActivityBoard,
+  CloseProcessResult,
+  CompleteResult,
+  CreateInstanceResult,
   FormEditPreviewResult,
   FormEditSubmitResult,
   InstanceDetail,
@@ -8,7 +13,11 @@ import type {
   OperationDetail,
   OperationSummary,
   OverviewSummary,
+  NewFormTemplate,
+  OrgUnitListResult,
   ProcessListResult,
+  ReassignResult,
+  ReexecuteResult,
   SeedsData,
 } from './types';
 
@@ -81,4 +90,56 @@ export const api = {
     request<FormEditPreviewResult>('/api/form-edit/preview', { method: 'POST', body: { serialNo, changes } }),
   submitEdit: (body: { serialNo: string; changes?: Record<string, string>; rawFormXml?: string; confirm: boolean }) =>
     request<FormEditSubmitResult>('/api/form-edit/submit', { method: 'POST', body }),
+
+  // 建立新單
+  listOrgUnits: (userId: string) =>
+    request<OrgUnitListResult>('/api/form-edit/org-units', { params: { userId } }),
+  loadNewForm: (processId: string) =>
+    request<NewFormTemplate>('/api/form-edit/new-form', { params: { processId } }),
+  createInstance: (body: {
+    processId: string;
+    requesterId: string;
+    orgUnitId: string;
+    subject?: string;
+    values?: Record<string, string>;
+    orgId?: string;
+    confirm: boolean;
+  }) => request<CreateInstanceResult>('/api/form-edit/create', { method: 'POST', body }),
+
+  // 關卡操作
+  getBoard: (serialNo: string) =>
+    request<ActivityBoard>(`/api/workitem/board/${encodeURIComponent(serialNo)}`),
+  acceptWorkItem: (body: { workItemOID: string; userId: string; confirm: boolean }) =>
+    request<AcceptResult>('/api/workitem/accept', { method: 'POST', body }),
+  completeWorkItem: (body: {
+    serialNo: string;
+    workItemOID: string;
+    userId: string;
+    comment?: string;
+    changes?: Record<string, string>;
+    autoAccept?: boolean;
+    confirm: boolean;
+  }) => request<CompleteResult>('/api/workitem/complete', { method: 'POST', body }),
+  reassignWorkItem: (body: {
+    workItemOID: string;
+    acceptorId: string;
+    comment?: string;
+    mode?: string;
+    requesterId?: string;
+    confirm: boolean;
+  }) => request<ReassignResult>('/api/workitem/reassign', { method: 'POST', body }),
+  reexecuteActivity: (body: {
+    serialNo: string;
+    askUserId: string;
+    activityId: string;
+    comment?: string;
+    confirm: boolean;
+  }) => request<ReexecuteResult>('/api/workitem/reexecute', { method: 'POST', body }),
+  closeProcess: (body: {
+    serialNo: string;
+    mode?: string;
+    userId?: string;
+    comment?: string;
+    confirm: boolean;
+  }) => request<CloseProcessResult>('/api/workitem/close', { method: 'POST', body }),
 };

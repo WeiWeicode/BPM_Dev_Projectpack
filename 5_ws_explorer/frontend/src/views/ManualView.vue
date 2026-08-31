@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, inject, onMounted, ref, watch } from 'vue';
+import { computed, inject, onMounted, ref, watch, type Ref } from 'vue';
 import { api } from '../api/client';
 import type { OperationDetail, OperationSummary } from '../api/types';
 
@@ -7,7 +7,7 @@ const emit = defineEmits<{
   (e: 'select-workbench', operationName: string, inputMessage?: string): void;
 }>();
 
-const globalKeyword = inject<ref<string>>('keyword', ref(''));
+const globalKeyword = inject<Ref<string>>('keyword', ref(''));
 const showToast = inject<(msg: string) => void>('showToast', () => {});
 
 const operations = ref<OperationSummary[]>([]);
