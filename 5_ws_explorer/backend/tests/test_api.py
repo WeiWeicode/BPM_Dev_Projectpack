@@ -5,11 +5,15 @@ import os
 import sys
 import pytest
 from fastapi.testclient import TestClient
+from xml.sax.saxutils import escape
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app.main import app  # noqa: E402
 from app.service import classify_level, extract_shape  # noqa: E402
+# 要排在 app.main 之後：settings 被載入時才會把 5_ws_explorer 根目錄
+# 放進 sys.path，form_edit 匯入的 ws_client 就在那裡。
+from app import form_edit  # noqa: E402
 
 client = TestClient(app)
 
@@ -117,3 +121,69 @@ def test_invoke_safety_boundary_write():
     data = res.json()
     assert data['status'] == 'error'
     assert '副作用' in data['error']
+
+
+# ── 改單工作台 ──────────────────────────────────────────────────
+# 這幾項不連 191，只驗證不需要網路的純函式與安全防線。
+# 真正的讀寫路徑無法離線測，實測記錄見 form_edit.py 的模組 docstring。
+
+def test_form_edit_parse_and_set():
+    """欄位解析與內文替換：屬性不能被動到，值要正確逸出。"""
+    xml = ('<TestForm>'
+           '<A id="A" dataType="java.lang.String" perDataProId="">舊值</A>'
+           '<B id="B" dataType="java.util.Date">2026/08/31</B>'
+           '</TestForm>')
+    form_id, fields = form_edit.parse_form_xml(xml)
+    assert form_id == 'TestForm'
+    assert [f['id'] for f in fields] == ['A', 'B']
+    assert fields[0]['value'] == '舊值'
+    assert fields[0]['attributes']['perDataProId'] == ''
+
+    changed = form_edit.set_field_value(xml, 'A', 'X&Y <Z>')
+    assert 'perDataProId=""' in changed          # 屬性原樣保留
+    assert 'X&amp;Y &lt;Z&gt;' in changed        # 值有逸出
+    assert '<B id="B" dataType="java.util.Date">2026/08/31</B>' in changed
+
+
+def test_form_edit_rejects_duplicate_tags():
+    """重複標籤要拋錯，不能靜默改到第一個。"""
+    xml = '<F><A id="A">1</A><A id="A">2</A></F>'
+    with pytest.raises(form_edit.FormEditError):
+        form_edit.parse_form_xml(xml)
+
+
+def test_form_edit_unwrap_detects_wrapper():
+    """把整包回傳寫回去造成的多層包裝要被偵測並剝開。"""
+    inner = '<F><A id="A">值</A></F>'
+    healthy = '<com.dsc.nana.services.webservice.FormCollection><forms>' \
+              '<com.dsc.nana.services.webservice.FormInfo><fieldValues>%s' \
+              '</fieldValues></com.dsc.nana.services.webservice.FormInfo>' \
+              '</forms></com.dsc.nana.services.webservice.FormCollection>'
+    text, corruption = form_edit.unwrap_field_values(
+        healthy % escape(inner))
+    assert text == inner
+    assert corruption is None
+
+    poisoned = healthy % escape(healthy % escape(inner))
+    text, corruption = form_edit.unwrap_field_values(poisoned)
+    assert text == inner
+    assert corruption and 'FormCollection' in corruption
+
+
+def test_form_edit_submit_requires_confirm():
+    """沒帶 confirm 不得寫入，且必須在連線之前就擋下。"""
+    res = client.post('/api/form-edit/submit', json={
+        'serialNo': 'X00000001',
+        'changes': {'A': 'B'},
+    })
+    assert res.status_code == 400
+    assert '確認' in res.json()['detail']
+
+
+def test_form_edit_blocks_190():
+    """190 正式區在改單頁一樣禁止。"""
+    res = client.get('/api/form-edit/instance/X00000001', params={
+        'endpoint': 'http://10.10.130.190:9090/NaNaWeb/services/WorkflowService',
+    })
+    assert res.status_code == 400
+    assert '190' in res.json()['detail']

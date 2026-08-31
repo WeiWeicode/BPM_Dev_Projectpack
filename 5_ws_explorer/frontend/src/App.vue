@@ -2,12 +2,13 @@
 import { onMounted, provide, ref } from 'vue';
 import { api } from './api/client';
 import type { OverviewSummary } from './api/types';
+import FormEditView from './views/FormEditView.vue';
 import GuideView from './views/GuideView.vue';
 import ManualView from './views/ManualView.vue';
 import SeedsView from './views/SeedsView.vue';
 import WorkbenchView from './views/WorkbenchView.vue';
 
-const currentTab = ref<'manual' | 'workbench' | 'guide' | 'seeds'>('manual');
+const currentTab = ref<'manual' | 'workbench' | 'formEdit' | 'guide' | 'seeds'>('manual');
 const overview = ref<OverviewSummary | null>(null);
 const keyword = ref('');
 const toast = ref('');
@@ -90,6 +91,13 @@ onMounted(loadOverview);
           </button>
           <button
             class="nav-tab"
+            :class="{ active: currentTab === 'formEdit' }"
+            @click="currentTab = 'formEdit'"
+          >
+            📝 改單工作台
+          </button>
+          <button
+            class="nav-tab"
             :class="{ active: currentTab === 'guide' }"
             @click="currentTab = 'guide'"
           >
@@ -117,6 +125,7 @@ onMounted(loadOverview);
         :initial-operation-name="targetWorkbenchOp"
         :initial-input-message="targetWorkbenchMsg"
       />
+      <FormEditView v-else-if="currentTab === 'formEdit'" />
       <GuideView v-else-if="currentTab === 'guide'" />
       <SeedsView v-else-if="currentTab === 'seeds'" />
     </main>

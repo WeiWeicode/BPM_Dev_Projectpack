@@ -21,6 +21,11 @@ SEEDS_JSON_PATH = os.path.join(PROJECT_DIR, 'seeds.json')
 PAYLOAD_DIR = os.path.join(PROJECT_DIR, 'out', 'payloads')
 MANUAL_MD_PATH = os.path.join(PROJECT_DIR, 'docs', 'WorkflowService_API手冊.md')
 
+# 3_db_explorer 的唯讀資料庫知識庫。改單頁靠它把欄位 id 對成中文名稱與型別；
+# 少了它（無 .env 或無 pyodbc）改單頁仍可用，只是名稱欄顯示為未知，不靜默假裝。
+DB_EXPLORER_DIR = os.path.join(os.path.dirname(PROJECT_DIR), '3_db_explorer')
+FORM_PROCESS_MAP_PATH = os.path.join(DB_EXPLORER_DIR, 'out', 'form_process_map.json')
+
 # 預設 Endpoint（191 測試區）
 DEFAULT_ENDPOINT = 'http://10.10.130.191:8080/NaNaWeb/services/WorkflowService'
 

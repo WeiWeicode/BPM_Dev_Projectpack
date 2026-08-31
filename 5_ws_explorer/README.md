@@ -50,8 +50,30 @@ npm run dev
 開啟瀏覽器前往 <http://localhost:5174> 即可：
 - 📑 **API 手冊與目錄**：65 支方法多維度篩選（唯讀/副作用/實測狀態/信心）、參數規格與回傳樣本。
 - ⚡ **即時實測工作台**：線上填入參數、一鍵代入種子、發送 SOAP 請求至 191 測試區並即時檢視回傳 XML 與 SOAP 封包。
+- 📝 **改單工作台**：`updateFormValueBySerialNember` 的專用流程 —— 查流程 → 挑單（進行中／已結案）→ 帶出欄位 id、中文名稱、型別與現值 → 逐欄編輯 → 送出後自動讀回逐欄驗證。
 - 📖 **呼叫前必讀**：視覺化呈現 rpc/encoded、回傳 string 四種型態、假成功防範與欄位 ID 地雷。
 - ⚙️ **種子資料庫**：檢視與複製測試用參數種子出處。
+
+### 改單工作台為什麼要獨立一頁
+
+`updateFormValueBySerialNember` 是**整份覆寫**，不是合併。實測：
+
+| 送出 | 讀回 |
+|:---|:---|
+| 完整 15 欄、只改其中 2 欄 | 15 欄，只有那 2 欄變 |
+| 只送要改的 1 欄 | **剩 1 欄**，其餘 14 欄整個消失 |
+
+它也不驗證欄位 id 與 XML 結構。把 `fetchFormInstanceWithProcSerlNo` 的整包回傳
+（`FormCollection`）當成 `pFormValue` 貼回去，BPM 照收，表單第一層變成
+`FormCollection` 而非表單 id，畫面上所有欄位就退回預設值 —— 看起來像資料被清空，
+其實只是多包了一層。這一頁因此**不讓人手貼 XML**：前端只送「哪個欄位改成什麼」，
+後端在寫入前重讀現值、只替換目標欄位內文、整份送回，再讀回逐欄比對。
+偵測到被包壞的單會直接標紅並提供一鍵修復。
+
+欄位的中文名稱與型別來自 `3_db_explorer` 的 `bpm_kb`（唯讀連線）。
+沒有 `.env` 或未裝 pyodbc 時這一頁照常可用，只是名稱欄留白並註明原因，不靜默假裝。
+流程清單讀 `3_db_explorer/out/form_process_map.json`（WorkflowService 沒有
+「列出所有流程」的方法，`fetchProcInstances` 一定要先給 `pProcessId`）。
 
 
 | 檔案 | 角色 | 誰維護 |

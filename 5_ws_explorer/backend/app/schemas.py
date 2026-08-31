@@ -97,3 +97,114 @@ class InvokeResult(BaseModel):
     faultString: Optional[str] = None
     softError: Optional[str] = None
     error: Optional[str] = None
+
+
+# ── 改單工作台 ──────────────────────────────────────────────────
+
+class ProcessOption(BaseModel):
+    processId: Optional[str] = None
+    processName: Optional[str] = None
+    version: Optional[int] = None
+    formIds: List[str] = Field(default_factory=list)
+    formNames: List[str] = Field(default_factory=list)
+
+
+class ProcessListResult(BaseModel):
+    processes: List[ProcessOption] = Field(default_factory=list)
+    total: int = 0
+    truncated: bool = False
+    source: Optional[str] = None
+
+
+class InstanceSummary(BaseModel):
+    serialNo: Optional[str] = None
+    oid: Optional[str] = None
+    state: Optional[str] = None
+    subject: Optional[str] = None
+    requesterId: Optional[str] = None
+    requesterName: Optional[str] = None
+    createdTime: Optional[str] = None
+    processId: Optional[str] = None
+    processName: Optional[str] = None
+
+
+class InstanceListResult(BaseModel):
+    instances: List[InstanceSummary] = Field(default_factory=list)
+    total: int = 0
+    method: Optional[str] = None
+    elapsedMs: int = 0
+
+
+class FormFieldInfo(BaseModel):
+    tag: str
+    id: str
+    value: str = ''
+    name: Optional[str] = None
+    dataType: Optional[str] = None
+    fieldType: Optional[str] = None
+    attrBacked: bool = False
+    attributes: Dict[str, str] = Field(default_factory=dict)
+    extraAttributes: Dict[str, str] = Field(default_factory=dict)
+
+
+class InstanceDetail(BaseModel):
+    header: InstanceSummary
+    formId: Optional[str] = None
+    formIdFromResponse: Optional[str] = None
+    formSerialNumber: Optional[str] = None
+    fields: List[FormFieldInfo] = Field(default_factory=list)
+    rawFormXml: str = ''
+    labelSource: Optional[str] = None
+    labelsAvailable: bool = False
+    corruption: Optional[str] = None
+    closed: bool = False
+    elapsedMs: int = 0
+
+
+class FieldDiff(BaseModel):
+    tag: str
+    before: Optional[str] = None
+    after: Optional[str] = None
+
+
+class FieldMismatch(BaseModel):
+    tag: str
+    expected: Optional[str] = None
+    actual: Optional[str] = None
+
+
+class FormEditPreviewRequest(BaseModel):
+    serialNo: str
+    changes: Dict[str, str] = Field(default_factory=dict)
+    endpoint: Optional[str] = None
+
+
+class FormEditPreviewResult(BaseModel):
+    serialNo: Optional[str] = None
+    diff: List[FieldDiff] = Field(default_factory=list)
+    fieldCount: int = 0
+    pFormValue: str = ''
+    unchanged: bool = False
+
+
+class FormEditSubmitRequest(BaseModel):
+    serialNo: str
+    changes: Dict[str, str] = Field(default_factory=dict)
+    rawFormXml: Optional[str] = None
+    confirm: bool = False
+    endpoint: Optional[str] = None
+
+
+class FormEditSubmitResult(BaseModel):
+    status: str  # ok / mismatch / unchanged
+    serialNo: Optional[str] = None
+    diff: List[FieldDiff] = Field(default_factory=list)
+    verified: bool = False
+    mismatches: List[FieldMismatch] = Field(default_factory=list)
+    backupFormXml: Optional[str] = None
+    pFormValue: Optional[str] = None
+    fieldCountBefore: Optional[int] = None
+    fieldCountAfter: Optional[int] = None
+    corruptionCleared: bool = False
+    elapsedMs: int = 0
+    message: Optional[str] = None

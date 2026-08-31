@@ -13,7 +13,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import settings
-from .routers import api_meta, invoke
+from .routers import api_meta, form_edit, invoke
 
 app = FastAPI(
     title='鼎新 BPM WorkflowService API 檢視與實測工具',
@@ -31,6 +31,7 @@ app.add_middleware(
 
 app.include_router(api_meta.router)
 app.include_router(invoke.router)
+app.include_router(form_edit.router)
 
 # 前端建置產物存在時掛載，讓單一服務即可直接運行完整前端
 if os.path.isdir(settings.FRONTEND_DIST):

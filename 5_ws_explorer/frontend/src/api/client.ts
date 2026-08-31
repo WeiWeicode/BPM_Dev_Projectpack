@@ -1,9 +1,14 @@
 import type {
+  FormEditPreviewResult,
+  FormEditSubmitResult,
+  InstanceDetail,
+  InstanceListResult,
   InvokeRequest,
   InvokeResult,
   OperationDetail,
   OperationSummary,
   OverviewSummary,
+  ProcessListResult,
   SeedsData,
 } from './types';
 
@@ -64,4 +69,16 @@ export const api = {
     return res.text();
   },
   invoke: (req: InvokeRequest) => request<InvokeResult>('/api/invoke', { method: 'POST', body: req }),
+
+  // 改單工作台
+  listEditProcesses: (keyword?: string) =>
+    request<ProcessListResult>('/api/form-edit/processes', { params: { keyword } }),
+  listEditInstances: (params: { processId: string; scope?: string; startTime?: string; endTime?: string; dateBasis?: string }) =>
+    request<InstanceListResult>('/api/form-edit/instances', { params }),
+  loadEditInstance: (serialNo: string) =>
+    request<InstanceDetail>(`/api/form-edit/instance/${encodeURIComponent(serialNo)}`),
+  previewEdit: (serialNo: string, changes: Record<string, string>) =>
+    request<FormEditPreviewResult>('/api/form-edit/preview', { method: 'POST', body: { serialNo, changes } }),
+  submitEdit: (body: { serialNo: string; changes?: Record<string, string>; rawFormXml?: string; confirm: boolean }) =>
+    request<FormEditSubmitResult>('/api/form-edit/submit', { method: 'POST', body }),
 };
