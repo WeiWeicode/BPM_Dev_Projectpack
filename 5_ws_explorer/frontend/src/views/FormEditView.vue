@@ -2,7 +2,7 @@
 /**
  * 流程工作台，兩種模式共用同一份欄位編輯表：
  *
- *   改既有單  查流程 → 選單 → 改欄位 → 送出 → 讀回驗證（updateFormValueBySerialNember）
+ *   改既有單  查流程 → 選單 → 改欄位 → 下載改單前備份 → 送出 → 讀回驗證（updateFormValueBySerialNember）
  *   建立新單  查流程 → 取空白範本 → 填欄位 → 開單 → 讀回驗證（invokeProcess）
  *
  * 兩邊都刻意不讓人手貼表單 XML。updateFormValueBySerialNember 是整份覆寫、
@@ -52,6 +52,33 @@ const loading = ref(false);
 const result = ref<FormEditSubmitResult | null>(null);
 const backup = ref<{ serialNo: string; xml: string } | null>(null);
 const showRawXml = ref(false);
+
+// ── 備份 ──
+// updateFormValueBySerialNember 是整份覆寫、寫進去就回不去了，
+// 所以改單前一定要先把現況存成檔案，沒下載就不給送出。
+interface BackupFile {
+  kind: string;
+  version: number;
+  exportedAt: string;
+  serialNo: string;
+  processName: string;
+  formId: string;
+  state: string;
+  fields: { tag: string; id: string; name: string; value: string }[];
+  rawFormXml: string;
+}
+
+const backupSaved = ref(false);
+const backupFileName = ref('');
+const backupFileInput = ref<HTMLInputElement | null>(null);
+const importedBackup = ref<BackupFile | null>(null);
+const importReport = ref<{
+  fileName: string;
+  applied: string[];
+  missing: string[];
+  extra: string[];
+  formIdChanged: boolean;
+} | null>(null);
 
 const changedTags = computed(() => {
   if (!detail.value) return [];
@@ -117,6 +144,10 @@ async function openInstance(serialNo: string) {
     edited.value = {};
     for (const f of data.fields) edited.value[f.tag] = f.value;
     confirmWrite.value = false;
+    backupSaved.value = false;
+    backupFileName.value = '';
+    importedBackup.value = null;
+    importReport.value = null;
     if (data.corruption) showToast('這張單的表單值有異常，請看上方紅框說明');
   } catch (err) {
     detail.value = null;
@@ -140,6 +171,7 @@ function resetAll() {
 async function submit() {
   if (!detail.value) return;
   if (!confirmWrite.value) return showToast('請先勾選確認');
+  if (!backupSaved.value) return showToast('請先下載改單前備份，送出才會解鎖');
   if (!changedTags.value.length && !detail.value.corruption) {
     return showToast('沒有任何欄位被改動');
   }
@@ -165,6 +197,7 @@ async function submit() {
 
 async function restoreBackup() {
   if (!backup.value) return;
+  if (!backupSaved.value) return showToast('請先下載目前這份的備份，還原一樣是整份覆寫');
   submitting.value = true;
   try {
     const res = await api.submitEdit({
@@ -175,6 +208,128 @@ async function restoreBackup() {
     result.value = res;
     showToast(res.verified ? '已還原成送出前的內容' : '還原後讀回比對有落差，請檢查');
     await openInstance(backup.value.serialNo);
+  } catch (err) {
+    fail(err);
+  } finally {
+    submitting.value = false;
+  }
+}
+
+function timestampTag() {
+  const d = new Date();
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}${p(d.getMonth() + 1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`;
+}
+
+/** 匯出改單前的現況：逐欄值供人核對，rawFormXml 供之後整份還原。 */
+function downloadBackup() {
+  const d = detail.value;
+  if (!d) return;
+  const serialNo = d.header.serialNo || serialInput.value;
+  const data: BackupFile = {
+    kind: 'bpm-form-backup',
+    version: 1,
+    exportedAt: new Date().toISOString(),
+    serialNo,
+    processName: d.header.processName || '',
+    formId: d.formId || '',
+    state: d.header.state || '',
+    fields: d.fields.map((f) => ({ tag: f.tag, id: f.id, name: f.name || '', value: f.value })),
+    rawFormXml: d.rawFormXml,
+  };
+  const fileName = `${serialNo || 'form'}_${timestampTag()}.backup.json`;
+  const url = URL.createObjectURL(
+    new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' }),
+  );
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = fileName;
+  link.click();
+  URL.revokeObjectURL(url);
+  backupSaved.value = true;
+  backupFileName.value = fileName;
+  showToast(`已下載備份 ${fileName}`);
+}
+
+function pickBackupFile() {
+  backupFileInput.value?.click();
+}
+
+async function onBackupFileChosen(event: Event) {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  input.value = '';  // 同一個檔案再選一次也要能觸發 change
+  if (!file) return;
+
+  let data: BackupFile;
+  try {
+    data = JSON.parse(await file.text());
+  } catch (err: any) {
+    return showToast(`備份檔不是合法的 JSON：${err?.message || err}`);
+  }
+  if (data?.kind !== 'bpm-form-backup' || !Array.isArray(data.fields)) {
+    return showToast('這不是本工具匯出的備份檔（kind 不是 bpm-form-backup）');
+  }
+  if (!data.serialNo) return showToast('備份檔沒有單號，無法判斷要套到哪一張單');
+
+  // 單號不同就先把那張單讀進來，避免把 A 單的值套到 B 單上
+  if (detail.value?.header.serialNo !== data.serialNo) {
+    await openInstance(data.serialNo);
+    if (detail.value?.header.serialNo !== data.serialNo) return;  // 讀取失敗，openInstance 已報錯
+  }
+  applyBackup(data, file.name);
+}
+
+/** 把備份的欄位值填回編輯表；對不上的欄位一律列出來，不靜默略過。 */
+function applyBackup(data: BackupFile, fileName: string) {
+  const current = new Map((detail.value?.fields || []).map((f) => [f.tag, f]));
+  const applied: string[] = [];
+  const missing: string[] = [];
+  for (const f of data.fields) {
+    const field = current.get(f.tag);
+    if (!field) {
+      missing.push(f.tag);
+      continue;
+    }
+    const value = f.value ?? '';
+    edited.value[f.tag] = value;
+    if (field.value !== value) applied.push(f.tag);
+  }
+  const backupTags = new Set(data.fields.map((f) => f.tag));
+  const extra = [...current.keys()].filter((tag) => !backupTags.has(tag));
+
+  importedBackup.value = data;
+  importReport.value = {
+    fileName,
+    applied,
+    missing,
+    extra,
+    formIdChanged: !!data.formId && !!detail.value?.formId && data.formId !== detail.value.formId,
+  };
+  confirmWrite.value = false;  // 匯入等於換了一批待送出的值，重新確認一次
+  showToast(
+    applied.length
+      ? `已套用備份的 ${applied.length} 欄，確認後再送出`
+      : '備份的值與目前單上的值完全相同，沒有產生任何變更',
+  );
+}
+
+/** 用備份檔的 rawFormXml 整份覆寫。欄位對不上或結構壞掉時，逐欄套用救不回來，只能走這條。 */
+async function restoreImported() {
+  const data = importedBackup.value;
+  if (!data) return;
+  if (!confirmWrite.value) return showToast('請先勾選確認');
+  if (!backupSaved.value) return showToast('請先下載目前這份的備份，還原一樣是整份覆寫');
+  submitting.value = true;
+  try {
+    const res = await api.submitEdit({
+      serialNo: data.serialNo,
+      rawFormXml: data.rawFormXml,
+      confirm: true,
+    });
+    result.value = res;
+    showToast(res.verified ? '已用備份檔整份還原' : '還原後讀回比對有落差，請檢查');
+    await openInstance(data.serialNo);
   } catch (err) {
     fail(err);
   } finally {
@@ -702,6 +857,48 @@ onMounted(searchProcesses);
             </button>
           </div>
 
+          <div class="backup-box" :class="{ done: backupSaved }">
+            <div class="backup-title">
+              {{ backupSaved ? `✅ 已下載改單前備份：${backupFileName}` : '⚠️ 尚未下載改單前備份' }}
+            </div>
+            <p class="hint">
+              寫回是<b>整份覆寫</b>，BPM 不會留下改前的版本。備份檔（JSON）存的是這張單
+              <b>讀取當下</b>的逐欄值與表單 XML；沒下載就不給送出。
+            </p>
+            <div class="btn-row">
+              <button class="primary" @click="downloadBackup">⬇ 下載改單前備份</button>
+              <button @click="pickBackupFile">📂 匯入備份檔</button>
+              <input
+                ref="backupFileInput"
+                type="file"
+                accept="application/json,.json"
+                class="file-input"
+                @change="onBackupFileChosen"
+              />
+            </div>
+          </div>
+
+          <div v-if="importReport" class="callout info">
+            <div class="callout-title">已匯入備份檔 {{ importReport.fileName }}</div>
+            <p v-if="importReport.applied.length">
+              套回 {{ importReport.applied.length }} 欄：{{ importReport.applied.join('、') }}。
+              上表的差異就是待送出的變更，確認後按「送出並讀回驗證」。
+            </p>
+            <p v-else>備份的值與目前單上的值完全相同，沒有任何欄位需要改。</p>
+            <p v-if="importReport.formIdChanged">
+              ⚠ 備份檔的表單是 <code>{{ importedBackup?.formId }}</code>，
+              目前這張單是 <code>{{ detail.formId }}</code>，不是同一張表單。
+            </p>
+            <p v-if="importReport.missing.length">
+              ⚠ 備份裡有、目前表單沒有的欄位，<b>沒有套用</b>：
+              <code>{{ importReport.missing.join('、') }}</code>
+            </p>
+            <p v-if="importReport.extra.length">
+              ⚠ 目前表單有、備份裡沒有的欄位，<b>維持現值不動</b>：
+              <code>{{ importReport.extra.join('、') }}</code>
+            </p>
+          </div>
+
           <div class="safety-box">
             <label class="safety-check">
               <input v-model="confirmWrite" type="checkbox" />
@@ -713,19 +910,30 @@ onMounted(searchProcesses);
             <div class="btn-row">
               <button
                 class="primary"
-                :disabled="submitting || !confirmWrite"
+                :disabled="submitting || !confirmWrite || !backupSaved"
                 @click="submit"
               >
                 {{ submitting ? '寫入中…' : '送出並讀回驗證' }}
               </button>
               <button
+                v-if="importedBackup"
+                class="danger"
+                :disabled="submitting || !confirmWrite || !backupSaved"
+                @click="restoreImported"
+              >
+                用備份檔整份還原
+              </button>
+              <button
                 v-if="backup && backup.serialNo === detail.header.serialNo"
                 class="danger"
-                :disabled="submitting"
+                :disabled="submitting || !backupSaved"
                 @click="restoreBackup"
               >
                 還原成上次送出前
               </button>
+            </div>
+            <div v-if="!backupSaved" class="hint">
+              送出與還原都是寫入，要先下載改單前備份才會解鎖。
             </div>
           </div>
         </div>
@@ -1024,6 +1232,33 @@ onMounted(searchProcesses);
   font-size: 12px;
   color: var(--accent);
   font-weight: 500;
+}
+
+.backup-box {
+  background: var(--danger-soft);
+  border: 1px solid rgba(208, 67, 60, .3);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  margin-bottom: 10px;
+}
+
+.backup-box.done {
+  background: var(--ok-soft);
+  border-color: rgba(18, 154, 107, .3);
+}
+
+.backup-title {
+  font-size: 13px;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.backup-box .hint {
+  margin-top: 4px;
+}
+
+.file-input {
+  display: none;
 }
 
 .safety-box {
