@@ -39,3 +39,8 @@ __pycache__/
 /6_todo_viewer/frontend/dist/
 /6_todo_viewer/frontend/src/api/types.ts
 /6_todo_viewer/backend/openapi.json
+
+# 7_proc_export 前端建置產物
+# （src/api/types.ts 是手寫的，與 4／6 的產生式不同，要進版控）
+/7_proc_export/frontend/node_modules/
+/7_proc_export/frontend/dist/

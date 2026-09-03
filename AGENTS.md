@@ -78,6 +78,7 @@
 | `2_web_builder/index.html` | 同上 —— 測試會抽出 `CORE START/END` 區塊 |
 | `3_db_explorer/bpm_kb/` | `python bpm_kb_tool.py check` 與 `pull`，比對 `out/*.json` |
 | `4_db_viewer/backend/` | `pytest`，以及 `/docs` 能開、端點回得出 Pydantic 結構 |
+| `7_proc_export/backend/` | `python -m pytest tests -q`（17 項，不需資料庫），改到 `catalog` / `query` 時另外實際查一支流程並匯出 Excel 打開確認 |
 
 ### 範例
 ```
@@ -133,7 +134,7 @@
 
 | 項目 | 規範 |
 |:---|:---|
-| 系統 | SQL Server（測試區 `10.10.130.191` / `NaNa`） |
+| 系統 | SQL Server。測試區 `10.10.130.191` / `NaNa`；正式區 `10.10.130.190` / `NaNa`（僅 `4_db_viewer`、`7_proc_export` 可讀，見 8.2） |
 | 連線 | 一律經由 `bpm_kb.db.Database`，`readonly=True` |
 | 查詢 | 一律參數化（`?` 佔位符），**絕不字串拼接使用者輸入** |
 | ORM | 無。鼎新的 schema 是 OJB 產生的，硬套 ORM 只會製造麻煩 |
@@ -260,7 +261,7 @@
 - `.env` 含實際帳密，**不進版控、不輸出到日誌、不寫進 API 回應**。
   需要顯示連線資訊時用 `config.describe()`（它不吐密碼）。
 - `samples/` 內是公司實際表單資料，已列入 `.gitignore`，不要改動這個設定。
-- `4_db_viewer` 後端預設只綁 `127.0.0.1`，要對外開放需明確指示。
+- `4_db_viewer`、`7_proc_export` 後端預設只綁 `127.0.0.1`，要對外開放需明確指示。
 
 ### 8.1 BPM SOAP API（`5_ws_explorer`）的操作邊界
 
@@ -295,6 +296,19 @@
   `The workitem is not running state`。WSDL 上看不出這個順序。
 
 ---
+
+### 8.2 190 正式區資料庫的唯讀查詢
+
+稽核調閱需要正式區的實際單據，故 `4_db_viewer` 與 `7_proc_export` 可以連
+190 正式區資料庫，**但只限 SELECT**：一樣經由 `bpm_kb.db.Database`
+（`readonly=True`），一樣參數化，INSERT / UPDATE / DELETE / DDL 依舊完全禁止。
+
+這條**只放寬資料庫**。SOAP API 對 190 的禁令不變（見 8.1）——
+API 呼叫會真的開單、簽核、作廢，跟唯讀查詢是兩回事。
+
+正式區帳密目前與測試區相同，故不必另設；要分開時用
+`BPM_DB_USER_190` / `BPM_DB_PASSWORD_190` 覆寫。
+畫面上必須明顯標示目前正在看哪一區，不能讓人分不出來。
 
 ## 9. 回應規範
 
