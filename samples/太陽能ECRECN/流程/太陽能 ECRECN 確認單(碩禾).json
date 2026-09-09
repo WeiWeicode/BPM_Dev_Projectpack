@@ -1,0 +1,1226 @@
+{
+  "fileType": "BPMN",
+  "packageId": "GSRNProess",
+  "processId": "GSRNProess",
+  "processName": "太陽能 ECRECN 確認單(碩禾)",
+  "sourceFile": "太陽能 ECRECN 確認單(碩禾).bpmn",
+  "activities": [
+    {
+      "name": "完成通知ERB生管單位",
+      "originalId": "ERBS2190SendTask",
+      "id": "ERBS2190SendTask",
+      "type": "SendTask",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "ERB-質保單位-S6100 ",
+      "originalId": "ERBS6100UserTask",
+      "id": "ERBS6100UserTask",
+      "type": "UserTask",
+      "buttons": [],
+      "fieldPermissions": [
+        {
+          "originalId": "Attachment",
+          "id": "Attachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "GridExtraData",
+          "id": "GridExtraData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "EDDesc1",
+          "id": "EDDesc1",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "S6100_2_Desc",
+          "id": "S6100_2_Desc",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "S6100_2",
+          "id": "S6100_2",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "S6100_1_Desc",
+          "id": "S6100_1_Desc",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "S6100_1",
+          "id": "S6100_1",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "lbl_EDCrDate1",
+          "id": "lbl_EDCrDate1",
+          "permission": "INVISIBLE"
+        },
+        {
+          "originalId": "lbl_EDCrUser1",
+          "id": "lbl_EDCrUser1",
+          "permission": "INVISIBLE"
+        },
+        {
+          "originalId": "SubTab76",
+          "id": "SubTab76",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnAddEXData",
+          "id": "btnAddEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnDelEXData",
+          "id": "btnDelEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnOK",
+          "id": "btnOK",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnCancel",
+          "id": "btnCancel",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "DropdownAttachment",
+          "id": "DropdownAttachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ImageHtmlButtonOpen",
+          "id": "ImageHtmlButtonOpen",
+          "permission": "ENABLED"
+        }
+      ],
+      "formId": "ECRECN001"
+    },
+    {
+      "name": "Event",
+      "originalId": "EndEvent_2",
+      "id": "EndEvent_2",
+      "type": "EndEvent",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "完成通知ERB質保單位",
+      "originalId": "ERBS6100SendTask",
+      "id": "ERBS6100SendTask",
+      "type": "SendTask",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "ERB-生管單位-S2190",
+      "originalId": "ERBS2190UserTask",
+      "id": "ERBS2190UserTask",
+      "type": "UserTask",
+      "buttons": [],
+      "fieldPermissions": [
+        {
+          "originalId": "Attachment",
+          "id": "Attachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "EDDesc1",
+          "id": "EDDesc1",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "S2190_1",
+          "id": "S2190_1",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "S2190_1_Desc",
+          "id": "S2190_1_Desc",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "S2190_2",
+          "id": "S2190_2",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "S2190_2_Desc",
+          "id": "S2190_2_Desc",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "GridExtraData",
+          "id": "GridExtraData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "lbl_EDCrUser1",
+          "id": "lbl_EDCrUser1",
+          "permission": "INVISIBLE"
+        },
+        {
+          "originalId": "SubTab76",
+          "id": "SubTab76",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnAddEXData",
+          "id": "btnAddEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnDelEXData",
+          "id": "btnDelEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnOK",
+          "id": "btnOK",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnCancel",
+          "id": "btnCancel",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "DropdownAttachment",
+          "id": "DropdownAttachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ImageHtmlButtonOpen",
+          "id": "ImageHtmlButtonOpen",
+          "permission": "ENABLED"
+        }
+      ],
+      "formId": "ECRECN001"
+    },
+    {
+      "name": "完成通知ERB技術發展單位",
+      "originalId": "ERBS4120SendTask",
+      "id": "ERBS4120SendTask",
+      "type": "SendTask",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "完成通知ERB業務單位",
+      "originalId": "ERBS2100SendTask",
+      "id": "ERBS2100SendTask",
+      "type": "SendTask",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "ERB-生產單位-S3100",
+      "originalId": "ERBS3100UserTask",
+      "id": "ERBS3100UserTask",
+      "type": "UserTask",
+      "buttons": [],
+      "fieldPermissions": [
+        {
+          "originalId": "Attachment",
+          "id": "Attachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "EDDesc1",
+          "id": "EDDesc1",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "GridExtraData",
+          "id": "GridExtraData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "S3100_1",
+          "id": "S3100_1",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "S3100_1_Desc",
+          "id": "S3100_1_Desc",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "S3100_2",
+          "id": "S3100_2",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "S3100_2_Desc",
+          "id": "S3100_2_Desc",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "lbl_EDCrUser1",
+          "id": "lbl_EDCrUser1",
+          "permission": "INVISIBLE"
+        },
+        {
+          "originalId": "lbl_EDCrDate1",
+          "id": "lbl_EDCrDate1",
+          "permission": "INVISIBLE"
+        },
+        {
+          "originalId": "SubTab76",
+          "id": "SubTab76",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnAddEXData",
+          "id": "btnAddEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnDelEXData",
+          "id": "btnDelEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnOK",
+          "id": "btnOK",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnCancel",
+          "id": "btnCancel",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "DropdownAttachment",
+          "id": "DropdownAttachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ImageHtmlButtonOpen",
+          "id": "ImageHtmlButtonOpen",
+          "permission": "ENABLED"
+        }
+      ],
+      "formId": "ECRECN001"
+    },
+    {
+      "name": "完成通知ERB產聘驗證單位",
+      "originalId": "ERBS4230SendTask",
+      "id": "ERBS4230SendTask",
+      "type": "SendTask",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "完成通知ERB生產單位",
+      "originalId": "ERBS3100SendTask",
+      "id": "ERBS3100SendTask",
+      "type": "SendTask",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "立案申請通知",
+      "originalId": "ApplySendTask",
+      "id": "ApplySendTask",
+      "type": "SendTask",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "申請使用者填單",
+      "originalId": "IssueECNReqUserTask",
+      "id": "IssueECNReqUserTask",
+      "type": "UserTask",
+      "buttons": [
+        {
+          "originalId": "ECNSubTabSendButton",
+          "id": "ECNSubTabSendButton",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ECNSubTabCloseButton",
+          "id": "ECNSubTabCloseButton",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ECNDescButton",
+          "id": "ECNDescButton",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ECNSpecButton",
+          "id": "ECNSpecButton",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ECNSpecSubTabCloseButton",
+          "id": "ECNSpecSubTabCloseButton",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ECNSpecSubTabSendButton",
+          "id": "ECNSpecSubTabSendButton",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "TestButton",
+          "id": "TestButton",
+          "permission": "ENABLED"
+        }
+      ],
+      "fieldPermissions": [
+        {
+          "originalId": "chgCategory",
+          "id": "chgCategory",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ECNDesc",
+          "id": "ECNDesc",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ECNSpec",
+          "id": "ECNSpec",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "Attachment",
+          "id": "Attachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "GridExtraData",
+          "id": "GridExtraData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "EDDesc1",
+          "id": "EDDesc1",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "chgAttb",
+          "id": "chgAttb",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "chgItem",
+          "id": "chgItem",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "chgDate",
+          "id": "chgDate",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "chgEQ",
+          "id": "chgEQ",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "chgTestQty",
+          "id": "chgTestQty",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "lbl_EDCrDate1",
+          "id": "lbl_EDCrDate1",
+          "permission": "INVISIBLE"
+        },
+        {
+          "originalId": "lbl_EDCrUser1",
+          "id": "lbl_EDCrUser1",
+          "permission": "INVISIBLE"
+        },
+        {
+          "originalId": "SubTab76",
+          "id": "SubTab76",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnAddEXData",
+          "id": "btnAddEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnDelEXData",
+          "id": "btnDelEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnOK",
+          "id": "btnOK",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnCancel",
+          "id": "btnCancel",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ECSubject",
+          "id": "ECSubject",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "DropdownAttachment",
+          "id": "DropdownAttachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ImageHtmlButtonOpen",
+          "id": "ImageHtmlButtonOpen",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "RChgItemDesc",
+          "id": "RChgItemDesc",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "chgItemTextArea",
+          "id": "chgItemTextArea",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "chgCategoryTextArea",
+          "id": "chgCategoryTextArea",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "chgEQTextArea",
+          "id": "chgEQTextArea",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "Button80",
+          "id": "Button80",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ECNSubTab",
+          "id": "ECNSubTab",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ECNDescTextBox",
+          "id": "ECNDescTextBox",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ECNDescCheckBox",
+          "id": "ECNDescCheckBox",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ECNDescHtmlTextArea",
+          "id": "ECNDescHtmlTextArea",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ECNSpecTextBox",
+          "id": "ECNSpecTextBox",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ECNSpecCheckBox",
+          "id": "ECNSpecCheckBox",
+          "permission": "ENABLED"
+        }
+      ],
+      "formId": "ECRECN001"
+    },
+    {
+      "name": "ERB完成通知",
+      "originalId": "ERBPssSendTask",
+      "id": "ERBPssSendTask",
+      "type": "SendTask",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "ERB-產品驗證單位-S4230",
+      "originalId": "ERBS4230UserTask",
+      "id": "ERBS4230UserTask",
+      "type": "UserTask",
+      "buttons": [
+        {
+          "originalId": "ExtraDataAddOpenButton",
+          "id": "ExtraDataAddOpenButton",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "AttButton",
+          "id": "AttButton",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ExtraDataDelButton",
+          "id": "ExtraDataDelButton",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ExtraDataAddButton",
+          "id": "ExtraDataAddButton",
+          "permission": "ENABLED"
+        }
+      ],
+      "fieldPermissions": [
+        {
+          "originalId": "ExtraDataDescTextArea",
+          "id": "ExtraDataDescTextArea",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ExtraDataAttDropDown",
+          "id": "ExtraDataAttDropDown",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ERBS4230PrecautionsRadio",
+          "id": "ERBS4230PrecautionsRadio",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ERBS4230PrecautionsTextArea",
+          "id": "ERBS4230PrecautionsTextArea",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ERBS4230OtherRadio",
+          "id": "ERBS4230OtherRadio",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ERBS4230OtherTextArea",
+          "id": "ERBS4230OtherTextArea",
+          "permission": "ENABLED"
+        }
+      ],
+      "formId": "SolarEnergyECRECN"
+    },
+    {
+      "name": "ERB-業務單位-S2100",
+      "originalId": "ERBS2100UserTask",
+      "id": "ERBS2100UserTask",
+      "type": "UserTask",
+      "buttons": [
+        {
+          "originalId": "ExtraDataAddOpenButton",
+          "id": "ExtraDataAddOpenButton",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "AttButton",
+          "id": "AttButton",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ExtraDataDelButton",
+          "id": "ExtraDataDelButton",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ExtraDataAddButton",
+          "id": "ExtraDataAddButton",
+          "permission": "ENABLED"
+        }
+      ],
+      "fieldPermissions": [
+        {
+          "originalId": "ExtraDataDescTextArea",
+          "id": "ExtraDataDescTextArea",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ExtraDataAttDropDown",
+          "id": "ExtraDataAttDropDown",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ERBS2100PrecautionsRadio",
+          "id": "ERBS2100PrecautionsRadio",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ERBS2100PrecautionsTextArea",
+          "id": "ERBS2100PrecautionsTextArea",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ERBS2100OtherRadio",
+          "id": "ERBS2100OtherRadio",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ERBS2100OtherTextArea",
+          "id": "ERBS2100OtherTextArea",
+          "permission": "ENABLED"
+        }
+      ],
+      "formId": "SolarEnergyECRECN"
+    },
+    {
+      "name": "質保處長確認 ",
+      "originalId": "QADirectorUserTask",
+      "id": "QADirectorUserTask",
+      "type": "UserTask",
+      "buttons": [
+        {
+          "originalId": "SelSalesRadioButton",
+          "id": "SelSalesRadioButton",
+          "permission": "ENABLED"
+        }
+      ],
+      "fieldPermissions": [
+        {
+          "originalId": "Attachment",
+          "id": "Attachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "GridExtraData",
+          "id": "GridExtraData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "EDDesc1",
+          "id": "EDDesc1",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "lbl_EDCrDate1",
+          "id": "lbl_EDCrDate1",
+          "permission": "INVISIBLE"
+        },
+        {
+          "originalId": "lbl_EDCrUser1",
+          "id": "lbl_EDCrUser1",
+          "permission": "INVISIBLE"
+        },
+        {
+          "originalId": "btnAddEXData",
+          "id": "btnAddEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "SubTab76",
+          "id": "SubTab76",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnDelEXData",
+          "id": "btnDelEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnOK",
+          "id": "btnOK",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnCancel",
+          "id": "btnCancel",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "DropdownAttachment",
+          "id": "DropdownAttachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ImageHtmlButtonOpen",
+          "id": "ImageHtmlButtonOpen",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnSelSales",
+          "id": "btnSelSales",
+          "permission": "ENABLED"
+        }
+      ],
+      "formId": "ECRECN001"
+    },
+    {
+      "name": "驗證單位(ECN)確認",
+      "originalId": "ECNConfirmUserTask",
+      "id": "ECNConfirmUserTask",
+      "type": "UserTask",
+      "buttons": [
+        {
+          "originalId": "SelSalesRadioButton",
+          "id": "SelSalesRadioButton",
+          "permission": "ENABLED"
+        }
+      ],
+      "fieldPermissions": [
+        {
+          "originalId": "Attachment",
+          "id": "Attachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "GridExtraData",
+          "id": "GridExtraData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "EDDesc1",
+          "id": "EDDesc1",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "lbl_EDCrUser1",
+          "id": "lbl_EDCrUser1",
+          "permission": "INVISIBLE"
+        },
+        {
+          "originalId": "SubTab76",
+          "id": "SubTab76",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnAddEXData",
+          "id": "btnAddEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnDelEXData",
+          "id": "btnDelEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnOK",
+          "id": "btnOK",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnCancel",
+          "id": "btnCancel",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "lbl_EDCrDate1",
+          "id": "lbl_EDCrDate1",
+          "permission": "INVISIBLE"
+        },
+        {
+          "originalId": "DropdownAttachment",
+          "id": "DropdownAttachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ImageHtmlButtonOpen",
+          "id": "ImageHtmlButtonOpen",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnSelSales",
+          "id": "btnSelSales",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "RemarkTextArea",
+          "id": "RemarkTextArea",
+          "permission": "ENABLED"
+        }
+      ],
+      "formId": "ECRECN001"
+    },
+    {
+      "name": "使用者直屬主管簽核",
+      "originalId": "ApplicantMgrUserTask",
+      "id": "ApplicantMgrUserTask",
+      "type": "UserTask",
+      "buttons": [],
+      "fieldPermissions": [
+        {
+          "originalId": "Attachment",
+          "id": "Attachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "EDDesc1",
+          "id": "EDDesc1",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "GridExtraData",
+          "id": "GridExtraData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "lbl_EDCrDate1",
+          "id": "lbl_EDCrDate1",
+          "permission": "INVISIBLE"
+        },
+        {
+          "originalId": "lbl_EDCrUser1",
+          "id": "lbl_EDCrUser1",
+          "permission": "INVISIBLE"
+        },
+        {
+          "originalId": "SubTab76",
+          "id": "SubTab76",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnAddEXData",
+          "id": "btnAddEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnDelEXData",
+          "id": "btnDelEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnOK",
+          "id": "btnOK",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnCancel",
+          "id": "btnCancel",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "DropdownAttachment",
+          "id": "DropdownAttachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ImageHtmlButtonOpen",
+          "id": "ImageHtmlButtonOpen",
+          "permission": "ENABLED"
+        }
+      ],
+      "formId": "ECRECN001"
+    },
+    {
+      "name": "驗證單位(ECR)立案確認",
+      "originalId": "ECRConfirmUserTask",
+      "id": "ECRConfirmUserTask",
+      "type": "UserTask",
+      "buttons": [],
+      "fieldPermissions": [
+        {
+          "originalId": "chgDate",
+          "id": "chgDate",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "chgEQ",
+          "id": "chgEQ",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ECNSpec",
+          "id": "ECNSpec",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "EDDesc1",
+          "id": "EDDesc1",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "GridExtraData",
+          "id": "GridExtraData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "chgTestQty",
+          "id": "chgTestQty",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ECNDesc",
+          "id": "ECNDesc",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "lbl_EDCrUser1",
+          "id": "lbl_EDCrUser1",
+          "permission": "INVISIBLE"
+        },
+        {
+          "originalId": "Attachment",
+          "id": "Attachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "lbl_EDCrDate1",
+          "id": "lbl_EDCrDate1",
+          "permission": "INVISIBLE"
+        },
+        {
+          "originalId": "btnAddEXData",
+          "id": "btnAddEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnDelEXData",
+          "id": "btnDelEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "SubTab76",
+          "id": "SubTab76",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnOK",
+          "id": "btnOK",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnCancel",
+          "id": "btnCancel",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "DropdownAttachment",
+          "id": "DropdownAttachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ImageHtmlButtonOpen",
+          "id": "ImageHtmlButtonOpen",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "RemarkTextArea",
+          "id": "RemarkTextArea",
+          "permission": "ENABLED"
+        }
+      ],
+      "formId": "ECRECN001"
+    },
+    {
+      "name": "ParallelGateway",
+      "originalId": "ParallelGateway_14",
+      "id": "ParallelGateway_14",
+      "type": "ParallelGateway",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "Event",
+      "originalId": "StartEvent_1",
+      "id": "StartEvent_1",
+      "type": "StartEvent",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "ParallelGateway",
+      "originalId": "ParallelGateway_25",
+      "id": "ParallelGateway_25",
+      "type": "ParallelGateway",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "ERB-技術發展單位-S4210",
+      "originalId": "ERBS4210UserTask",
+      "id": "ERBS4210UserTask",
+      "type": "UserTask",
+      "buttons": [],
+      "fieldPermissions": [
+        {
+          "originalId": "Attachment",
+          "id": "Attachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "GridExtraData",
+          "id": "GridExtraData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "EDDesc1",
+          "id": "EDDesc1",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "S4210_1",
+          "id": "S4210_1",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "S4210_1_Desc",
+          "id": "S4210_1_Desc",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "S4210_2",
+          "id": "S4210_2",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "S4210_2_Desc",
+          "id": "S4210_2_Desc",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "lbl_EDCrDate1",
+          "id": "lbl_EDCrDate1",
+          "permission": "INVISIBLE"
+        },
+        {
+          "originalId": "lbl_EDCrUser1",
+          "id": "lbl_EDCrUser1",
+          "permission": "INVISIBLE"
+        },
+        {
+          "originalId": "SubTab76",
+          "id": "SubTab76",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnAddEXData",
+          "id": "btnAddEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnDelEXData",
+          "id": "btnDelEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnOK",
+          "id": "btnOK",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnCancel",
+          "id": "btnCancel",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "DropdownAttachment",
+          "id": "DropdownAttachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ImageHtmlButtonOpen",
+          "id": "ImageHtmlButtonOpen",
+          "permission": "ENABLED"
+        }
+      ],
+      "formId": "ECRECN001"
+    },
+    {
+      "name": "驗證單位主管覆核",
+      "originalId": "QAUserTask",
+      "id": "QAUserTask",
+      "type": "UserTask",
+      "buttons": [
+        {
+          "originalId": "SelSalesRadioButton",
+          "id": "SelSalesRadioButton",
+          "permission": "ENABLED"
+        }
+      ],
+      "fieldPermissions": [
+        {
+          "originalId": "Attachment",
+          "id": "Attachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "EDDesc1",
+          "id": "EDDesc1",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "GridExtraData",
+          "id": "GridExtraData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "lbl_EDCrUser1",
+          "id": "lbl_EDCrUser1",
+          "permission": "INVISIBLE"
+        },
+        {
+          "originalId": "lbl_EDCrDate1",
+          "id": "lbl_EDCrDate1",
+          "permission": "INVISIBLE"
+        },
+        {
+          "originalId": "btnAddEXData",
+          "id": "btnAddEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnDelEXData",
+          "id": "btnDelEXData",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "SubTab76",
+          "id": "SubTab76",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnOK",
+          "id": "btnOK",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnCancel",
+          "id": "btnCancel",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "DropdownAttachment",
+          "id": "DropdownAttachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ImageHtmlButtonOpen",
+          "id": "ImageHtmlButtonOpen",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "btnSelSales",
+          "id": "btnSelSales",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "RemarkTextArea",
+          "id": "RemarkTextArea",
+          "permission": "ENABLED"
+        }
+      ],
+      "formId": "ECRECN001"
+    },
+    {
+      "name": "完成流程通知",
+      "originalId": "ProcessCompletedSendTask",
+      "id": "ProcessCompletedSendTask",
+      "type": "SendTask",
+      "buttons": [],
+      "fieldPermissions": [
+        {
+          "originalId": "ImageHtmlButtonOpen",
+          "id": "ImageHtmlButtonOpen",
+          "permission": "ENABLED"
+        }
+      ],
+      "formId": "ECRECN001"
+    }
+  ]
+}

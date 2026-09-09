@@ -1,0 +1,164 @@
+{
+  "fileType": "FORM",
+  "formId": "quickDevTestForm",
+  "formName": "快速開發測試",
+  "sourceFile": "原檔案-quickDevTestForm.form",
+  "fields": [
+    {
+      "name": "HiddenTextBox",
+      "originalId": "HiddenTextBox7",
+      "id": "Test01HiddenTextBox",
+      "type": "HIDDEN"
+    },
+    {
+      "name": "Title",
+      "originalId": "Title1",
+      "id": "Test02Title",
+      "type": "TITLE"
+    },
+    {
+      "name": "分隔線",
+      "originalId": "HorizontalLine2",
+      "id": "Test03HorizontalLine",
+      "type": "HORIZONTAL_LINE"
+    },
+    {
+      "name": "文本",
+      "originalId": "Label3",
+      "id": "Test04Label",
+      "type": "LABEL"
+    },    
+    {
+      "name": "按鈕",
+      "originalId": "Button4",
+      "id": "Test06Button",
+      "type": "BUTTON"
+    },
+    {
+      "name": "輸入框",
+      "originalId": "TextBox5",
+      "id": "Test07TextBox",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "輸入區域",
+      "originalId": "TextArea6",
+      "id": "Test08TextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "單號",
+      "originalId": "SerialNumber9",
+      "id": "Test09SerialNumber",
+      "type": "SERIAL_NUMBER"
+    },
+    {
+      "name": "表格",
+      "originalId": "Grid10",
+      "id": "Test10Grid",
+      "type": "LIST"
+    },
+    {
+      "name": "按鈕+輸入框",
+      "originalId": "DialogInput11",
+      "id": "Test11DialogInput",
+      "type": "DIALOGINPUT"
+    },
+    {
+      "name": "按鈕+雙輸入框",
+      "originalId": "DialogInputLabel12",
+      "id": "Test12DialogInputLabel",
+      "type": "DIALOGINPUTLABEL"
+    },
+    {
+      "name": "按鈕+輸入區域",
+      "originalId": "DialogInputMulti13",
+      "id": "Test13DialogInputMulti",
+      "type": "DIALOGINPUTMULTI"
+    },
+    {
+      "name": "雙輸入框",
+      "originalId": "DoubleTextBox14",
+      "id": "Test14DoubleTextBox",
+      "type": "DOUBLETEXT"
+    },
+    {
+      "name": "選擇按鈕",
+      "originalId": "RadioButton15",
+      "id": "Test15RadioButton",
+      "type": "RADIO"
+    },
+    {
+      "name": "複選按鈕",
+      "originalId": "CheckBox16",
+      "id": "Test16CheckBox",
+      "type": "SELECT"
+    },
+    {
+      "name": "下拉選擇",
+      "originalId": "Dropdown17",
+      "id": "Test17Dropdown",
+      "type": "SELECT"
+    },
+    {
+      "name": "列表",
+      "originalId": "ListBox18",
+      "id": "Test18ListBox",
+      "type": "DROPDOWN"
+    },
+    {
+      "name": "日期",
+      "originalId": "Date19",
+      "id": "Test19Date",
+      "type": "DATE"
+    },
+    {
+      "name": "時間",
+      "originalId": "Time20",
+      "id": "Test20Time",
+      "type": "TIME"
+    },
+    {
+      "name": "SubTab22",
+      "originalId": "SubTab22",
+      "id": "Test21SubTab",
+      "type": "SUBTAB"
+    },
+    {
+      "name": "密碼",
+      "originalId": "Password23",
+      "id": "Test22Password",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "Image24",
+      "originalId": "Image24",
+      "id": "Test23Image",
+      "type": "IMAGE"
+    },
+    {
+      "name": "連結",
+      "originalId": "Link25",
+      "id": "Test24Link",
+      "type": "LINK"
+    },
+    {
+      "name": "條碼",
+      "originalId": "Barcode26",
+      "id": "Test25Barcode",
+      "type": "BARCODE"
+    },
+    {
+      "name": "QRCode27",
+      "originalId": "QRCode27",
+      "id": "Test26QRCode",
+      "type": "QRCODE"
+    },
+    {
+      "name": "手寫區域",
+      "originalId": "HandWriting28",
+      "id": "Test27HandWriting",
+      "type": "HANDWRITING"
+    }
+  ]
+}

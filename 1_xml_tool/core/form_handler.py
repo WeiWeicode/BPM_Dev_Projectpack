@@ -294,3 +294,38 @@ def _queue_id_name_edits(text, element, old_id, new_id, edits, messages):
         messages.append('! 元件「%s」的 <name> 為「%s」（不等於舊 ID），已保留不動'
                         % (old_id, current))
 
+
+def extract_script(xml_path):
+    """從 .form 檔案萃取 <script> 區塊，反轉義後回傳純 JavaScript 字串。
+
+    若表單無 <script> 節點回傳 (None, '訊息')；若成功回傳 (js_code, '訊息')。
+    """
+    text, _bom = X.read_xml(xml_path)
+    spans = X.find_blocks(text, lambda n: n == 'script')
+    if not spans:
+        return None, '表單中未包含 <script> 區塊'
+    raw_script = text[spans[0].inner_start:spans[0].inner_end]
+    js_code = X.xml_unescape(raw_script)
+    return js_code, '成功萃取 JavaScript 腳本（共 %d 個字元）' % len(js_code)
+
+
+def write_back_script(xml_path, js_content, out_path):
+    """將 JavaScript 字串轉義後回寫至目標 .form 檔案的 <script> 區塊，產出至 out_path。"""
+    text, bom = X.read_xml(xml_path)
+    escaped_js = X.xml_escape(js_content)
+    spans = X.find_blocks(text, lambda n: n == 'script')
+
+    if spans:
+        edits = [(spans[0].inner_start, spans[0].inner_end, escaped_js)]
+    else:
+        roots = X.find_blocks(text, lambda n: n.endswith('FormDefinition'))
+        if not roots:
+            raise ValueError('目標檔案非合法 FormDefinition XML')
+        insert_pos = roots[0].inner_end
+        edits = [(insert_pos, insert_pos, '\n  <script>%s</script>' % escaped_js)]
+
+    new_xml = X.apply_edits(text, edits)
+    X.write_xml(out_path, new_xml, bom)
+    return True
+
+

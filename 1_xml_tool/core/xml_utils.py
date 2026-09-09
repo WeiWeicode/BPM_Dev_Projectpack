@@ -140,4 +140,5 @@ def xml_unescape(s):
 
 def xml_escape(s):
     return (s.replace('&', '&amp;').replace('<', '&lt;')
-             .replace('>', '&gt;').replace('"', '&quot;'))
+             .replace('>', '&gt;').replace('"', '&quot;')
+             .replace("'", '&apos;'))

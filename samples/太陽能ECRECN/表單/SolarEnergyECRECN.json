@@ -1,0 +1,482 @@
+{
+  "fileType": "FORM",
+  "formId": "SolarEnergyECRECN",
+  "formName": "太陽能ECRECN 確認單(碩禾)",
+  "sourceFile": "SolarEnergyECRECN.form",
+  "fields": [
+    {
+      "name": "表單實例ID流程發送後生)",
+      "originalId": "formInstOIDHidden",
+      "id": "formInstOIDHidden",
+      "type": "HIDDEN"
+    },
+    {
+      "name": "BPMBackFormId(進入自動產生)檔案上傳與BPMFormData用",
+      "originalId": "BPMBackFormIdHidden",
+      "id": "BPMBackFormIdHidden",
+      "type": "HIDDEN"
+    },
+    {
+      "name": "流程實例ID",
+      "originalId": "processInstOIDHidden",
+      "id": "processInstOIDHidden",
+      "type": "HIDDEN"
+    },
+    {
+      "name": "太陽能 ECRECN 確認單(碩禾)",
+      "originalId": "FormTitle",
+      "id": "FormTitle",
+      "type": "TITLE"
+    },
+    {
+      "name": "單號：",
+      "originalId": "SerialNumber",
+      "id": "SerialNumber",
+      "type": "SERIAL_NUMBER"
+    },
+    {
+      "name": "testButton",
+      "originalId": "TestButton",
+      "id": "TestButton",
+      "type": "BUTTON"
+    },
+    {
+      "name": "填單日期：",
+      "originalId": "FillDate",
+      "id": "FillDate",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "ECR 單號",
+      "originalId": "ECRNoTextBox",
+      "id": "ECRNoTextBox",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "ECN 單號",
+      "originalId": "ECNNoTextBox",
+      "id": "ECNNoTextBox",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "變更項目說明",
+      "originalId": "ChangeItemImgButton",
+      "id": "ChangeItemImgButton",
+      "type": "BUTTON"
+    },
+    {
+      "name": "變更屬性",
+      "originalId": "ChgPropertyRadio",
+      "id": "ChgPropertyRadio",
+      "type": "RADIO"
+    },
+    {
+      "name": "變更項目",
+      "originalId": "ChgItemDropDown",
+      "id": "ChgItemDropDown",
+      "type": "SELECT"
+    },
+    {
+      "name": "產品種類",
+      "originalId": "ProductCategoryDropDown",
+      "id": "ProductCategoryDropDown",
+      "type": "SELECT"
+    },
+    {
+      "name": "上線機台",
+      "originalId": "UseMachineDropDown",
+      "id": "UseMachineDropDown",
+      "type": "SELECT"
+    },
+    {
+      "name": "變更項目_其他",
+      "originalId": "ChgItemOtherTextArea",
+      "id": "ChgItemOtherTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "產品種類_其他",
+      "originalId": "ProductCategoryOtherTextArea",
+      "id": "ProductCategoryOtherTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "上線機台_其他",
+      "originalId": "UseMachineOtherTextArea",
+      "id": "UseMachineOtherTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "上線時間",
+      "originalId": "OnlineDate",
+      "id": "OnlineDate",
+      "type": "DATE"
+    },
+    {
+      "name": "測試放量",
+      "originalId": "TestQtyTextBox",
+      "id": "TestQtyTextBox",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "主旨",
+      "originalId": "ECSubjectTextBox",
+      "id": "ECSubjectTextBox",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "內容說明",
+      "originalId": "ECContentDescTextArea",
+      "id": "ECContentDescTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "內容說明附件",
+      "originalId": "ECContentDescAttTextArea",
+      "id": "ECContentDescAttTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "規格",
+      "originalId": "ECSpecTextArea",
+      "id": "ECSpecTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "規格附件",
+      "originalId": "ECSpecAttTextArea",
+      "id": "ECSpecAttTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "質保備註",
+      "originalId": "RemarkTextArea",
+      "id": "RemarkTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "建議變更影響的屬性分類",
+      "originalId": "AttributeClassRadio",
+      "id": "AttributeClassRadio",
+      "type": "RADIO"
+    },
+    {
+      "name": "NotifyCustomersRadio",
+      "originalId": "NotifyCustomersRadio",
+      "id": "NotifyCustomersRadio",
+      "type": "RADIO"
+    },
+    {
+      "name": "補充說明登打",
+      "originalId": "ExtraDataAddOpenButton",
+      "id": "ExtraDataAddOpenButton",
+      "type": "BUTTON"
+    },
+    {
+      "name": "附件上傳",
+      "originalId": "AttButton",
+      "id": "AttButton",
+      "type": "BUTTON"
+    },
+    {
+      "name": "刪除補充資料",
+      "originalId": "ExtraDataDelButton",
+      "id": "ExtraDataDelButton",
+      "type": "BUTTON"
+    },
+    {
+      "name": "補充資料",
+      "originalId": "HorizontalLine37",
+      "id": "HorizontalLine37",
+      "type": "HORIZONTAL_LINE"
+    },
+    {
+      "name": "補充資料",
+      "originalId": "ExtraDataGrid",
+      "id": "ExtraDataGrid",
+      "type": "LIST"
+    },
+    {
+      "name": "ExtraDataSubTab",
+      "originalId": "ExtraDataSubTab",
+      "id": "ExtraDataSubTab",
+      "type": "SUBTAB"
+    },
+    {
+      "name": "補充資料描述",
+      "originalId": "ExtraDataDescTextArea",
+      "id": "ExtraDataDescTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "附件選擇",
+      "originalId": "ExtraDataAttDropDown",
+      "id": "ExtraDataAttDropDown",
+      "type": "SELECT"
+    },
+    {
+      "name": "建立時間",
+      "originalId": "ExtraDataSetupTimeTextBox",
+      "id": "ExtraDataSetupTimeTextBox",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "建立人員工號",
+      "originalId": "ExtraDataWorkNumberTextBox",
+      "id": "ExtraDataWorkNumberTextBox",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "建立人員姓名",
+      "originalId": "ExtraDataWorkNameTextBox",
+      "id": "ExtraDataWorkNameTextBox",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "新增補充資料",
+      "originalId": "ExtraDataAddButton",
+      "id": "ExtraDataAddButton",
+      "type": "BUTTON"
+    },
+    {
+      "name": "E.R.B 各單位",
+      "originalId": "HorizontalLine27",
+      "id": "HorizontalLine27",
+      "type": "HORIZONTAL_LINE"
+    },
+    {
+      "name": "ERBS2100SubTab",
+      "originalId": "ERBS2100SubTab",
+      "id": "ERBS2100SubTab",
+      "type": "SUBTAB"
+    },
+    {
+      "name": "簽核紀錄",
+      "originalId": "ERBS2100ApprovalRecordTextBox",
+      "id": "ERBS2100ApprovalRecordTextBox",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "1.注意事項",
+      "originalId": "ERBS2100PrecautionsRadio",
+      "id": "ERBS2100PrecautionsRadio",
+      "type": "RADIO"
+    },
+    {
+      "name": "注意事項敘述",
+      "originalId": "ERBS2100PrecautionsTextArea",
+      "id": "ERBS2100PrecautionsTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "2.其他",
+      "originalId": "ERBS2100OtherRadio",
+      "id": "ERBS2100OtherRadio",
+      "type": "RADIO"
+    },
+    {
+      "name": "其他敘述",
+      "originalId": "ERBS2100OtherTextArea",
+      "id": "ERBS2100OtherTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "ERBS2190SubTab",
+      "originalId": "ERBS2190SubTab",
+      "id": "ERBS2190SubTab",
+      "type": "SUBTAB"
+    },
+    {
+      "name": "簽核紀錄",
+      "originalId": "ERBS2190ApprovalRecordTextBox",
+      "id": "ERBS2190ApprovalRecordTextBox",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "1.注意事項",
+      "originalId": "ERBS2190PrecautionsRadio",
+      "id": "ERBS2190PrecautionsRadio",
+      "type": "RADIO"
+    },
+    {
+      "name": "注意事項敘述",
+      "originalId": "ERBS2190PrecautionsTextArea",
+      "id": "ERBS2190PrecautionsTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "2.其他",
+      "originalId": "ERBS2190OtherRadio",
+      "id": "ERBS2190OtherRadio",
+      "type": "RADIO"
+    },
+    {
+      "name": "其他敘述",
+      "originalId": "ERBS2190OtherTextArea",
+      "id": "ERBS2190OtherTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "ERBS3100SubTab",
+      "originalId": "ERBS3100SubTab",
+      "id": "ERBS3100SubTab",
+      "type": "SUBTAB"
+    },
+    {
+      "name": "簽核紀錄",
+      "originalId": "ERBS3100ApprovalRecordTextBox",
+      "id": "ERBS3100ApprovalRecordTextBox",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "1.注意事項",
+      "originalId": "ERBS3100PrecautionsRadio",
+      "id": "ERBS3100PrecautionsRadio",
+      "type": "RADIO"
+    },
+    {
+      "name": "注意事項敘述",
+      "originalId": "ERBS3100PrecautionsTextArea",
+      "id": "ERBS3100PrecautionsTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "2.其他",
+      "originalId": "ERBS3100OtherRadio",
+      "id": "ERBS3100OtherRadio",
+      "type": "RADIO"
+    },
+    {
+      "name": "其他敘述",
+      "originalId": "ERBS3100OtherTextArea",
+      "id": "ERBS3100OtherTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "ERBS4210SubTab",
+      "originalId": "ERBS4210SubTab",
+      "id": "ERBS4210SubTab",
+      "type": "SUBTAB"
+    },
+    {
+      "name": "簽核紀錄",
+      "originalId": "ERBS4210ApprovalRecordTextBox",
+      "id": "ERBS4210ApprovalRecordTextBox",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "1.注意事項",
+      "originalId": "ERBS4210PrecautionsRadio",
+      "id": "ERBS4210PrecautionsRadio",
+      "type": "RADIO"
+    },
+    {
+      "name": "注意事項敘述",
+      "originalId": "ERBS4210PrecautionsTextArea",
+      "id": "ERBS4210PrecautionsTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "2.其他",
+      "originalId": "ERBS4210OtherRadio",
+      "id": "ERBS4210OtherRadio",
+      "type": "RADIO"
+    },
+    {
+      "name": "其他敘述",
+      "originalId": "ERBS4210OtherTextArea",
+      "id": "ERBS4210OtherTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "ERBS4230SubTab",
+      "originalId": "ERBS4230SubTab",
+      "id": "ERBS4230SubTab",
+      "type": "SUBTAB"
+    },
+    {
+      "name": "簽核紀錄",
+      "originalId": "ERBS4230ApprovalRecordTextBox",
+      "id": "ERBS4230ApprovalRecordTextBox",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "1.注意事項",
+      "originalId": "ERBS4230PrecautionsRadio",
+      "id": "ERBS4230PrecautionsRadio",
+      "type": "RADIO"
+    },
+    {
+      "name": "注意事項敘述",
+      "originalId": "ERBS4230PrecautionsTextArea",
+      "id": "ERBS4230PrecautionsTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "2.其他",
+      "originalId": "ERBS4230OtherRadio",
+      "id": "ERBS4230OtherRadio",
+      "type": "RADIO"
+    },
+    {
+      "name": "其他敘述",
+      "originalId": "ERBS4230OtherTextArea",
+      "id": "ERBS4230OtherTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "ERBS6100SubTab",
+      "originalId": "ERBS6100SubTab",
+      "id": "ERBS6100SubTab",
+      "type": "SUBTAB"
+    },
+    {
+      "name": "簽核紀錄",
+      "originalId": "ERBS6100ApprovalRecordTextBox",
+      "id": "ERBS6100ApprovalRecordTextBox",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "1.注意事項",
+      "originalId": "ERBS6100PrecautionsRadio",
+      "id": "ERBS6100PrecautionsRadio",
+      "type": "RADIO"
+    },
+    {
+      "name": "注意事項敘述",
+      "originalId": "ERBS6100PrecautionsTextArea",
+      "id": "ERBS6100PrecautionsTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "2.其他",
+      "originalId": "ERBS6100OtherRadio",
+      "id": "ERBS6100OtherRadio",
+      "type": "RADIO"
+    },
+    {
+      "name": "其他敘述",
+      "originalId": "ERBS6100OtherTextArea",
+      "id": "ERBS6100OtherTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "ReminderNoteImageSubTab",
+      "originalId": "ReminderNoteImageSubTab",
+      "id": "ReminderNoteImageSubTab",
+      "type": "SUBTAB"
+    },
+    {
+      "name": "ReminderNoteImage",
+      "originalId": "ReminderNoteImage",
+      "id": "ReminderNoteImage",
+      "type": "IMAGE"
+    },
+    {
+      "name": "HorizontalLine75",
+      "originalId": "HorizontalLine75",
+      "id": "HorizontalLine75",
+      "type": "HORIZONTAL_LINE"
+    }
+  ]
+}

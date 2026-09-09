@@ -1,0 +1,65 @@
+{
+  "fileType": "BPMN",
+  "packageId": "quickDevTestProcess",
+  "processId": "quickDevTestProcess",
+  "processName": "測試快速開發",
+  "sourceFile": "測試快速開發.bpmn",
+  "activities": [
+    {
+      "name": "通知任務",
+      "originalId": "SendTask_8",
+      "id": "ACT_SendNotify_01",
+      "type": "SendTask",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "主管",
+      "originalId": "UserTask_4",
+      "id": "ACT_ManagerApprove_02",
+      "type": "UserTask",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "Event",
+      "originalId": "StartEvent_1",
+      "id": "ACT_Start_03",
+      "type": "StartEvent",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "Event",
+      "originalId": "EndEvent_2",
+      "id": "ACT_End_04",
+      "type": "EndEvent",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "人工任務",
+      "originalId": "ManualTask_10",
+      "id": "ACT_ManualTask_05",
+      "type": "ManualTask",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "開單",
+      "originalId": "UserTask_3",
+      "id": "ACT_CreateForm_06",
+      "type": "UserTask",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "核決層級",
+      "originalId": "DecisionRule_9",
+      "id": "ACT_DecisionRule_07",
+      "type": "DecisionRuleTask",
+      "buttons": [],
+      "fieldPermissions": []
+    }
+  ]
+}
