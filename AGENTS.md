@@ -38,6 +38,8 @@
 - `2_web_builder` 是單檔 HTML、原生 JS，**不要引入任何框架或 CDN**。
 - `4_db_viewer` 前端不用 Pinia、不用 UI 元件庫 —— 三個檢視、唯讀資料，
   composables + 手刻 CSS 就夠。
+- `BPM5892` 原廠程式本體龐大，**非必要不要讀取 `wildfly-15.0.0.Final` 內容**
+  —— 優先查閱已提煉的 Markdown 系統地圖與規格清冊（見第 8.3 節）。
 
 ### 範例
 ```
@@ -252,6 +254,18 @@
 `bpm_kb` 的關聯路徑是實測驗證過的。需要資料時 import 它的函式，
 不要另外寫一套查詢 —— 兩份實作一定會漂移。
 
+### 7.6 鼎新原廠系統解構知識（BPM5892）
+
+`BPM5892/` 存放鼎新 BPM（EFGP / NaNa）原廠程式的解構分析與系統地圖。
+需要查詢底層架構、路由、ERP 對接或前端可用資源時，**查閱對應的 Markdown 文件，不要直接翻找 Java class 或 JSP**：
+
+| 文件 | 適用時機與內容 |
+|:---|:---|
+| [BPM5892/BPM系統地圖.md](BPM5892/BPM系統地圖.md) | 查詢 Web 入口、Struts 1.3 模組與 254 條路由、`ActionServlet` 與 `hdnMethod` 分派規則、DWR 服務進入點。 |
+| [BPM5892/BPM系統分析.md](BPM5892/BPM系統分析.md) | 查詢 WildFly 15 伺服器技術棧（Java EE、EJB 3、Struts、Quartz、Castor/XPDL）、12 個部署單元結構與歷史 log 分布。 |
+| [BPM5892/BPM_ERP整合介面.md](BPM5892/BPM_ERP整合介面.md) | 查詢 BPM 與 ERP 介面（Call Out 87 個核心方法如 TIPTOP `TiptopManager`、T100 `NewTiptopManager`、SAP `SapXmlManager`；Call In SOAP 介面）。 |
+| [BPM5892/BPM_表單腳本可用資源.md](BPM5892/BPM_表單腳本可用資源.md) | **撰寫表單 JavaScript 時必查**：頁面預載的 28 個前端 JS（免載入直接用）、可直呼的 45 支 DWR 後端服務（866 個方法）、CustomJsLib 與 OpenWin 開窗選擇器。 |
+
 ---
 
 ## 8. 安全與資料處理
@@ -309,6 +323,16 @@ API 呼叫會真的開單、簽核、作廢，跟唯讀查詢是兩回事。
 正式區帳密目前與測試區相同，故不必另設；要分開時用
 `BPM_DB_USER_190` / `BPM_DB_PASSWORD_190` 覆寫。
 畫面上必須明顯標示目前正在看哪一區，不能讓人分不出來。
+
+---
+
+### 8.3 原廠程式目錄讀取限制（BPM5892/wildfly-15.0.0.Final）
+
+`BPM5892/wildfly-15.0.0.Final/` 為鼎新 BPM 伺服器與原廠應用程式本體（含 12 個部署單元、數萬個 Java class、JSP、JAR 與設定檔）：
+
+- **非必要絕不讀取該目錄內容**：嚴禁執行全目錄遞迴掃描、大範圍 grep 或無目標的列出檔案，避免消耗巨量 token、造成上下文膨脹或工具逾時。
+- **優先查閱提煉文件**：絕大多數架構、路由、ERP 整合與表單前端腳本問題，已完整整理於 `BPM5892/` 下的 4 份 Markdown 文件中（見 7.6 節），應優先以文件為依據。
+- **單檔查核例外**：只有在 4 份文件未涵蓋特定細節、且已掌握確切檔案相對路徑與排查目標時，才允許針對單一具體檔案做最小範圍的唯讀讀取。
 
 ## 9. 回應規範
 

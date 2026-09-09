@@ -3,7 +3,8 @@
 七個各自獨立、但共用同一套解析核心與資料庫模組的工具，涵蓋 BPM 開發、API 整合、日常流程查詢與稽核調閱：
 **改造既有檔案 → 設定權限 → 理解線上現況 → 隨時查閱與快速調整**，
 外加 ⑤ `5_ws_explorer`（SOAP API 擷取與實測工作台）、⑥ `6_todo_viewer`（個人待辦與單據查詢器）
-與 ⑦ `7_proc_export`（流程與表單匯出，供稽核調閱）。
+與 ⑦ `7_proc_export`（流程與表單匯出，供稽核調閱）；
+以及 `BPM5892`（鼎新原廠 WildFly 核心程式的深層架構解構、Struts 路由、DWR 服務與 ERP 整合知識庫）。
 
 > **資料庫預設一律唯讀。** 全工具集只有一個地方會寫資料庫
 > （`4_db_viewer/backend/app/writer.py`），且預設關閉、正式區永久禁寫。
@@ -70,11 +71,18 @@ BPM快速開發/
 │   ├── backend/               FastAPI（待辦/經辦/申請查詢 + 欄位中文名即時解析）
 │   └── frontend/              Vue 3 + Vite（三頁籤清單 + 詳情抽屜 + BPM 深連結）
 │
-└── 7_proc_export/         ⑦ 流程與表單匯出（稽核調閱）
-    ├── README.md              使用說明、欄位名稱實測數據與狀態碼依據
-    ├── backend/               FastAPI（查單 + Excel 匯出，全唯讀）
-    │   └── app/excel.py       ★ 清單／內容／明細／簽核名單寫成同一個 Excel
-    └── frontend/              Vue 3 + Vite（流程清單 + 查詢 + 欄位挑選抽屜 + 明細面板）
+├── 7_proc_export/         ⑦ 流程與表單匯出（稽核調閱）
+│   ├── README.md              使用說明、欄位名稱實測數據與狀態碼依據
+│   ├── backend/               FastAPI（查單 + Excel 匯出，全唯讀）
+│   │   └── app/excel.py       ★ 清單／內容／明細／簽核名單寫成同一個 Excel
+│   └── frontend/              Vue 3 + Vite（流程清單 + 查詢 + 欄位挑選抽屜 + 明細面板）
+│
+└── BPM5892/                 鼎新原廠系統核心與解構知識庫
+    ├── BPM系統地圖.md         ★ 系統入口、Struts 路由（68 模組 / 254 路由）與 DWR 清冊
+    ├── BPM系統分析.md         技術棧盤點（WildFly 15/EJB 3/Struts 1.3）與部署單元架構
+    ├── BPM_ERP整合介面.md     BPM ↔ ERP 雙向介面清冊（Call Out 87 方法 / Call In 介面）
+    ├── BPM_表單腳本可用資源.md ★ 表單腳本可用資源（DWR 45 服務、預載 JS、CustomJsLib）
+    └── wildfly-15.0.0.Final/  原廠伺服器部署本體（檔案極多，已列入 .gitignore，非必要勿讀）
 ```
 
 ---
@@ -259,7 +267,24 @@ python -m uvicorn app.main:app --port 8002
 
 ---
 
-## 七者的關係
+## ⑧ BPM5892 —— 鼎新原廠系統核心與解構知識庫
+
+鼎新 BPM（產品內部代號 **EFGP**，流程引擎代號 **NaNa**）跑在 **WildFly 15.0.0.Final** 上的原廠應用程式本體與深度解構。
+為避免在龐大且未經混淆的 Java class、JSP、設定檔中大海撈針，本目錄已將底層架構精煉為四份系統地圖與規格清冊：
+
+| 文件 | 核心內容與查閱指引 |
+|:---|:---|
+| [BPM系統地圖.md](BPM5892/BPM系統地圖.md) | **系統入口與 Struts 路由總覽**：整理 68 個 Struts 模組、254 條 URL 路由（含 PerformWorkItem 26 條核心路由）、`ActionServlet` 與 `hdnMethod` 分派機制、45 個 DWR 前後端直呼服務，以及 URL 組成規則。 |
+| [BPM系統分析.md](BPM5892/BPM系統分析.md) | **技術棧與部署架構盤點**：分析 WildFly 15、Java EE/EJB 3、Struts 1.3、Quartz 排程、Castor/XPDL 流程模型等底層元件；記錄 65GB 歷史 log 清理歷程與 12 個部署單元（1.1 GB）解構。 |
+| [BPM_ERP整合介面.md](BPM5892/BPM_ERP整合介面.md) | **BPM ↔ ERP 雙向介面清冊**：Call Out 87 個核心 ERP 方法（支援 TIPTOP、T100、SAP、易飛、Cosmos 等）、Call In SOAP Web Service（35 個白名單方法 + 143 個全開放方法），以及真實故障案例對策。 |
+| [BPM_表單腳本可用資源.md](BPM5892/BPM_表單腳本可用資源.md) | **表單設計器腳本可用資源**：清點前端表單已預載的 28 個 JS 函式庫（免載即可用）、45 支 DWR 後端服務（866 個可直呼方法）、CustomJsLib 20 支共用庫與 OpenWin 4 大資料選擇器開窗函式。 |
+
+> **特別注意**：`wildfly-15.0.0.Final/` 為原廠伺服器部署本體，檔案極多已列入 `.gitignore`。
+> 日常開發、排查問題與查閱架構**優先閱讀上述 4 份提煉好的 Markdown 文件**，非必要不要逐檔讀取或掃描 WildFly 目錄。
+
+---
+
+## 各工具與模組的關係
 
 ```
         鼎新 BPM 設計師                        BPM 資料庫
@@ -283,6 +308,11 @@ python -m uvicorn app.main:app --port 8002
                                 │
                           5_ws_explorer
                       （API 擷取、實測工作台）
+                                │
+                                └── 參照底層架構、路由、DWR 服務、ERP 介面與表單可用 JS ──┐
+                                                                                         ↓
+                                                                                   BPM5892/
+                                                                            （原廠系統解構知識庫）
 ```
 
 - `1_xml_tool/core/` 是共用的解析核心：`3_db_explorer` 直接 import 它來解析撈下來的 XML，`4_db_viewer`、`6_todo_viewer` 與 `7_proc_export` 亦透過 `bpm_kb` / `core` 解析表單定義與欄位中文名；`2_web_builder` 則是其 JavaScript 對應實作（以 `test_core.mjs` 交叉驗證）。
@@ -292,6 +322,8 @@ python -m uvicorn app.main:app --port 8002
   - 線上結構與權限矩陣檢視、純權限值微調走 ④。
   - 外部系統整合與 SOAP WebService 呼叫、實測工作台走 ⑤。
   - 日常作業、待簽單據追蹤、個人申請/經辦歷史查閱與深連結跳轉走 ⑥。
+  - 稽核調閱、跨關卡歷程與多頁籤 Excel 匯出走 ⑦。
+  - 原廠底層架構、Struts 路由、DWR 服務、ERP 介面與表單腳本可用資源查閱走 `BPM5892/`。
 
 ---
 

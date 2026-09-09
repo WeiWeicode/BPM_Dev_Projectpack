@@ -44,3 +44,6 @@ __pycache__/
 # （src/api/types.ts 是手寫的，與 4／6 的產生式不同，要進版控）
 /7_proc_export/frontend/node_modules/
 /7_proc_export/frontend/dist/
+
+# 鼎新BPM程式
+/BPM5892/wildfly-15.0.0.Final/*
