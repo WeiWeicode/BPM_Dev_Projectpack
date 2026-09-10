@@ -1,0 +1,89 @@
+<com.dsc.nana.domain.form.FormDefinition id="1">
+  <appDesignType id="2">
+    <value>-1</value>
+  </appDesignType>
+  <authorName>系統管理員</authorName>
+  <containerOID>962b57c4fa0a1004851cac97a977dbbf</containerOID>
+  <createdTime id="3">2026-09-09 15:47:08.0</createdTime>
+  <dataAccessDefinitions class="list" id="4"/>
+  <description></description>
+  <EleCountForDesigner>0</EleCountForDesigner>
+  <elementDefinitions class="list" id="5"/>
+  <formDefinitionStyles class="list" id="6">
+    <com.dsc.nana.domain.form.FormDefinitionStyle id="7">
+      <device id="8">
+        <value>0</value>
+      </device>
+      <isAbsolutePosition>true</isAbsolutePosition>
+      <height>480</height>
+      <width>640</width>
+    </com.dsc.nana.domain.form.FormDefinitionStyle>
+    <com.dsc.nana.domain.form.FormDefinitionStyle id="9">
+      <device id="10">
+        <value>3</value>
+      </device>
+      <isAbsolutePosition>true</isAbsolutePosition>
+      <height>640</height>
+      <width>360</width>
+    </com.dsc.nana.domain.form.FormDefinitionStyle>
+  </formDefinitionStyles>
+  <id>OriginalBlankFormProject</id>
+  <labelAlign id="11">
+    <value>0</value>
+  </labelAlign>
+  <labelProportion id="12">
+    <value>1</value>
+  </labelProportion>
+  <mobileScript>function formCreate(){
+  return true;
+}
+function formOpen(){
+  return true;
+}
+function formSave(){
+  return true;
+}
+function formClose(){
+  return true;
+}
+function formDispatch(){
+  return true;
+}</mobileScript>
+  <multiZhMap id="13"/>
+  <name>OriginalBlankFormProject</name>
+  <processCommentType id="14">
+    <value>SHOW_ALL</value>
+  </processCommentType>
+  <publicationStatus id="15">
+    <value>RELEASED</value>
+  </publicationStatus>
+  <rwdLayout>[]</rwdLayout>
+  <script>function formCreate(){
+  return true;
+}
+function formOpen(){
+  return true;
+}
+function formSave(){
+  return true;
+}
+function formClose(){
+  return true;
+}
+function formDispatch(){
+  return true;
+}</script>
+  <sqlCmds class="list" id="16"/>
+  <validFrom id="17">2026-09-09 15:47:01.0</validFrom>
+  <version>1</version>
+  <scriptInfo></scriptInfo>
+  <mobileScriptInfo></mobileScriptInfo>
+  <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+  <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+  <OID>962b57c5fa0a1004851cac97a977dbbf</OID>
+  <objectVersion>2</objectVersion>
+  <dto>true</dto>
+  <dtoState id="18">
+    <value>1</value>
+  </dtoState>
+</com.dsc.nana.domain.form.FormDefinition>

@@ -1,7 +1,8 @@
 # 8_BPMAIworker —— AI 產生鼎新 BPM 表單與流程
 
-> 狀態：**僅有規格文件，尚無程式碼**。本目錄現階段是設計與手冊，
-> 供人與 AI 在動手寫程式之前先取得共識。
+> 狀態：規格文件 + 第一組可執行的組裝工具。
+> 已產出第一個實測用專案 `samples/AI設計的流程測試/`
+> （靜態檢查與反解對比全過，**尚未匯入鼎新設計師實測**）。
 
 ---
 
@@ -79,11 +80,51 @@ AI 決定「有哪些欄位、叫什麼、在第幾列、哪個關卡看得到�
     ├── 流程生成手冊.md            .bpmn 的骨架、關卡、連線、權限、OID 規則
     ├── 表單腳本手冊.md            .js 的生命週期、全域變數、可用資源與禁忌
     └── 驗證與驗收.md              五層驗證管線與驗收標準
-（以下為 M1 之後才會出現）
-├── templates/                   從 samples 抽出的樣板片段（元件／關卡／骨架）
+├── templates/                   ★ 新專案的基底
+│   ├── README.md                範本清冊：裡面有什麼、缺什麼、複製時換掉哪幾格
+│   └── 原始空白專案/             鼎新設計器直接匯出的空白專案（表單 0 元件、流程 4 關卡）
+├── tools/                       ★ 目前實際可跑的組裝工具（Python，零第三方依賴）
+│   ├── xstream_ref.py           XStream 相對參照解析與就地展開
+│   ├── bpm_edit.py              共用編輯動作（定位／刪除／OID 重配／權限／重編號）
+│   ├── new_project.py           ★ 從空白範本複製出一個新專案
+│   ├── set_permissions.py       ★ 把關卡欄位權限寫進 .bpmn（可插入不存在的節點）
+│   ├── build_form.py            以教材表單為底組出新的 .form
+│   ├── build_bpmn.py            以教材流程為底組出新的 .bpmn
+│   └── verify.py                靜態檢查 + 用 1_xml_tool 反解對比
+（以下為 M2 之後才會出現）
 ├── ir/                          IR 的 JSON Schema 與範例
-├── builder/                     確定性組裝器（Python，零第三方依賴）
-└── tests/
+└── builder/                     由 IR 直接組裝（目前是寫死設定的 build_*.py）
+```
+
+### 兩條產出路線
+
+| 路線 | 什麼時候用 | 入口 |
+|:---|:---|:---|
+| **從空白範本長出來** | 要做一支全新的流程 | `tools/new_project.py` → `tools/set_permissions.py` |
+| **改造既有的教材檔** | 要一次拿到很多現成元件（表單元件庫） | `tools/build_form.py` / `tools/build_bpmn.py` |
+
+空白範本的流程剛好就是 `開單人 → 直屬主管 → 結案`，
+執行者也已經是 `PROCESS_REQUESTER` / `MANAGER`，所以新流程不必自己編執行者型別。
+它唯一缺的是 `<formFieldAccessControl>`（關卡權限），那正是 `set_permissions.py` 要補的。
+
+### tools/ 目前做得到什麼
+
+| 能力 | 說明 |
+|:---|:---|
+| 展開 XStream 參照 | `.form` 的數字 `reference` 與 `.bpmn` 的 XPATH 相對 `reference` 都能解析並就地展開。**這是能安全增刪元件與關卡的前提** |
+| 重編 XStream id | 展開參照後全檔重編 1…N，新增元件不會踩到連號問題 |
+| 改 ID／中文名／權限 | 走 `1_xml_tool/core` 已有測試保護的 write_back |
+| 刪關卡並改接連線 | 連同執行者、連線、流程圖節點一起處理 |
+| 重配 OID | 全檔換成本專案自己的一組，避免與線上定義撞號 |
+| 插入欄位權限 | 關卡只有 `formFieldAccessDefinition`、沒有 `formFieldAccessControl` 時，直接插一個進去 |
+| 靜態檢查 | 連號、參照、版面一致性、圖形與關卡一致性、權限欄位是否真的存在 |
+
+```bash
+python 8_BPMAIworker/tools/new_project.py --name 採購申請單 --form-id PurchaseForm --process-id PurchaseProcess
+```
+
+```bash
+python 8_BPMAIworker/tools/verify.py
 ```
 
 ---

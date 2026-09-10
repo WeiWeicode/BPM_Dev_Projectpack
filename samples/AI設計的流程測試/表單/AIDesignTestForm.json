@@ -1,0 +1,194 @@
+{
+  "fileType": "FORM",
+  "formId": "AIDesignTestForm",
+  "formName": "AI設計的流程測試",
+  "sourceFile": "AIDesignTestForm.form",
+  "fields": [
+    {
+      "name": "流程實例ID",
+      "originalId": "processInstOIDHidden",
+      "id": "processInstOIDHidden",
+      "type": "HIDDEN"
+    },
+    {
+      "name": "AI設計的流程測試",
+      "originalId": "FormTitle",
+      "id": "FormTitle",
+      "type": "TITLE"
+    },
+    {
+      "name": "分隔線",
+      "originalId": "TitleLine",
+      "id": "TitleLine",
+      "type": "HORIZONTAL_LINE"
+    },
+    {
+      "name": "本單為 AI 產生的測試單，僅供功能驗證",
+      "originalId": "FormNoteLabel",
+      "id": "FormNoteLabel",
+      "type": "LABEL"
+    },
+    {
+      "name": "檔案上傳",
+      "originalId": "Attachment",
+      "id": "Attachment",
+      "type": "ATTACHMENT"
+    },
+    {
+      "name": "檔案上傳",
+      "originalId": "UploadFileButton",
+      "id": "UploadFileButton",
+      "type": "BUTTON"
+    },
+    {
+      "name": "帶入部門與人員",
+      "originalId": "PickUserButton",
+      "id": "PickUserButton",
+      "type": "BUTTON"
+    },
+    {
+      "name": "主旨",
+      "originalId": "SubjectTextBox",
+      "id": "SubjectTextBox",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "項次",
+      "originalId": "ItemNoTextBox",
+      "id": "ItemNoTextBox",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "品名",
+      "originalId": "ItemNameTextBox",
+      "id": "ItemNameTextBox",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "數量",
+      "originalId": "ItemQtyTextBox",
+      "id": "ItemQtyTextBox",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "內容說明",
+      "originalId": "ContentTextArea",
+      "id": "ContentTextArea",
+      "type": "TEXTAREA"
+    },
+    {
+      "name": "單號",
+      "originalId": "SerialNumber",
+      "id": "SerialNumber",
+      "type": "SERIAL_NUMBER"
+    },
+    {
+      "name": "明細表格",
+      "originalId": "ItemGrid",
+      "id": "ItemGrid",
+      "type": "LIST"
+    },
+    {
+      "name": "相關單號",
+      "originalId": "RelatedNoDialogInput",
+      "id": "RelatedNoDialogInput",
+      "type": "DIALOGINPUT"
+    },
+    {
+      "name": "申請人（工號／姓名）",
+      "originalId": "EmpDialogInputLabel",
+      "id": "EmpDialogInputLabel",
+      "type": "DIALOGINPUTLABEL"
+    },
+    {
+      "name": "備註",
+      "originalId": "RemarkDialogInputMulti",
+      "id": "RemarkDialogInputMulti",
+      "type": "DIALOGINPUTMULTI"
+    },
+    {
+      "name": "部門（代號／名稱）",
+      "originalId": "DeptDoubleTextBox",
+      "id": "DeptDoubleTextBox",
+      "type": "DOUBLETEXT"
+    },
+    {
+      "name": "急件等級",
+      "originalId": "UrgencyRadio",
+      "id": "UrgencyRadio",
+      "type": "RADIO"
+    },
+    {
+      "name": "通知對象",
+      "originalId": "NotifyCheckBox",
+      "id": "NotifyCheckBox",
+      "type": "SELECT"
+    },
+    {
+      "name": "申請類別",
+      "originalId": "CategoryDropDown",
+      "id": "CategoryDropDown",
+      "type": "SELECT"
+    },
+    {
+      "name": "廠區",
+      "originalId": "SiteListBox",
+      "id": "SiteListBox",
+      "type": "DROPDOWN"
+    },
+    {
+      "name": "需求日期",
+      "originalId": "NeedDate",
+      "id": "NeedDate",
+      "type": "DATE"
+    },
+    {
+      "name": "需求時間",
+      "originalId": "NeedTime",
+      "id": "NeedTime",
+      "type": "TIME"
+    },
+    {
+      "name": "SubTab22",
+      "originalId": "SubTab22",
+      "id": "SubTab22",
+      "type": "SUBTAB"
+    },
+    {
+      "name": "密碼",
+      "originalId": "PasswordTextBox",
+      "id": "PasswordTextBox",
+      "type": "TEXTBOX"
+    },
+    {
+      "name": "LogoImage",
+      "originalId": "LogoImage",
+      "id": "LogoImage",
+      "type": "IMAGE"
+    },
+    {
+      "name": "參考連結",
+      "originalId": "RefLink",
+      "id": "RefLink",
+      "type": "LINK"
+    },
+    {
+      "name": "條碼",
+      "originalId": "FormBarcode",
+      "id": "FormBarcode",
+      "type": "BARCODE"
+    },
+    {
+      "name": "FormQRCode",
+      "originalId": "FormQRCode",
+      "id": "FormQRCode",
+      "type": "QRCODE"
+    },
+    {
+      "name": "手寫簽名",
+      "originalId": "SignHandWriting",
+      "id": "SignHandWriting",
+      "type": "HANDWRITING"
+    }
+  ]
+}

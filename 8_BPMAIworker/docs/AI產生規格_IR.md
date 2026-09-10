@@ -225,17 +225,85 @@ IR 只描述人看得懂的部分，其餘由組裝器換算：
 
 ## 7. 命名規範（給 AI 的硬規則）
 
-| 對象 | 規則 | 例 |
+### 7.1 基本式
+
+**英文語意名 + 型別後綴，駝峰。**
+
+| 對象 | 式子 | 例 |
 |:---|:---|:---|
-| 欄位 ID | 英文 PascalCase + **型別後綴** | `ECRNoTextBox`、`OnlineDate`、`ChgItemDropDown` |
-| 按鈕 ID | 必須以 `Button` 或 `Btn` 結尾 | `ExtraDataAddButton` |
-| 關卡 ID | 語意 + `UserTask` / `SendTask` 後綴 | `ApplicantMgrUserTask`、`ApplySendTask` |
-| 隱藏欄 | 以 `Hidden` 結尾 | `processInstOIDHidden` |
-| 表格明細 | 以 `Grid` 或 `List` 結尾 | `ExtraDataGrid` |
+| 表單欄位 | `英文語意名` + `型別後綴` | `departmentTextBox`、`ECRNoTextBox`、`OnlineDate` |
+| 流程關卡 | `英文語意名` + `關卡型別後綴` | `ApplicantMgrUserTask`、`ERBS2190SendTask` |
 
-**按鈕後綴是有功能意義的**，不只是美觀：`bpmn_handler` 依 ID 結尾把權限項分成
-「按鈕」與「欄位」兩區（`BUTTON_SUFFIXES = ('button', 'btn')`）。
-按鈕沒有這個後綴，會被歸類成欄位，權限矩陣就對不上。
+型別後綴不是裝飾，是**看 ID 就知道這是什麼元件**，改版與對權限時省掉來回查表。
 
-所有 ID 一律符合 `^[A-Za-z_][A-Za-z0-9_]*$`——這是 ①② 兩個工具共同的檢查式，
-因為 ID 會被當成 XML 標籤名寫進 `formFieldAccessControl`。**中文、空白、減號一律不行。**
+### 7.2 型別後綴對照
+
+下表取自線上表單 `SolarEnergyECRECN`（79 個元件）的實際命名，
+**同一型別的後綴 100% 一致**，所以直接當成規範用：
+
+| IR `type` | ID 後綴 | 線上實例 |
+|:---|:---|:---|
+| `TEXTBOX` | `TextBox` | `ECRNoTextBox`、`TestQtyTextBox` |
+| `TEXTAREA` | `TextArea` | `ECSpecTextArea`、`RemarkTextArea` |
+| `SELECT` / `DROPDOWN` | **`DropDown`**（中間 D 大寫） | `ChgItemDropDown`、`ProductCategoryDropDown` |
+| `RADIO` | `Radio` | `ChgPropertyRadio` |
+| `CHECKBOX` | `CheckBox` | — |
+| `BUTTON` | `Button` | `ExtraDataAddButton`、`AttButton` |
+| `DATE` | `Date` | `OnlineDate` |
+| `TIME` | `Time` | — |
+| `HIDDEN` | `Hidden` | `formInstOIDHidden`、`BPMBackFormIdHidden` |
+| `LIST`（表格） | `Grid` | `ExtraDataGrid` |
+| `SUBTAB` | `SubTab` | `ERBS6100SubTab` |
+| `IMAGE` | `Image` | `ReminderNoteImage` |
+| `TITLE` | `Title` | `FormTitle` |
+| `LINK` / `BARCODE` / `QRCODE` / `HANDWRITING` | `Link` / `Barcode` / `QRCode` / `HandWriting` | — |
+| `DIALOGINPUT` 系列 | `DialogInput` / `DialogInputLabel` / `DialogInputMulti` | — |
+| `HORIZONTAL_LINE` | 無後綴（不存值、不設權限） | — |
+
+> ⚠️ **是 `DropDown` 不是 `Dropdown`。** 線上 4 個下拉全部是 `DropDown`。
+
+### 7.3 首字大小寫
+
+線上 79 個元件裡 **77 個首字大寫**，唯二小寫的是 `formInstOIDHidden` 與
+`processInstOIDHidden` —— 因為它們對應 BPM 執行期的全域變數
+`formInstOID` / `processInstOID`，跟著全域變數走。
+
+規則：
+- **預設首字大寫**（`ECRNoTextBox`、`ApplicantMgrUserTask`）。
+- 對應 BPM 全域變數的欄位跟著那個變數用小寫開頭。
+- 縮寫與專有代號維持原本的大寫（`ECRNo…`、`ERBS2190…`），不要硬拗成 `eCRNo…`。
+- **同一支表單內必須一致**，不要一半大寫一半小寫。
+
+### 7.4 保留 ID —— 不可自行命名
+
+| ID | 用途 | 規則 |
+|:---|:---|:---|
+| **`Attachment`** | 檔案上傳（BPM 內建附件區） | **一律叫 `Attachment`，絕對不可改名**。改了就不是內建附件區了 |
+| **`SerialNumber`** | 單號 | 設計器預設會給 `SerialNumber` + 數字（例如 `SerialNumber9`），**一律改成 `SerialNumber`**。線上表單也是這樣 |
+| `formInstOIDHidden` / `processInstOIDHidden` | 表單／流程實例 ID | 沿用線上既有寫法，不要另創 |
+
+`1_xml_tool` 的改名工具會連動更新 `rwdLayout` 與腳本，但**不會**幫你避開保留 ID ——
+把 `Attachment` 改掉不會報錯，是匯入後附件功能失效才發現。
+
+### 7.5 關卡 ID
+
+| 關卡 | 規則 | 例 |
+|:---|:---|:---|
+| `UserTask` / `SendTask` / `ManualTask` / `DecisionRuleTask` | 語意 + 型別後綴 | `ApplicantMgrUserTask`、`ERBS2190SendTask` |
+| `StartEvent` / `EndEvent` / `ParallelGateway` | **沿用設計器預設**（`StartEvent_1`、`EndEvent_2`、`ParallelGateway_14`），不要改 | — |
+
+線上 25 個關卡裡，12 個 `UserTask`、9 個 `SendTask` 全數帶後綴；
+四個系統節點維持設計器給的預設名。
+
+### 7.6 按鈕後綴有功能意義
+
+**按鈕一定要以 `Button` 或 `Btn` 結尾**，不只是美觀：
+`bpmn_handler` 依 ID 結尾把權限項分成「按鈕」與「欄位」兩區
+（`BUTTON_SUFFIXES = ('button', 'btn')`）。按鈕沒有這個後綴會被歸類成欄位，
+權限矩陣就對不上。
+
+### 7.7 字元限制
+
+所有 ID 一律符合 `^[A-Za-z_][A-Za-z0-9_]*$` —— 這是 ①② 兩個工具共同的檢查式，
+因為 ID 會被當成 XML 標籤名寫進 `formFieldAccessControl`。
+**中文、空白、減號一律不行。**

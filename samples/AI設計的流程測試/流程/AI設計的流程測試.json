@@ -1,0 +1,206 @@
+{
+  "fileType": "BPMN",
+  "packageId": "AIDesignTestProcess",
+  "processId": "AIDesignTestProcess",
+  "processName": "AI設計的流程測試",
+  "sourceFile": "AI設計的流程測試.bpmn",
+  "activities": [
+    {
+      "name": "Event",
+      "originalId": "StartEvent_1",
+      "id": "StartEvent_1",
+      "type": "StartEvent",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "Event",
+      "originalId": "EndEvent_2",
+      "id": "EndEvent_2",
+      "type": "EndEvent",
+      "buttons": [],
+      "fieldPermissions": []
+    },
+    {
+      "name": "直屬主管",
+      "originalId": "ManagerUserTask",
+      "id": "ManagerUserTask",
+      "type": "UserTask",
+      "buttons": [],
+      "fieldPermissions": [
+        {
+          "originalId": "RemarkDialogInputMulti",
+          "id": "RemarkDialogInputMulti",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "UrgencyRadio",
+          "id": "UrgencyRadio",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "SignHandWriting",
+          "id": "SignHandWriting",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "Attachment",
+          "id": "Attachment",
+          "permission": "ENABLED"
+        }
+      ],
+      "formId": "AIDesignTestForm"
+    },
+    {
+      "name": "開單人",
+      "originalId": "ApplyUserTask",
+      "id": "ApplyUserTask",
+      "type": "UserTask",
+      "buttons": [
+        {
+          "originalId": "UploadFileButton",
+          "id": "UploadFileButton",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "PickUserButton",
+          "id": "PickUserButton",
+          "permission": "ENABLED"
+        }
+      ],
+      "fieldPermissions": [
+        {
+          "originalId": "processInstOIDHidden",
+          "id": "processInstOIDHidden",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "SerialNumber",
+          "id": "SerialNumber",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "SubjectTextBox",
+          "id": "SubjectTextBox",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ContentTextArea",
+          "id": "ContentTextArea",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "EmpDialogInputLabel",
+          "id": "EmpDialogInputLabel",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "DeptDoubleTextBox",
+          "id": "DeptDoubleTextBox",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "RelatedNoDialogInput",
+          "id": "RelatedNoDialogInput",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "RemarkDialogInputMulti",
+          "id": "RemarkDialogInputMulti",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "UrgencyRadio",
+          "id": "UrgencyRadio",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "NotifyCheckBox",
+          "id": "NotifyCheckBox",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "CategoryDropDown",
+          "id": "CategoryDropDown",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "SiteListBox",
+          "id": "SiteListBox",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "NeedDate",
+          "id": "NeedDate",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "NeedTime",
+          "id": "NeedTime",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ItemGrid",
+          "id": "ItemGrid",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ItemNoTextBox",
+          "id": "ItemNoTextBox",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ItemNameTextBox",
+          "id": "ItemNameTextBox",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "ItemQtyTextBox",
+          "id": "ItemQtyTextBox",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "Attachment",
+          "id": "Attachment",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "SubTab22",
+          "id": "SubTab22",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "PasswordTextBox",
+          "id": "PasswordTextBox",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "RefLink",
+          "id": "RefLink",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "LogoImage",
+          "id": "LogoImage",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "FormBarcode",
+          "id": "FormBarcode",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "FormQRCode",
+          "id": "FormQRCode",
+          "permission": "ENABLED"
+        },
+        {
+          "originalId": "SignHandWriting",
+          "id": "SignHandWriting",
+          "permission": "ENABLED"
+        }
+      ],
+      "formId": "AIDesignTestForm"
+    }
+  ]
+}

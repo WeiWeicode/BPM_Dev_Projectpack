@@ -1,0 +1,1150 @@
+<com.dsc.nana.domain.workflow__definition.ProcessPackage>
+  <firstActIsReqstPerform>false</firstActIsReqstPerform>
+  <flowType>SignatureFlow</flowType>
+  <formInstanceType>0</formInstanceType>
+  <header>
+    <bpmnVersion>2.0</bpmnVersion>
+    <createdTime>2026-08-20 15:06:01.0</createdTime>
+    <vendor>Data Systems Consulting</vendor>
+    <xpdlVersion>1.0</xpdlVersion>
+    <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+    <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+    <OID>7a10d001a1de51000851cac97a977dbb</OID>
+    <objectVersion>1</objectVersion>
+    <dto>true</dto>
+    <dtoState>
+      <value>0</value>
+    </dtoState>
+  </header>
+  <id>AIDesignTestProcess</id>
+  <isUsedTemplate>false</isUsedTemplate>
+  <mainProcessDefinitionId>AIDesignTestProcess</mainProcessDefinitionId>
+  <name>AI設計的流程測試</name>
+  <packageInvokeAuthority>
+    <functionDefList></functionDefList>
+    <groupList></groupList>
+    <organizationUnitList>GIGASOLAR~~S1100</organizationUnitList>
+    <userList></userList>
+    <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+    <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+    <OID>7a10d002a1de51000851cac97a977dbb</OID>
+    <objectVersion>1</objectVersion>
+    <dto>true</dto>
+    <dtoState reference="../../header/dtoState"/>
+  </packageInvokeAuthority>
+  <processDefinitions>
+    <com.dsc.nana.domain.workflow__definition.ProcessDefinition>
+      <abortable>true</abortable>
+      <accessLevel>
+        <value>PUBLIC</value>
+      </accessLevel>
+      <additionalRules>0</additionalRules>
+      <allowCanceled>true</allowCanceled>
+      <applicationDefinitions>
+        <com.dsc.nana.domain.workflow__definition.app.WebApplication>
+          <allowUserInteraction>true</allowUserInteraction>
+          <autoApproval>true</autoApproval>
+          <urlString>../PerformWorkItem/CallAttachmentHandler.do?hdnMethod=handleAttachment</urlString>
+          <usingProxy>false</usingProxy>
+          <usingSSL>false</usingSSL>
+          <formalParameters class="org.hibernate.collection.internal.PersistentBag">
+            <bag>
+              <com.dsc.nana.domain.workflow__definition.FormalParameter>
+                <containerOID>0000000ApplicationDefinition0005</containerOID>
+                <dataType class="com.dsc.nana.domain.workflow_definition.AttachmentType">
+                  <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+                  <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+                  <OID>00000000000000AttachmentType0001</OID>
+                  <objectVersion>1</objectVersion>
+                  <dto>true</dto>
+                  <dtoState>
+                    <value>1</value>
+                  </dtoState>
+                </dataType>
+                <dataTypeOID>00000000000000AttachmentType0001</dataTypeOID>
+                <id>AttachmentInstance</id>
+                <index>1</index>
+                <mode>
+                  <value>INOUT</value>
+                </mode>
+                <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+                <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+                <OID>0000000000000FormalParameter0002</OID>
+                <objectVersion>1</objectVersion>
+                <dto>true</dto>
+                <dtoState reference="../dataType/dtoState"/>
+              </com.dsc.nana.domain.workflow__definition.FormalParameter>
+            </bag>
+            <isTempSession>false</isTempSession>
+            <initialized>true</initialized>
+            <owner class="com.dsc.nana.domain.workflow_definition.app.WebApplication" reference="../.."/>
+            <cachedSize>-1</cachedSize>
+            <role>com.dsc.nana.domain.workflow_definition.ApplicationDefinition.formalParameters</role>
+            <key class="string">0000000ApplicationDefinition0005</key>
+            <dirty>false</dirty>
+            <elementRemoved>false</elementRemoved>
+            <storedSnapshot class="list">
+              <com.dsc.nana.domain.workflow__definition.FormalParameter reference="../../bag/com.dsc.nana.domain.workflow_definition.FormalParameter"/>
+            </storedSnapshot>
+            <allowLoadOutsideTransaction>false</allowLoadOutsideTransaction>
+          </formalParameters>
+          <globalApplication>true</globalApplication>
+          <id>AttachmentHandler</id>
+          <isDefault>true</isDefault>
+          <name>附件處理程式</name>
+          <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+          <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+          <OID>0000000ApplicationDefinition0005</OID>
+          <objectVersion>1</objectVersion>
+          <dto>true</dto>
+          <dtoState reference="../formalParameters/bag/com.dsc.nana.domain.workflow_definition.FormalParameter/dataType/dtoState"/>
+        </com.dsc.nana.domain.workflow__definition.app.WebApplication>
+        <com.dsc.nana.domain.workflow__definition.app.WebApplication>
+          <allowUserInteraction>true</allowUserInteraction>
+          <autoApproval>true</autoApproval>
+          <urlString>../PerformWorkItem/CallFormHandler.do?hdnMethod=handleForm</urlString>
+          <usingProxy>false</usingProxy>
+          <usingSSL>false</usingSSL>
+          <formalParameters class="org.hibernate.collection.internal.PersistentBag">
+            <bag>
+              <com.dsc.nana.domain.workflow__definition.FormalParameter>
+                <containerOID>0000000ApplicationDefinition0001</containerOID>
+                <dataType class="com.dsc.nana.domain.workflow_definition.FormType">
+                  <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+                  <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+                  <OID>00000000000000000000FormType0001</OID>
+                  <objectVersion>1</objectVersion>
+                  <dto>true</dto>
+                  <dtoState reference="../../../../../../com.dsc.nana.domain.workflow_definition.app.WebApplication/formalParameters/bag/com.dsc.nana.domain.workflow_definition.FormalParameter/dataType/dtoState"/>
+                </dataType>
+                <dataTypeOID>00000000000000000000FormType0001</dataTypeOID>
+                <id>FormInstance</id>
+                <index>1</index>
+                <mode reference="../../../../../com.dsc.nana.domain.workflow_definition.app.WebApplication/formalParameters/bag/com.dsc.nana.domain.workflow_definition.FormalParameter/mode"/>
+                <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+                <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+                <OID>0000000000000FormalParameter0001</OID>
+                <objectVersion>1</objectVersion>
+                <dto>true</dto>
+                <dtoState reference="../../../../../com.dsc.nana.domain.workflow_definition.app.WebApplication/formalParameters/bag/com.dsc.nana.domain.workflow_definition.FormalParameter/dataType/dtoState"/>
+              </com.dsc.nana.domain.workflow__definition.FormalParameter>
+            </bag>
+            <isTempSession>false</isTempSession>
+            <initialized>true</initialized>
+            <owner class="com.dsc.nana.domain.workflow_definition.app.WebApplication" reference="../.."/>
+            <cachedSize>-1</cachedSize>
+            <role>com.dsc.nana.domain.workflow_definition.ApplicationDefinition.formalParameters</role>
+            <key class="string">0000000ApplicationDefinition0001</key>
+            <dirty>false</dirty>
+            <elementRemoved>false</elementRemoved>
+            <storedSnapshot class="list">
+              <com.dsc.nana.domain.workflow__definition.FormalParameter reference="../../bag/com.dsc.nana.domain.workflow_definition.FormalParameter"/>
+            </storedSnapshot>
+            <allowLoadOutsideTransaction>false</allowLoadOutsideTransaction>
+          </formalParameters>
+          <globalApplication>true</globalApplication>
+          <id>FormHandler</id>
+          <isDefault>true</isDefault>
+          <name>表單處理程式</name>
+          <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+          <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+          <OID>0000000ApplicationDefinition0001</OID>
+          <objectVersion>1</objectVersion>
+          <dto>true</dto>
+          <dtoState reference="../../com.dsc.nana.domain.workflow_definition.app.WebApplication/formalParameters/bag/com.dsc.nana.domain.workflow_definition.FormalParameter/dataType/dtoState"/>
+        </com.dsc.nana.domain.workflow__definition.app.WebApplication>
+      </applicationDefinitions>
+      <applyDefaultNoticeContent>true</applyDefaultNoticeContent>
+      <bitSize>8</bitSize>
+      <bpmXML>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+&lt;Diagram x=&quot;0.0&quot; y=&quot;0.0&quot; width=&quot;1795.0&quot; height=&quot;1050.0&quot;&gt;
+&lt;Node ClassName=&quot;StartEvent&quot; Id=&quot;StartEvent_1&quot;&gt;
+&lt;Font name=&quot;微軟正黑體&quot; style=&quot;0&quot; size=&quot;15&quot;&gt;&lt;/Font&gt;
+&lt;Bounds x=&quot;100.0&quot; y=&quot;100.0&quot; width=&quot;30.0&quot; height=&quot;30.0&quot;&gt;&lt;/Bounds&gt;
+&lt;ZIndex&gt;3&lt;/ZIndex&gt;
+&lt;Background Red=&quot;220&quot; Green=&quot;230&quot; Blue=&quot;242&quot;&gt;&lt;/Background&gt;
+&lt;Text&gt;&lt;/Text&gt;
+&lt;TextBrush Red=&quot;0&quot; Green=&quot;0&quot; Blue=&quot;0&quot;&gt;&lt;/TextBrush&gt;
+&lt;ContainerNode NodeId=&quot;StartEvent_1&quot;&gt;NoContainerNode&lt;/ContainerNode&gt;
+&lt;/Node&gt;
+&lt;Node ClassName=&quot;EndEvent&quot; Id=&quot;EndEvent_2&quot;&gt;
+&lt;Font name=&quot;微軟正黑體&quot; style=&quot;0&quot; size=&quot;15&quot;&gt;&lt;/Font&gt;
+&lt;Bounds x=&quot;500.0&quot; y=&quot;100.0&quot; width=&quot;30.0&quot; height=&quot;30.0&quot;&gt;&lt;/Bounds&gt;
+&lt;ZIndex&gt;3&lt;/ZIndex&gt;
+&lt;Background Red=&quot;220&quot; Green=&quot;230&quot; Blue=&quot;242&quot;&gt;&lt;/Background&gt;
+&lt;Text&gt;&lt;/Text&gt;
+&lt;TextBrush Red=&quot;0&quot; Green=&quot;0&quot; Blue=&quot;0&quot;&gt;&lt;/TextBrush&gt;
+&lt;ContainerNode NodeId=&quot;EndEvent_2&quot;&gt;NoContainerNode&lt;/ContainerNode&gt;
+&lt;/Node&gt;
+&lt;Node ClassName=&quot;UserTask&quot; Id=&quot;ApplyUserTask&quot;&gt;
+&lt;Font name=&quot;微軟正黑體&quot; style=&quot;0&quot; size=&quot;10&quot;&gt;&lt;/Font&gt;
+&lt;Bounds x=&quot;190.0&quot; y=&quot;90.0&quot; width=&quot;80.0&quot; height=&quot;50.0&quot;&gt;&lt;/Bounds&gt;
+&lt;ZIndex&gt;3&lt;/ZIndex&gt;
+&lt;Background Red=&quot;220&quot; Green=&quot;230&quot; Blue=&quot;242&quot;&gt;&lt;/Background&gt;
+&lt;Text&gt;開單人&lt;/Text&gt;
+&lt;TextBrush Red=&quot;0&quot; Green=&quot;0&quot; Blue=&quot;0&quot;&gt;&lt;/TextBrush&gt;
+&lt;ContainerNode NodeId=&quot;ApplyUserTask&quot;&gt;NoContainerNode&lt;/ContainerNode&gt;
+&lt;/Node&gt;
+&lt;Node ClassName=&quot;UserTask&quot; Id=&quot;ManagerUserTask&quot;&gt;
+&lt;Font name=&quot;微軟正黑體&quot; style=&quot;0&quot; size=&quot;10&quot;&gt;&lt;/Font&gt;
+&lt;Bounds x=&quot;330.0&quot; y=&quot;90.0&quot; width=&quot;80.0&quot; height=&quot;50.0&quot;&gt;&lt;/Bounds&gt;
+&lt;ZIndex&gt;3&lt;/ZIndex&gt;
+&lt;Background Red=&quot;220&quot; Green=&quot;230&quot; Blue=&quot;242&quot;&gt;&lt;/Background&gt;
+&lt;Text&gt;直屬主管&lt;/Text&gt;
+&lt;TextBrush Red=&quot;0&quot; Green=&quot;0&quot; Blue=&quot;0&quot;&gt;&lt;/TextBrush&gt;
+&lt;ContainerNode NodeId=&quot;ManagerUserTask&quot;&gt;NoContainerNode&lt;/ContainerNode&gt;
+&lt;/Node&gt;
+&lt;Node ClassName=&quot;DiagramLink&quot; Id=&quot;Link_5&quot;&gt;
+&lt;Bounds x=&quot;130.0&quot; y=&quot;115.0&quot; width=&quot;60.0&quot; height=&quot;0.0&quot;&gt;&lt;/Bounds&gt;
+&lt;ZIndex&gt;5&lt;/ZIndex&gt;
+&lt;Background Red=&quot;0&quot; Green=&quot;0&quot; Blue=&quot;0&quot;&gt;&lt;/Background&gt;
+&lt;Form Id=&quot;StartEvent_1&quot;&gt;StartEvent&lt;/Form&gt;
+&lt;To Id=&quot;ApplyUserTask&quot;&gt;UserTask&lt;/To&gt;
+&lt;Text&gt;&lt;/Text&gt;
+&lt;LinkShape&gt;2&lt;/LinkShape&gt;
+&lt;PointList&gt;
+&lt;Point x=&quot;130&quot; y=&quot;115&quot;&gt;&lt;/Point&gt;
+&lt;Point x=&quot;190&quot; y=&quot;115&quot;&gt;&lt;/Point&gt;
+&lt;/PointList&gt;
+&lt;ContainerNode NodeId=&quot;NoNodeId&quot;&gt;NoContainerNode&lt;/ContainerNode&gt;
+&lt;/Node&gt;
+&lt;Node ClassName=&quot;DiagramLink&quot; Id=&quot;Link_6&quot;&gt;
+&lt;Bounds x=&quot;270.0&quot; y=&quot;115.0&quot; width=&quot;60.0&quot; height=&quot;0.0&quot;&gt;&lt;/Bounds&gt;
+&lt;ZIndex&gt;5&lt;/ZIndex&gt;
+&lt;Background Red=&quot;0&quot; Green=&quot;0&quot; Blue=&quot;0&quot;&gt;&lt;/Background&gt;
+&lt;Form Id=&quot;ApplyUserTask&quot;&gt;UserTask&lt;/Form&gt;
+&lt;To Id=&quot;ManagerUserTask&quot;&gt;UserTask&lt;/To&gt;
+&lt;Text&gt;&lt;/Text&gt;
+&lt;LinkShape&gt;2&lt;/LinkShape&gt;
+&lt;PointList&gt;
+&lt;Point x=&quot;270&quot; y=&quot;115&quot;&gt;&lt;/Point&gt;
+&lt;Point x=&quot;330&quot; y=&quot;115&quot;&gt;&lt;/Point&gt;
+&lt;/PointList&gt;
+&lt;ContainerNode NodeId=&quot;NoNodeId&quot;&gt;NoContainerNode&lt;/ContainerNode&gt;
+&lt;/Node&gt;
+&lt;Node ClassName=&quot;DiagramLink&quot; Id=&quot;Link_11&quot;&gt;
+&lt;Bounds x=&quot;410.0&quot; y=&quot;115.0&quot; width=&quot;90.0&quot; height=&quot;0.0&quot;&gt;&lt;/Bounds&gt;
+&lt;ZIndex&gt;5&lt;/ZIndex&gt;
+&lt;Background Red=&quot;0&quot; Green=&quot;0&quot; Blue=&quot;0&quot;&gt;&lt;/Background&gt;
+&lt;Form Id=&quot;ManagerUserTask&quot;&gt;UserTask&lt;/Form&gt;
+&lt;To Id=&quot;EndEvent_2&quot;&gt;EndEvent&lt;/To&gt;
+&lt;Text&gt;&lt;/Text&gt;
+&lt;LinkShape&gt;2&lt;/LinkShape&gt;
+&lt;PointList&gt;
+&lt;Point x=&quot;410&quot; y=&quot;115&quot;&gt;&lt;/Point&gt;
+&lt;Point x=&quot;500&quot; y=&quot;115&quot;&gt;&lt;/Point&gt;
+&lt;/PointList&gt;
+&lt;ContainerNode NodeId=&quot;NoNodeId&quot;&gt;NoContainerNode&lt;/ContainerNode&gt;
+&lt;/Node&gt;
+&lt;/Diagram&gt;</bpmXML>
+      <header>
+        <createdTime>2026-08-20 14:27:08.0</createdTime>
+        <durationUnit>
+          <value>h</value>
+        </durationUnit>
+        <limit>0.0</limit>
+        <timeEstimation>
+          <duration>0.0</duration>
+          <waitingTime>0.0</waitingTime>
+          <workingTime>0.0</workingTime>
+          <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+          <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+          <objectVersion>1</objectVersion>
+          <dto>true</dto>
+          <dtoState reference="../../../../../header/dtoState"/>
+        </timeEstimation>
+        <validFrom>2026-08-20 14:27:08.0</validFrom>
+        <validTo>2100-12-31 14:37:17.0</validTo>
+        <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+        <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+        <OID>7a10d003a1de51000851cac97a977dbb</OID>
+        <objectVersion>1</objectVersion>
+        <dto>true</dto>
+        <dtoState reference="../../../../header/dtoState"/>
+      </header>
+      <id>AIDesignTestProcess</id>
+      <lastActivityIdNum>16</lastActivityIdNum>
+      <lastActivitySetIdNum>0</lastActivitySetIdNum>
+      <lastFormalParameterIdNum>0</lastFormalParameterIdNum>
+      <lastParticipantIdNum>0</lastParticipantIdNum>
+      <lastTransitionIdNum>0</lastTransitionIdNum>
+      <mobilityProcess>0</mobilityProcess>
+      <mobilitySignOff>0</mobilitySignOff>
+      <multiNotification>false</multiNotification>
+      <multiNotificationIntervalTime>24</multiNotificationIntervalTime>
+      <name>AI設計的流程測試</name>
+      <noticable>true</noticable>
+      <noticeAllAuthority>6</noticeAllAuthority>
+      <notificationIntervalTimeUnit reference="../header/durationUnit"/>
+      <participantDefinitions>
+        <com.dsc.nana.domain.workflow__definition.ParticipantDefinition>
+          <autoAgentId>AutoAgent</autoAgentId>
+          <containerOID>7a10d004a1de51000851cac97a977dbb</containerOID>
+          <id>_SystemParticipantID</id>
+          <includeSubUnit>true</includeSubUnit>
+          <type>
+            <value>SYSTEM</value>
+          </type>
+          <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+          <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+          <OID>7a10d005a1de51000851cac97a977dbb</OID>
+          <objectVersion>1</objectVersion>
+          <dto>true</dto>
+          <dtoState reference="../../../../../header/dtoState"/>
+        </com.dsc.nana.domain.workflow__definition.ParticipantDefinition>
+        <com.dsc.nana.domain.workflow__definition.ParticipantDefinition>
+          <containerOID>7a10d004a1de51000851cac97a977dbb</containerOID>
+          <id>PAR17872072291572</id>
+          <includeSubUnit>true</includeSubUnit>
+          <type>
+            <value>PROCESS_REQUESTER</value>
+          </type>
+          <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+          <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+          <OID>7a10d006a1de51000851cac97a977dbb</OID>
+          <objectVersion>1</objectVersion>
+          <dto>true</dto>
+          <dtoState reference="../../../../../header/dtoState"/>
+        </com.dsc.nana.domain.workflow__definition.ParticipantDefinition>
+        <com.dsc.nana.domain.workflow__definition.ParticipantDefinition>
+          <activityDefinitionId>ApplyUserTask</activityDefinitionId>
+          <containerOID>7a10d004a1de51000851cac97a977dbb</containerOID>
+          <id>PAR17872072291573</id>
+          <includeSubUnit>true</includeSubUnit>
+          <type>
+            <value>MANAGER</value>
+          </type>
+          <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+          <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+          <OID>7a10d007a1de51000851cac97a977dbb</OID>
+          <objectVersion>1</objectVersion>
+          <dto>true</dto>
+          <dtoState reference="../../../../../header/dtoState"/>
+        </com.dsc.nana.domain.workflow__definition.ParticipantDefinition>
+      </participantDefinitions>
+      <personalDataProtection>false</personalDataProtection>
+      <processPackages>
+        <com.dsc.nana.domain.workflow__definition.ProcessPackage reference="../../../.."/>
+      </processPackages>
+      <processViewInformation>
+        <endActivityBoundInfo>
+          <height>30</height>
+          <width>30</width>
+          <x>865</x>
+          <y>100</y>
+          <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+          <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+          <objectVersion>1</objectVersion>
+          <dto>true</dto>
+          <dtoState reference="../../../../../header/dtoState"/>
+        </endActivityBoundInfo>
+        <startActivityBoundInfo>
+          <height>30</height>
+          <width>30</width>
+          <x>100</x>
+          <y>100</y>
+          <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+          <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+          <objectVersion>1</objectVersion>
+          <dto>true</dto>
+          <dtoState reference="../../../../../header/dtoState"/>
+        </startActivityBoundInfo>
+        <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+        <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+        <objectVersion>1</objectVersion>
+        <dto>true</dto>
+        <dtoState reference="../../applicationDefinitions/com.dsc.nana.domain.workflow_definition.app.WebApplication/formalParameters/bag/com.dsc.nana.domain.workflow_definition.FormalParameter/dataType/dtoState"/>
+      </processViewInformation>
+      <redefinableHeader>
+        <authorName>administrator 系統管理員</authorName>
+        <publicationStatus>
+          <value>RELEASED</value>
+        </publicationStatus>
+        <version>0</version>
+        <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+        <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+        <OID>7a10d008a1de51000851cac97a977dbb</OID>
+        <objectVersion>1</objectVersion>
+        <dto>true</dto>
+        <dtoState reference="../../../../header/dtoState"/>
+      </redefinableHeader>
+      <relevantDataDefinitions>
+        <com.dsc.nana.domain.workflow__definition.RelevantDataDefinition>
+          <containerOID>7a10d004a1de51000851cac97a977dbb</containerOID>
+          <dataType class="com.dsc.nana.domain.workflow_definition.FormType">
+            <formDefinitionId>AIDesignTestForm</formDefinitionId>
+            <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+            <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+            <OID>7a10d009a1de51000851cac97a977dbb</OID>
+            <objectVersion>1</objectVersion>
+            <dto>true</dto>
+            <dtoState reference="../../../../../../header/dtoState"/>
+          </dataType>
+          <id>AIDesignTestForm</id>
+          <initialValue></initialValue>
+          <isArray>
+            <value>FALSE</value>
+          </isArray>
+          <length>0</length>
+          <name>AI設計的流程測試</name>
+          <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+          <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+          <OID>7a10d00aa1de51000851cac97a977dbb</OID>
+          <objectVersion>1</objectVersion>
+          <dto>true</dto>
+          <dtoState reference="../../../../../header/dtoState"/>
+        </com.dsc.nana.domain.workflow__definition.RelevantDataDefinition>
+        <com.dsc.nana.domain.workflow__definition.RelevantDataDefinition>
+          <containerOID>7a10d004a1de51000851cac97a977dbb</containerOID>
+          <dataType class="com.dsc.nana.domain.workflow_definition.BasicType">
+            <type>
+              <value>STRING</value>
+            </type>
+            <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+            <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+            <OID>7a10d00ba1de51000851cac97a977dbb</OID>
+            <objectVersion>1</objectVersion>
+            <dto>true</dto>
+            <dtoState reference="../../../../../../header/dtoState"/>
+          </dataType>
+          <id>processSerialNumber</id>
+          <initialValue>SerialNo</initialValue>
+          <isArray>
+            <value>FALSE</value>
+          </isArray>
+          <length>0</length>
+          <name>流程序號</name>
+          <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+          <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+          <OID>7a10d00ca1de51000851cac97a977dbb</OID>
+          <objectVersion>1</objectVersion>
+          <dto>true</dto>
+          <dtoState reference="../../../../../header/dtoState"/>
+        </com.dsc.nana.domain.workflow__definition.RelevantDataDefinition>
+        <com.dsc.nana.domain.workflow__definition.RelevantDataDefinition>
+          <containerOID>7a10d004a1de51000851cac97a977dbb</containerOID>
+          <dataType class="com.dsc.nana.domain.workflow_definition.BasicType">
+            <type>
+              <value>BOOLEAN</value>
+            </type>
+            <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+            <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+            <OID>7a10d00da1de51000851cac97a977dbb</OID>
+            <objectVersion>1</objectVersion>
+            <dto>true</dto>
+            <dtoState reference="../../../../../../header/dtoState"/>
+          </dataType>
+          <id>isSeparateByVerNo</id>
+          <initialValue>false</initialValue>
+          <isArray>
+            <value>FALSE</value>
+          </isArray>
+          <length>0</length>
+          <name>是否依版號分開</name>
+          <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+          <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+          <OID>7a10d00ea1de51000851cac97a977dbb</OID>
+          <objectVersion>1</objectVersion>
+          <dto>true</dto>
+          <dtoState reference="../../../../../header/dtoState"/>
+        </com.dsc.nana.domain.workflow__definition.RelevantDataDefinition>
+      </relevantDataDefinitions>
+      <sysintegrationWith>
+        <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+        <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+        <objectVersion>1</objectVersion>
+        <dto>true</dto>
+        <dtoState reference="../../../../header/dtoState"/>
+      </sysintegrationWith>
+      <deleteProcess>true</deleteProcess>
+      <activityDefinitions>
+        <com.dsc.nana.domain.workflow__definition.ActivityDefinition>
+          <ableToAskActivityReexecuteType>
+            <value>4</value>
+          </ableToAskActivityReexecuteType>
+          <ableToInvokeRefProcess>false</ableToInvokeRefProcess>
+          <activityType class="com.dsc.nana.domain.workflow_definition.BpmEvent">
+            <eventType>startEvent</eventType>
+            <id>StartEvent_1</id>
+            <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+            <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+            <OID>7a10d00fa1de51000851cac97a977dbb</OID>
+            <objectVersion>1</objectVersion>
+            <dto>true</dto>
+            <dtoState reference="../../../../../../header/dtoState"/>
+          </activityType>
+          <addingActivityAuthority>0</addingActivityAuthority>
+          <applyDefaultNoticeContent>true</applyDefaultNoticeContent>
+          <autoDelivery>
+            <value>1</value>
+          </autoDelivery>
+          <allowChangeOnlineRead>
+            <value>1</value>
+          </allowChangeOnlineRead>
+          <automaticPhrase></automaticPhrase>
+          <batchComm>false</batchComm>
+          <batchPerformable>false</batchPerformable>
+          <boundViewInformation>
+            <height>0</height>
+            <width>0</width>
+            <x>0</x>
+            <y>0</y>
+            <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+            <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+            <OID>7a10d010a1de51000851cac97a977dbb</OID>
+            <objectVersion>1</objectVersion>
+            <dto>true</dto>
+            <dtoState reference="../../../../../../header/dtoState"/>
+          </boundViewInformation>
+          <bpmnType>StartEvent</bpmnType>
+          <bypassable>true</bypassable>
+          <confirmAttachmentHits>false</confirmAttachmentHits>
+          <confirmComm>false</confirmComm>
+          <container class="com.dsc.nana.domain.workflow_definition.ProcessDefinition" reference="../../.."/>
+          <dealOvertimeActivityType>
+            <value>SEND_NOTIFICATION</value>
+          </dealOvertimeActivityType>
+          <description></description>
+          <disNoticeSend>false</disNoticeSend>
+          <disNoticeSendForSendTask>false</disNoticeSendForSendTask>
+          <disNoticeSendForReexecute>false</disNoticeSendForReexecute>
+          <disNoticeSendForRegainable>false</disNoticeSendForRegainable>
+          <finishMode>
+            <value>AUTOMATIC</value>
+          </finishMode>
+          <finishWorkPercentage>100.0</finishWorkPercentage>
+          <firstNoticeInitiator>false</firstNoticeInitiator>
+          <firstNoticeResponsible>false</firstNoticeResponsible>
+          <firstNoticeUnitManager>false</firstNoticeUnitManager>
+          <id>StartEvent_1</id>
+          <isProcessTemplateActivity>false</isProcessTemplateActivity>
+          <limit>0.0</limit>
+          <multiNotification>true</multiNotification>
+          <multiNotificationIntervalTime>-1</multiNotificationIntervalTime>
+          <multiUserMode>
+            <value>FIREST_GET_FIRST_WIN</value>
+          </multiUserMode>
+          <mustUploadAttachment>false</mustUploadAttachment>
+          <name>Event</name>
+          <noticeAuthority>1</noticeAuthority>
+          <notificationAttachment>false</notificationAttachment>
+          <notificationIntervalTimeUnit reference="../../../header/durationUnit"/>
+          <performType>
+            <value>NORMAL</value>
+          </performType>
+          <printActivity>true</printActivity>
+          <proInsLevel>false</proInsLevel>
+          <reassignableAuthority>3</reassignableAuthority>
+          <reexecuteComm>false</reexecuteComm>
+          <regainable>true</regainable>
+          <requiredToSpecifyOrgUnit>false</requiredToSpecifyOrgUnit>
+          <requiredToTransForm>false</requiredToTransForm>
+          <responsible>false</responsible>
+          <secondNoticeInitiator>false</secondNoticeInitiator>
+          <secondNoticeResponsible>false</secondNoticeResponsible>
+          <secondNoticeUnitManager>false</secondNoticeUnitManager>
+          <secured>false</secured>
+          <startMode>
+            <value>AUTOMATIC</value>
+          </startMode>
+          <straightSignOff>false</straightSignOff>
+          <thirdNoticeInitiator>false</thirdNoticeInitiator>
+          <thirdNoticeResponsible>false</thirdNoticeResponsible>
+          <thirdNoticeUnitManager>false</thirdNoticeUnitManager>
+          <transitionRestrictions>
+            <com.dsc.nana.domain.workflow__definition.TransitionRestriction>
+              <containerOID>7a10d011a1de51000851cac97a977dbb</containerOID>
+              <joinType>
+                <value>AND</value>
+              </joinType>
+              <splitType>
+                <value>AND</value>
+              </splitType>
+              <transitionReferences>
+                <com.dsc.nana.domain.workflow__definition.TransitionReference>
+                  <containerOID>7a10d012a1de51000851cac97a977dbb</containerOID>
+                  <transitionDefinitionId>Link_5</transitionDefinitionId>
+                  <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+                  <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+                  <OID>7a10d013a1de51000851cac97a977dbb</OID>
+                  <objectVersion>1</objectVersion>
+                  <dto>true</dto>
+                  <dtoState reference="../../../../../../../../../header/dtoState"/>
+                </com.dsc.nana.domain.workflow__definition.TransitionReference>
+              </transitionReferences>
+              <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+              <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+              <OID>7a10d012a1de51000851cac97a977dbb</OID>
+              <objectVersion>1</objectVersion>
+              <dto>true</dto>
+              <dtoState reference="../../../../../../../header/dtoState"/>
+            </com.dsc.nana.domain.workflow__definition.TransitionRestriction>
+          </transitionRestrictions>
+          <unitManager>false</unitManager>
+          <unReexecuteType>
+            <wrappedValue class="string">INCLUDE</wrappedValue>
+          </unReexecuteType>
+          <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+          <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+          <OID>7a10d011a1de51000851cac97a977dbb</OID>
+          <objectVersion>1</objectVersion>
+          <dto>true</dto>
+          <dtoState reference="../../../../../header/dtoState"/>
+        </com.dsc.nana.domain.workflow__definition.ActivityDefinition>
+        <com.dsc.nana.domain.workflow__definition.ActivityDefinition>
+          <ableToAskActivityReexecuteType>
+            <value>4</value>
+          </ableToAskActivityReexecuteType>
+          <ableToInvokeRefProcess>false</ableToInvokeRefProcess>
+          <activityType class="com.dsc.nana.domain.workflow_definition.BpmEvent">
+            <eventType>endEvent</eventType>
+            <id>EndEvent_2</id>
+            <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+            <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+            <OID>7a10d014a1de51000851cac97a977dbb</OID>
+            <objectVersion>1</objectVersion>
+            <dto>true</dto>
+            <dtoState reference="../../../../../../header/dtoState"/>
+          </activityType>
+          <addingActivityAuthority>0</addingActivityAuthority>
+          <applyDefaultNoticeContent>true</applyDefaultNoticeContent>
+          <autoDelivery>
+            <value>1</value>
+          </autoDelivery>
+          <allowChangeOnlineRead>
+            <value>1</value>
+          </allowChangeOnlineRead>
+          <automaticPhrase></automaticPhrase>
+          <batchComm>false</batchComm>
+          <batchPerformable>false</batchPerformable>
+          <boundViewInformation>
+            <height>0</height>
+            <width>0</width>
+            <x>0</x>
+            <y>0</y>
+            <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+            <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+            <OID>7a10d015a1de51000851cac97a977dbb</OID>
+            <objectVersion>1</objectVersion>
+            <dto>true</dto>
+            <dtoState reference="../../../../../../header/dtoState"/>
+          </boundViewInformation>
+          <bpmnType>EndEvent</bpmnType>
+          <bypassable>true</bypassable>
+          <confirmAttachmentHits>false</confirmAttachmentHits>
+          <confirmComm>false</confirmComm>
+          <container class="com.dsc.nana.domain.workflow_definition.ProcessDefinition" reference="../../.."/>
+          <dealOvertimeActivityType>
+            <value>SEND_NOTIFICATION</value>
+          </dealOvertimeActivityType>
+          <description></description>
+          <disNoticeSend>false</disNoticeSend>
+          <disNoticeSendForSendTask>false</disNoticeSendForSendTask>
+          <disNoticeSendForReexecute>false</disNoticeSendForReexecute>
+          <disNoticeSendForRegainable>false</disNoticeSendForRegainable>
+          <finishMode>
+            <value>AUTOMATIC</value>
+          </finishMode>
+          <finishWorkPercentage>100.0</finishWorkPercentage>
+          <firstNoticeInitiator>false</firstNoticeInitiator>
+          <firstNoticeResponsible>false</firstNoticeResponsible>
+          <firstNoticeUnitManager>false</firstNoticeUnitManager>
+          <id>EndEvent_2</id>
+          <isProcessTemplateActivity>false</isProcessTemplateActivity>
+          <limit>0.0</limit>
+          <multiNotification>true</multiNotification>
+          <multiNotificationIntervalTime>-1</multiNotificationIntervalTime>
+          <multiUserMode>
+            <value>FIREST_GET_FIRST_WIN</value>
+          </multiUserMode>
+          <mustUploadAttachment>false</mustUploadAttachment>
+          <name>Event</name>
+          <noticeAuthority>1</noticeAuthority>
+          <notificationAttachment>false</notificationAttachment>
+          <notificationIntervalTimeUnit reference="../../../header/durationUnit"/>
+          <performType>
+            <value>NORMAL</value>
+          </performType>
+          <printActivity>true</printActivity>
+          <proInsLevel>false</proInsLevel>
+          <reassignableAuthority>3</reassignableAuthority>
+          <reexecuteComm>false</reexecuteComm>
+          <regainable>true</regainable>
+          <requiredToSpecifyOrgUnit>false</requiredToSpecifyOrgUnit>
+          <requiredToTransForm>false</requiredToTransForm>
+          <responsible>false</responsible>
+          <secondNoticeInitiator>false</secondNoticeInitiator>
+          <secondNoticeResponsible>false</secondNoticeResponsible>
+          <secondNoticeUnitManager>false</secondNoticeUnitManager>
+          <secured>false</secured>
+          <startMode>
+            <value>AUTOMATIC</value>
+          </startMode>
+          <straightSignOff>false</straightSignOff>
+          <thirdNoticeInitiator>false</thirdNoticeInitiator>
+          <thirdNoticeResponsible>false</thirdNoticeResponsible>
+          <thirdNoticeUnitManager>false</thirdNoticeUnitManager>
+          <transitionRestrictions>
+            <com.dsc.nana.domain.workflow__definition.TransitionRestriction>
+              <containerOID>7a10d016a1de51000851cac97a977dbb</containerOID>
+              <joinType>
+                <value>AND</value>
+              </joinType>
+              <splitType>
+                <value>AND</value>
+              </splitType>
+              <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+              <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+              <OID>7a10d017a1de51000851cac97a977dbb</OID>
+              <objectVersion>1</objectVersion>
+              <dto>true</dto>
+              <dtoState reference="../../../../../../../header/dtoState"/>
+            </com.dsc.nana.domain.workflow__definition.TransitionRestriction>
+          </transitionRestrictions>
+          <unitManager>false</unitManager>
+          <unReexecuteType>
+            <wrappedValue class="string">INCLUDE</wrappedValue>
+          </unReexecuteType>
+          <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+          <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+          <OID>7a10d016a1de51000851cac97a977dbb</OID>
+          <objectVersion>1</objectVersion>
+          <dto>true</dto>
+          <dtoState reference="../../../../../header/dtoState"/>
+        </com.dsc.nana.domain.workflow__definition.ActivityDefinition>
+        <com.dsc.nana.domain.workflow__definition.ActivityDefinition>
+          <ableToAskActivityReexecuteType>
+            <value>4</value>
+          </ableToAskActivityReexecuteType>
+          <ableToInvokeRefProcess>false</ableToInvokeRefProcess>
+          <activityType class="com.dsc.nana.domain.workflow_definition.Implementation">
+            <implementationTypes>
+              <com.dsc.nana.domain.workflow__definition.Tool>
+                <applicationDefinitionId>FormHandler</applicationDefinitionId>
+                <applicationMode class="com.dsc.nana.domain.workflow_definition.FormOperationDefinition">
+                  <operationType>1</operationType>
+                  <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+                  <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+                  <objectVersion>1</objectVersion>
+                  <dto>true</dto>
+                  <dtoState reference="../../../../../../../../../header/dtoState"/>
+                </applicationMode>
+                <id>178720947842210</id>
+                <index>1</index>
+                <type>
+                  <value>APPLICATION</value>
+                </type>
+                <actualParameters>
+                  <com.dsc.nana.domain.workflow__definition.ActualParameter>
+                    <containerOID>7a10d018a1de51000851cac97a977dbb</containerOID>
+                    <relevantDataDefinitionId>AIDesignTestForm</relevantDataDefinitionId>
+                    <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+                    <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+                    <OID>7a10d019a1de51000851cac97a977dbb</OID>
+                    <objectVersion>1</objectVersion>
+                    <dto>true</dto>
+                    <dtoState reference="../../../../../../../../../../header/dtoState"/>
+                  </com.dsc.nana.domain.workflow__definition.ActualParameter>
+                </actualParameters>
+                <container reference="../../.."/>
+                <containerOID>7a10d01aa1de51000851cac97a977dbb</containerOID>
+                <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+                <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+                <OID>7a10d018a1de51000851cac97a977dbb</OID>
+                <objectVersion>1</objectVersion>
+                <dto>true</dto>
+                <dtoState reference="../../../../../../../../header/dtoState"/>
+              </com.dsc.nana.domain.workflow__definition.Tool>
+            </implementationTypes>
+            <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+            <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+            <OID>7a10d01aa1de51000851cac97a977dbb</OID>
+            <objectVersion>1</objectVersion>
+            <dto>true</dto>
+            <dtoState reference="../../../../../../header/dtoState"/>
+          </activityType>
+          <addingActivityAuthority>0</addingActivityAuthority>
+          <applyDefaultNoticeContent>true</applyDefaultNoticeContent>
+          <autoDelivery>
+            <value>1</value>
+          </autoDelivery>
+          <allowChangeOnlineRead>
+            <value>1</value>
+          </allowChangeOnlineRead>
+          <automaticPhrase></automaticPhrase>
+          <batchComm>false</batchComm>
+          <batchPerformable>false</batchPerformable>
+          <boundViewInformation>
+            <height>0</height>
+            <width>0</width>
+            <x>0</x>
+            <y>0</y>
+            <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+            <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+            <OID>7a10d01ba1de51000851cac97a977dbb</OID>
+            <objectVersion>1</objectVersion>
+            <dto>true</dto>
+            <dtoState reference="../../../../../../header/dtoState"/>
+          </boundViewInformation>
+          <bpmnType>UserTask</bpmnType>
+          <bypassable>true</bypassable>
+          <confirmAttachmentHits>false</confirmAttachmentHits>
+          <confirmComm>false</confirmComm>
+          <container class="com.dsc.nana.domain.workflow_definition.ProcessDefinition" reference="../../.."/>
+          <dealOvertimeActivityType>
+            <value>SEND_NOTIFICATION</value>
+          </dealOvertimeActivityType>
+          <description></description>
+          <disNoticeSend>false</disNoticeSend>
+          <disNoticeSendForSendTask>false</disNoticeSendForSendTask>
+          <disNoticeSendForReexecute>false</disNoticeSendForReexecute>
+          <disNoticeSendForRegainable>false</disNoticeSendForRegainable>
+          <finishMode>
+            <value>AUTOMATIC</value>
+          </finishMode>
+          <finishWorkPercentage>100.0</finishWorkPercentage>
+          <firstNoticeInitiator>false</firstNoticeInitiator>
+          <firstNoticeResponsible>false</firstNoticeResponsible>
+          <firstNoticeUnitManager>false</firstNoticeUnitManager>
+          <formFieldAccessDefinition>
+            <formFieldAccessControl>&lt;FormFieldAccessControl&gt;&lt;AIDesignTestForm&gt;&lt;RemarkDialogInputMulti&gt;ENABLED&lt;/RemarkDialogInputMulti&gt;&lt;UrgencyRadio&gt;ENABLED&lt;/UrgencyRadio&gt;&lt;SignHandWriting&gt;ENABLED&lt;/SignHandWriting&gt;&lt;Attachment&gt;ENABLED&lt;/Attachment&gt;&lt;/AIDesignTestForm&gt;&lt;/FormFieldAccessControl&gt;</formFieldAccessControl>
+            <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+            <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+            <OID>7a10d01ca1de51000851cac97a977dbb</OID>
+            <objectVersion>1</objectVersion>
+            <dto>true</dto>
+            <dtoState reference="../../../../../../header/dtoState"/>
+          </formFieldAccessDefinition>
+          <id>ManagerUserTask</id>
+          <isProcessTemplateActivity>false</isProcessTemplateActivity>
+          <limit>0.0</limit>
+          <multiNotification>false</multiNotification>
+          <multiNotificationIntervalTime>-1</multiNotificationIntervalTime>
+          <multiUserMode>
+            <value>FIREST_GET_FIRST_WIN</value>
+          </multiUserMode>
+          <mustUploadAttachment>false</mustUploadAttachment>
+          <name>直屬主管</name>
+          <noticeAuthority>1</noticeAuthority>
+          <notificationAttachment>false</notificationAttachment>
+          <notificationIntervalTimeUnit reference="../../../header/durationUnit"/>
+          <performerIds>PAR17872072291573</performerIds>
+          <performType>
+            <value>NORMAL</value>
+          </performType>
+          <printActivity>true</printActivity>
+          <proInsLevel>false</proInsLevel>
+          <reassignableAuthority>3</reassignableAuthority>
+          <reexecuteComm>false</reexecuteComm>
+          <regainable>true</regainable>
+          <requiredToSpecifyOrgUnit>false</requiredToSpecifyOrgUnit>
+          <requiredToTransForm>false</requiredToTransForm>
+          <responsible>false</responsible>
+          <secondNoticeInitiator>false</secondNoticeInitiator>
+          <secondNoticeResponsible>false</secondNoticeResponsible>
+          <secondNoticeUnitManager>false</secondNoticeUnitManager>
+          <secured>false</secured>
+          <startMode>
+            <value>AUTOMATIC</value>
+          </startMode>
+          <straightSignOff>false</straightSignOff>
+          <thirdNoticeInitiator>false</thirdNoticeInitiator>
+          <thirdNoticeResponsible>false</thirdNoticeResponsible>
+          <thirdNoticeUnitManager>false</thirdNoticeUnitManager>
+          <transitionRestrictions>
+            <com.dsc.nana.domain.workflow__definition.TransitionRestriction>
+              <containerOID>7a10d01da1de51000851cac97a977dbb</containerOID>
+              <joinType>
+                <value>AND</value>
+              </joinType>
+              <splitType>
+                <value>AND</value>
+              </splitType>
+              <transitionReferences>
+                <com.dsc.nana.domain.workflow__definition.TransitionReference>
+                  <containerOID>7a10d01ea1de51000851cac97a977dbb</containerOID>
+                  <transitionDefinitionId>Link_11</transitionDefinitionId>
+                  <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+                  <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+                  <OID>7a10d01fa1de51000851cac97a977dbb</OID>
+                  <objectVersion>1</objectVersion>
+                  <dto>true</dto>
+                  <dtoState reference="../../../../../../../../../header/dtoState"/>
+                </com.dsc.nana.domain.workflow__definition.TransitionReference>
+              </transitionReferences>
+              <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+              <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+              <OID>7a10d01ea1de51000851cac97a977dbb</OID>
+              <objectVersion>1</objectVersion>
+              <dto>true</dto>
+              <dtoState reference="../../../../../../../header/dtoState"/>
+            </com.dsc.nana.domain.workflow__definition.TransitionRestriction>
+          </transitionRestrictions>
+          <unitManager>false</unitManager>
+          <unReexecuteType>
+            <wrappedValue class="string">INCLUDE</wrappedValue>
+          </unReexecuteType>
+          <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+          <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+          <OID>7a10d01da1de51000851cac97a977dbb</OID>
+          <objectVersion>1</objectVersion>
+          <dto>true</dto>
+          <dtoState reference="../../../../../header/dtoState"/>
+        </com.dsc.nana.domain.workflow__definition.ActivityDefinition>
+        <com.dsc.nana.domain.workflow__definition.ActivityDefinition>
+          <ableToAskActivityReexecuteType>
+            <value>4</value>
+          </ableToAskActivityReexecuteType>
+          <ableToInvokeRefProcess>false</ableToInvokeRefProcess>
+          <activityType class="com.dsc.nana.domain.workflow_definition.Implementation">
+            <implementationTypes>
+              <com.dsc.nana.domain.workflow__definition.Tool>
+                <applicationDefinitionId>FormHandler</applicationDefinitionId>
+                <applicationMode class="com.dsc.nana.domain.workflow_definition.FormOperationDefinition">
+                  <operationType>1</operationType>
+                  <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+                  <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+                  <objectVersion>1</objectVersion>
+                  <dto>true</dto>
+                  <dtoState reference="../../../../../../../../../header/dtoState"/>
+                </applicationMode>
+                <id>17872094714429</id>
+                <index>1</index>
+                <type>
+                  <value>APPLICATION</value>
+                </type>
+                <actualParameters>
+                  <com.dsc.nana.domain.workflow__definition.ActualParameter>
+                    <containerOID>7a10d020a1de51000851cac97a977dbb</containerOID>
+                    <relevantDataDefinitionId>AIDesignTestForm</relevantDataDefinitionId>
+                    <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+                    <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+                    <OID>7a10d021a1de51000851cac97a977dbb</OID>
+                    <objectVersion>1</objectVersion>
+                    <dto>true</dto>
+                    <dtoState reference="../../../../../../../../../../header/dtoState"/>
+                  </com.dsc.nana.domain.workflow__definition.ActualParameter>
+                </actualParameters>
+                <container reference="../../.."/>
+                <containerOID>7a10d022a1de51000851cac97a977dbb</containerOID>
+                <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+                <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+                <OID>7a10d020a1de51000851cac97a977dbb</OID>
+                <objectVersion>1</objectVersion>
+                <dto>true</dto>
+                <dtoState reference="../../../../../../../../header/dtoState"/>
+              </com.dsc.nana.domain.workflow__definition.Tool>
+            </implementationTypes>
+            <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+            <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+            <OID>7a10d022a1de51000851cac97a977dbb</OID>
+            <objectVersion>1</objectVersion>
+            <dto>true</dto>
+            <dtoState reference="../../../../../../header/dtoState"/>
+          </activityType>
+          <addingActivityAuthority>0</addingActivityAuthority>
+          <applyDefaultNoticeContent>true</applyDefaultNoticeContent>
+          <autoDelivery>
+            <value>1</value>
+          </autoDelivery>
+          <allowChangeOnlineRead>
+            <value>1</value>
+          </allowChangeOnlineRead>
+          <automaticPhrase></automaticPhrase>
+          <batchComm>false</batchComm>
+          <batchPerformable>false</batchPerformable>
+          <boundViewInformation>
+            <height>0</height>
+            <width>0</width>
+            <x>0</x>
+            <y>0</y>
+            <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+            <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+            <OID>7a10d023a1de51000851cac97a977dbb</OID>
+            <objectVersion>1</objectVersion>
+            <dto>true</dto>
+            <dtoState reference="../../../../../../header/dtoState"/>
+          </boundViewInformation>
+          <bpmnType>UserTask</bpmnType>
+          <bypassable>true</bypassable>
+          <confirmAttachmentHits>false</confirmAttachmentHits>
+          <confirmComm>false</confirmComm>
+          <container class="com.dsc.nana.domain.workflow_definition.ProcessDefinition" reference="../../.."/>
+          <dealOvertimeActivityType>
+            <value>SEND_NOTIFICATION</value>
+          </dealOvertimeActivityType>
+          <description></description>
+          <disNoticeSend>false</disNoticeSend>
+          <disNoticeSendForSendTask>false</disNoticeSendForSendTask>
+          <disNoticeSendForReexecute>false</disNoticeSendForReexecute>
+          <disNoticeSendForRegainable>false</disNoticeSendForRegainable>
+          <finishMode>
+            <value>AUTOMATIC</value>
+          </finishMode>
+          <finishWorkPercentage>100.0</finishWorkPercentage>
+          <firstNoticeInitiator>false</firstNoticeInitiator>
+          <firstNoticeResponsible>false</firstNoticeResponsible>
+          <firstNoticeUnitManager>false</firstNoticeUnitManager>
+          <formFieldAccessDefinition>
+            <formFieldAccessControl>&lt;FormFieldAccessControl&gt;&lt;AIDesignTestForm&gt;&lt;processInstOIDHidden&gt;ENABLED&lt;/processInstOIDHidden&gt;&lt;SerialNumber&gt;ENABLED&lt;/SerialNumber&gt;&lt;SubjectTextBox&gt;ENABLED&lt;/SubjectTextBox&gt;&lt;ContentTextArea&gt;ENABLED&lt;/ContentTextArea&gt;&lt;EmpDialogInputLabel&gt;ENABLED&lt;/EmpDialogInputLabel&gt;&lt;DeptDoubleTextBox&gt;ENABLED&lt;/DeptDoubleTextBox&gt;&lt;RelatedNoDialogInput&gt;ENABLED&lt;/RelatedNoDialogInput&gt;&lt;RemarkDialogInputMulti&gt;ENABLED&lt;/RemarkDialogInputMulti&gt;&lt;UrgencyRadio&gt;ENABLED&lt;/UrgencyRadio&gt;&lt;NotifyCheckBox&gt;ENABLED&lt;/NotifyCheckBox&gt;&lt;CategoryDropDown&gt;ENABLED&lt;/CategoryDropDown&gt;&lt;SiteListBox&gt;ENABLED&lt;/SiteListBox&gt;&lt;NeedDate&gt;ENABLED&lt;/NeedDate&gt;&lt;NeedTime&gt;ENABLED&lt;/NeedTime&gt;&lt;ItemGrid&gt;ENABLED&lt;/ItemGrid&gt;&lt;ItemNoTextBox&gt;ENABLED&lt;/ItemNoTextBox&gt;&lt;ItemNameTextBox&gt;ENABLED&lt;/ItemNameTextBox&gt;&lt;ItemQtyTextBox&gt;ENABLED&lt;/ItemQtyTextBox&gt;&lt;Attachment&gt;ENABLED&lt;/Attachment&gt;&lt;SubTab22&gt;ENABLED&lt;/SubTab22&gt;&lt;PasswordTextBox&gt;ENABLED&lt;/PasswordTextBox&gt;&lt;RefLink&gt;ENABLED&lt;/RefLink&gt;&lt;LogoImage&gt;ENABLED&lt;/LogoImage&gt;&lt;FormBarcode&gt;ENABLED&lt;/FormBarcode&gt;&lt;FormQRCode&gt;ENABLED&lt;/FormQRCode&gt;&lt;SignHandWriting&gt;ENABLED&lt;/SignHandWriting&gt;&lt;UploadFileButton&gt;ENABLED&lt;/UploadFileButton&gt;&lt;PickUserButton&gt;ENABLED&lt;/PickUserButton&gt;&lt;/AIDesignTestForm&gt;&lt;/FormFieldAccessControl&gt;</formFieldAccessControl>
+            <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+            <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+            <OID>7a10d024a1de51000851cac97a977dbb</OID>
+            <objectVersion>1</objectVersion>
+            <dto>true</dto>
+            <dtoState reference="../../../../../../header/dtoState"/>
+          </formFieldAccessDefinition>
+          <id>ApplyUserTask</id>
+          <isProcessTemplateActivity>false</isProcessTemplateActivity>
+          <limit>0.0</limit>
+          <multiNotification>false</multiNotification>
+          <multiNotificationIntervalTime>-1</multiNotificationIntervalTime>
+          <multiUserMode>
+            <value>FIREST_GET_FIRST_WIN</value>
+          </multiUserMode>
+          <mustUploadAttachment>false</mustUploadAttachment>
+          <name>開單人</name>
+          <noticeAuthority>1</noticeAuthority>
+          <notificationAttachment>false</notificationAttachment>
+          <notificationIntervalTimeUnit reference="../../../header/durationUnit"/>
+          <performerIds>PAR17872072291572</performerIds>
+          <performType>
+            <value>NORMAL</value>
+          </performType>
+          <printActivity>true</printActivity>
+          <proInsLevel>false</proInsLevel>
+          <reassignableAuthority>3</reassignableAuthority>
+          <reexecuteComm>false</reexecuteComm>
+          <regainable>true</regainable>
+          <requiredToSpecifyOrgUnit>false</requiredToSpecifyOrgUnit>
+          <requiredToTransForm>false</requiredToTransForm>
+          <responsible>false</responsible>
+          <secondNoticeInitiator>false</secondNoticeInitiator>
+          <secondNoticeResponsible>false</secondNoticeResponsible>
+          <secondNoticeUnitManager>false</secondNoticeUnitManager>
+          <secured>false</secured>
+          <startMode>
+            <value>AUTOMATIC</value>
+          </startMode>
+          <straightSignOff>false</straightSignOff>
+          <thirdNoticeInitiator>false</thirdNoticeInitiator>
+          <thirdNoticeResponsible>false</thirdNoticeResponsible>
+          <thirdNoticeUnitManager>false</thirdNoticeUnitManager>
+          <transitionRestrictions>
+            <com.dsc.nana.domain.workflow__definition.TransitionRestriction>
+              <containerOID>7a10d025a1de51000851cac97a977dbb</containerOID>
+              <joinType>
+                <value>AND</value>
+              </joinType>
+              <splitType>
+                <value>AND</value>
+              </splitType>
+              <transitionReferences>
+                <com.dsc.nana.domain.workflow__definition.TransitionReference>
+                  <containerOID>7a10d026a1de51000851cac97a977dbb</containerOID>
+                  <transitionDefinitionId>Link_6</transitionDefinitionId>
+                  <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+                  <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+                  <OID>7a10d027a1de51000851cac97a977dbb</OID>
+                  <objectVersion>1</objectVersion>
+                  <dto>true</dto>
+                  <dtoState reference="../../../../../../../../../header/dtoState"/>
+                </com.dsc.nana.domain.workflow__definition.TransitionReference>
+              </transitionReferences>
+              <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+              <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+              <OID>7a10d026a1de51000851cac97a977dbb</OID>
+              <objectVersion>1</objectVersion>
+              <dto>true</dto>
+              <dtoState reference="../../../../../../../header/dtoState"/>
+            </com.dsc.nana.domain.workflow__definition.TransitionRestriction>
+          </transitionRestrictions>
+          <unitManager>false</unitManager>
+          <unReexecuteType>
+            <wrappedValue class="string">INCLUDE</wrappedValue>
+          </unReexecuteType>
+          <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+          <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+          <OID>7a10d025a1de51000851cac97a977dbb</OID>
+          <objectVersion>1</objectVersion>
+          <dto>true</dto>
+          <dtoState reference="../../../../../header/dtoState"/>
+        </com.dsc.nana.domain.workflow__definition.ActivityDefinition>
+      </activityDefinitions>
+      <transitionDefinitions>
+        <com.dsc.nana.domain.workflow__definition.TransitionDefinition>
+          <container class="com.dsc.nana.domain.workflow_definition.ProcessDefinition" reference="../../.."/>
+          <fromActivityDefinitionId>ManagerUserTask</fromActivityDefinitionId>
+          <id>Link_11</id>
+          <name></name>
+          <toActivityDefinitionId>EndEvent_2</toActivityDefinitionId>
+          <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+          <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+          <OID>7a10d028a1de51000851cac97a977dbb</OID>
+          <objectVersion>1</objectVersion>
+          <dto>true</dto>
+          <dtoState reference="../../../../../header/dtoState"/>
+        </com.dsc.nana.domain.workflow__definition.TransitionDefinition>
+        <com.dsc.nana.domain.workflow__definition.TransitionDefinition>
+          <container class="com.dsc.nana.domain.workflow_definition.ProcessDefinition" reference="../../.."/>
+          <fromActivityDefinitionId>StartEvent_1</fromActivityDefinitionId>
+          <id>Link_5</id>
+          <name></name>
+          <toActivityDefinitionId>ApplyUserTask</toActivityDefinitionId>
+          <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+          <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+          <OID>7a10d029a1de51000851cac97a977dbb</OID>
+          <objectVersion>1</objectVersion>
+          <dto>true</dto>
+          <dtoState reference="../../../../../header/dtoState"/>
+        </com.dsc.nana.domain.workflow__definition.TransitionDefinition>
+        <com.dsc.nana.domain.workflow__definition.TransitionDefinition>
+          <container class="com.dsc.nana.domain.workflow_definition.ProcessDefinition" reference="../../.."/>
+          <fromActivityDefinitionId>ApplyUserTask</fromActivityDefinitionId>
+          <id>Link_6</id>
+          <name></name>
+          <toActivityDefinitionId>ManagerUserTask</toActivityDefinitionId>
+          <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+          <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+          <OID>7a10d02aa1de51000851cac97a977dbb</OID>
+          <objectVersion>1</objectVersion>
+          <dto>true</dto>
+          <dtoState reference="../../../../../header/dtoState"/>
+        </com.dsc.nana.domain.workflow__definition.TransitionDefinition>
+      </transitionDefinitions>
+      <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+      <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+      <OID>7a10d004a1de51000851cac97a977dbb</OID>
+      <objectVersion>1</objectVersion>
+      <dto>true</dto>
+      <dtoState reference="../../../header/dtoState"/>
+    </com.dsc.nana.domain.workflow__definition.ProcessDefinition>
+  </processDefinitions>
+  <processModel>BPMN</processModel>
+  <redefinableHeader>
+    <authorName>administrator 系統管理員</authorName>
+    <codePage>中文 zh (zho)</codePage>
+    <countryKey>台灣 TW (TWN)</countryKey>
+    <publicationStatus reference="../../processDefinitions/com.dsc.nana.domain.workflow_definition.ProcessDefinition/redefinableHeader/publicationStatus"/>
+    <version>3</version>
+    <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+    <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+    <OID>7a10d02ba1de51000851cac97a977dbb</OID>
+    <objectVersion>1</objectVersion>
+    <dto>true</dto>
+    <dtoState reference="../../header/dtoState"/>
+  </redefinableHeader>
+  <subjectTemplet></subjectTemplet>
+  <userDefineMode>
+    <value>FORBID_DEFINE</value>
+  </userDefineMode>
+  <userInputSubject>
+    <value>1</value>
+  </userInputSubject>
+  <SET__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.SetProxy</SET__PROXY__CLASS__NAME>
+  <LIST__PROXY__CLASS__NAME>org.apache.ojb.broker.accesslayer.ListProxy</LIST__PROXY__CLASS__NAME>
+  <OID>7a10d02ca1de51000851cac97a977dbb</OID>
+  <objectVersion>1</objectVersion>
+  <dto>true</dto>
+  <dtoState reference="../header/dtoState"/>
+</com.dsc.nana.domain.workflow__definition.ProcessPackage>

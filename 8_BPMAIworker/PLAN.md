@@ -60,6 +60,7 @@
 
 | 樣板 | 來源 | 用途 |
 |:---|:---|:---|
+| **空白專案骨架** | `templates/原始空白專案/`（設計器直接匯出） | **新專案的預設基底**，見 [templates/README.md](templates/README.md) |
 | 27 種元件片段 | `samples/快速開發測試/表單/原檔案-quickDevTestForm.form` | 每種元件型別各切一份，這支檔正好一種一個 |
 | 表單骨架 | 同上（去掉 `elementDefinitions` 內容） | 檔頭與尾端固定區 |
 | 7 種關卡片段 | `samples/快速開發測試/流程/原檔案-測試快速開發.bpmn` | UserTask／SendTask／ManualTask／DecisionRuleTask／Start／End／Gateway |
@@ -75,7 +76,8 @@
 
 | 期別 | 產出 | 完成判準 |
 |:---|:---|:---|
-| **M0**（目前） | 五份手冊 + 本計畫 | 人能照文件手工重現一次產生流程 |
+| **M0** ✅ | 五份手冊 + 本計畫 | 人能照文件手工重現一次產生流程 |
+| **M0.5**（目前） | `templates/` 空白基底 + `tools/` 六支工具 | 一行指令複製出新專案，靜態檢查全過；`samples/AI設計的流程測試/` 為第一個實測件 |
 | **M1** | `templates/` 切出、`ir/` schema 落地 | 用兩支 sample 反推出 IR，再由 IR 組回去，位元組不變 |
 | **M2** | `form_builder` | 從 IR 產生新表單，通過 L1；人工匯入通過 L2 |
 | **M3** | `bpmn_builder` | 從 IR 產生新流程（含權限），通過 L1、L2 |
