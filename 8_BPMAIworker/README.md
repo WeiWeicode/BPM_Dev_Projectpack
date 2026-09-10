@@ -1,8 +1,9 @@
 # 8_BPMAIworker —— AI 產生鼎新 BPM 表單與流程
 
 > 狀態：規格文件 + 第一組可執行的組裝工具。
-> 已產出第一個實測用專案 `samples/AI設計的流程測試/`
-> （靜態檢查與反解對比全過，**尚未匯入鼎新設計師實測**）。
+> 第一個實測用專案 `samples/AI設計的流程測試/` 靜態檢查與反解對比全過，
+> 並於 2026-09-09 以地端方式匯入鼎新設計器、完整跑過一次流程（L2＋L3 首次通過）。
+> 詳見 [PLAN.md 第 1 節](PLAN.md)。
 
 ---
 
@@ -60,6 +61,7 @@ AI 決定「有哪些欄位、叫什麼、在第幾列、哪個關卡看得到�
 | 改既有檔案的元件 ID、關卡 ID | ① `1_xml_tool` |
 | 視覺化調既有檔案的欄位權限 | ② `2_web_builder` |
 | 查線上已有哪些表單／流程可參考 | ③ `3_db_explorer` |
+| 把線上某支流程連同表單與 JS 整包抓下來當範本 | **⑧ `tools/fetch_online.py`**（唯讀，見 [docs/線上抓取手冊.md](docs/線上抓取手冊.md)） |
 | 產出後拿去測試區實際開單驗證 | ⑤ `5_ws_explorer`（**只打 191 測試區**） |
 
 ⑧ 會**直接沿用** `1_xml_tool/core/` 的解析核心來做產出物的自我驗證
@@ -79,6 +81,7 @@ AI 決定「有哪些欄位、叫什麼、在第幾列、哪個關卡看得到�
     ├── 表單生成手冊.md            .form 的骨架、元件型別、版面、編號規則
     ├── 流程生成手冊.md            .bpmn 的骨架、關卡、連線、權限、OID 規則
     ├── 表單腳本手冊.md            .js 的生命週期、全域變數、可用資源與禁忌
+    ├── 線上抓取手冊.md            ★ 從線上抓既有流程當範本的提示詞、指令與邊界
     └── 驗證與驗收.md              五層驗證管線與驗收標準
 ├── templates/                   ★ 新專案的基底
 │   ├── README.md                範本清冊：裡面有什麼、缺什麼、複製時換掉哪幾格
@@ -90,6 +93,9 @@ AI 決定「有哪些欄位、叫什麼、在第幾列、哪個關卡看得到�
 │   ├── set_permissions.py       ★ 把關卡欄位權限寫進 .bpmn（可插入不存在的節點）
 │   ├── build_form.py            以教材表單為底組出新的 .form
 │   ├── build_bpmn.py            以教材流程為底組出新的 .bpmn
+│   ├── fetch_online.py          ★ 從線上抓既有流程／表單／表單 JavaScript 當範本
+│   ├── rename_ids.py            ★ 改表單／流程代號，讓匯入時不覆蓋既有定義
+│   ├── build_from_online.py     ★ 用空白範本把線上舊表單重建成響應式新專案
 │   └── verify.py                靜態檢查 + 用 1_xml_tool 反解對比
 （以下為 M2 之後才會出現）
 ├── ir/                          IR 的 JSON Schema 與範例
@@ -102,6 +108,7 @@ AI 決定「有哪些欄位、叫什麼、在第幾列、哪個關卡看得到�
 |:---|:---|:---|
 | **從空白範本長出來** | 要做一支全新的流程 | `tools/new_project.py` → `tools/set_permissions.py` |
 | **改造既有的教材檔** | 要一次拿到很多現成元件（表單元件庫） | `tools/build_form.py` / `tools/build_bpmn.py` |
+| **照著線上既有流程做** | 要仿造一支已經在跑的流程 | `tools/fetch_online.py` 抓下來，再 `tools/build_from_online.py` 重建 |
 
 空白範本的流程剛好就是 `開單人 → 直屬主管 → 結案`，
 執行者也已經是 `PROCESS_REQUESTER` / `MANAGER`，所以新流程不必自己編執行者型別。
@@ -117,6 +124,9 @@ AI 決定「有哪些欄位、叫什麼、在第幾列、哪個關卡看得到�
 | 刪關卡並改接連線 | 連同執行者、連線、流程圖節點一起處理 |
 | 重配 OID | 全檔換成本專案自己的一組，避免與線上定義撞號 |
 | 插入欄位權限 | 關卡只有 `formFieldAccessDefinition`、沒有 `formFieldAccessControl` 時，直接插一個進去 |
+| 線上抓取 | 唯讀抓一支流程的關卡、連線、執行者、表單欄位、表單 JavaScript，並盤點腳本舊寫法 |
+| 改代號 | 一次改完 `.form` / `.bpmn` 內所有表單與流程代號（含逃脫過的欄位權限與主旨範本），並重配 OID |
+| 絕對位置 → 響應式 | 以空白範本為骨架、教材檔為元件字典，把線上舊表單的欄位、選項、版面分組與 JavaScript 重建成響應式表單，並自動反解對比（L1） |
 | 靜態檢查 | 連號、參照、版面一致性、圖形與關卡一致性、權限欄位是否真的存在 |
 
 ```bash
@@ -125,6 +135,18 @@ python 8_BPMAIworker/tools/new_project.py --name 採購申請單 --form-id Purch
 
 ```bash
 python 8_BPMAIworker/tools/verify.py
+```
+
+```bash
+python 8_BPMAIworker/tools/fetch_online.py --process SIC005 --host 190
+```
+
+```bash
+python 8_BPMAIworker/tools/rename_ids.py --form <檔案.form> --form-id 舊代號=新代號 --out <輸出目錄>
+```
+
+```bash
+python 8_BPMAIworker/tools/build_from_online.py --source <抓取產出目錄> --form-id 新表單代號 --process-id 新流程代號 --name 中文名 --out <輸出目錄>
 ```
 
 ---
@@ -138,6 +160,7 @@ python 8_BPMAIworker/tools/verify.py
 | [docs/表單生成手冊.md](docs/表單生成手冊.md) | 要動 `.form` 結構時 |
 | [docs/流程生成手冊.md](docs/流程生成手冊.md) | 要動 `.bpmn` 結構時 |
 | [docs/表單腳本手冊.md](docs/表單腳本手冊.md) | 要產生表單 JavaScript 時 |
+| [docs/線上抓取手冊.md](docs/線上抓取手冊.md) | 要照著線上既有流程仿造時（含提示詞與唯讀邊界） |
 | [docs/驗證與驗收.md](docs/驗證與驗收.md) | 產出後要確認能不能用時 |
 
 上層規範一律以 [AGENTS.md](../AGENTS.md) 為準，本目錄不重複。

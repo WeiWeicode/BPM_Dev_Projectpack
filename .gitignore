@@ -8,6 +8,9 @@
 
 # 從資料庫撈下來的產出
 /3_db_explorer/out/
+
+# 8_BPMAIworker 從線上抓下來的流程與表單原檔（含正式區實際資料）
+/8_BPMAIworker/out/
 /3_db_explorer/docs/schema/*.json
 
 __pycache__/

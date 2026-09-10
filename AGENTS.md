@@ -313,9 +313,12 @@
 
 ### 8.2 190 正式區資料庫的唯讀查詢
 
-稽核調閱需要正式區的實際單據，故 `4_db_viewer` 與 `7_proc_export` 可以連
-190 正式區資料庫，**但只限 SELECT**：一樣經由 `bpm_kb.db.Database`
+稽核調閱需要正式區的實際單據，故 `4_db_viewer` 與 `7_proc_export`、
+以及 `8_BPMAIworker/tools/fetch_online.py`（仿造線上流程時要抓範本）
+可以連 190 正式區資料庫，**但只限 SELECT**：一樣經由 `bpm_kb.db.Database`
 （`readonly=True`），一樣參數化，INSERT / UPDATE / DELETE / DDL 依舊完全禁止。
+`fetch_online.py` 抓下來的內容是正式區實際資料，只能落在
+`8_BPMAIworker/out/`（已列入 `.gitignore`），不得複製進版控。
 
 這條**只放寬資料庫**。SOAP API 對 190 的禁令不變（見 8.1）——
 API 呼叫會真的開單、簽核、作廢，跟唯讀查詢是兩回事。
