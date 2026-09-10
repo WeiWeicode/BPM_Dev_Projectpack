@@ -4,7 +4,7 @@
 **改造既有檔案 → 設定權限 → 理解線上現況 → 隨時查閱與快速調整**，
 外加 ⑤ `5_ws_explorer`（SOAP API 擷取與實測工作台）、⑥ `6_todo_viewer`（個人待辦與單據查詢器）
 與 ⑦ `7_proc_export`（流程與表單匯出，供稽核調閱）、
-⑧ `8_BPMAIworker`（AI 產生新表單與新流程，**規劃中，目前只有文件**）；
+⑧ `8_BPMAIworker`（AI 產生新表單與新流程，**組裝工具可跑，尚未匯入設計師實測**）；
 以及 `BPM5892`（鼎新原廠 WildFly 核心程式的深層架構解構、Struts 路由、DWR 服務與 ERP 整合知識庫）。
 
 > **資料庫預設一律唯讀。** 全工具集只有一個地方會寫資料庫
@@ -78,14 +78,23 @@ BPM快速開發/
 │   │   └── app/excel.py       ★ 清單／內容／明細／簽核名單寫成同一個 Excel
 │   └── frontend/              Vue 3 + Vite（流程清單 + 查詢 + 欄位挑選抽屜 + 明細面板）
 │
-├── 8_BPMAIworker/         ⑧ AI 產生表單與流程（規劃中，目前只有文件）
+├── 8_BPMAIworker/         ⑧ AI 產生表單與流程（工具可跑，L2／L3 待人工實測）
 │   ├── README.md              定位、與 ①～⑦ 的分工、為何 AI 不直接寫 XML
 │   ├── PLAN.md                管線、模組切分、里程碑與未驗證項目
+│   ├── templates/             設計師匯出的空白專案，新專案一律從這裡複製
+│   ├── tools/                 ★ 組裝工具（Python，零第三方依賴）
+│   │   ├── new_project.py       從空白範本複製出新專案
+│   │   ├── fetch_online.py      唯讀抓線上流程／表單／腳本當範本
+│   │   ├── build_from_online.py 把線上舊表單重建成響應式新專案
+│   │   ├── build_from_spec.py   ★ 由 AI 寫的 IR 直接組出 .form / .js / .bpmn
+│   │   └── verify.py            靜態檢查 + 用 1_xml_tool 反解對比
 │   └── docs/
 │       ├── AI產生規格_IR.md    ★ AI 唯一的輸出格式（意圖規格 JSON）
 │       ├── 表單生成手冊.md      .form 骨架、元件型別、版面與 XStream 編號規則
 │       ├── 流程生成手冊.md      .bpmn 骨架、關卡、連線、權限逃脫與 OID 規則
 │       ├── 表單腳本手冊.md      .js 生命週期、全域變數、可用資源與禁忌
+│       ├── 線上抓取手冊.md      ★ 照著線上既有流程仿造的提示詞與唯讀邊界
+│       ├── 從需求生成手冊.md    ★ 只有一張圖或一份欄位清單時的提示詞與命名規則
 │       └── 驗證與驗收.md        五層驗證管線與各里程碑的驗收標準
 │
 └── BPM5892/                 鼎新原廠系統核心與解構知識庫
@@ -278,12 +287,19 @@ python -m uvicorn app.main:app --port 8002
 
 ---
 
-## ⑧ 8_BPMAIworker —— AI 產生表單與流程（規劃中）
+## ⑧ 8_BPMAIworker —— AI 產生表單與流程
 
 ①～⑦ 都是在既有檔案或既有線上資料上工作。唯獨「從一句需求做出一張新表單與一支新流程」
 仍是純手工。⑧ 要把這段自動化：**需求描述 → AI → 可匯入設計師的 `.form` + `.bpmn` + `.js`**。
 
-**目前狀態：只有五份規格文件，尚無程式碼。**
+**目前狀態：三條產出路線的組裝工具都能跑，L1（反解對比）全過；
+L2（匯入設計師）與 L3（實跑一張單）仍須人工，其中「從需求生成」這條尚未有人匯過。**
+
+| 路線 | 手上有什麼 | 入口 |
+|:---|:---|:---|
+| 從空白範本長出來 | 只要一個空殼 | `tools/new_project.py` |
+| 照著線上既有流程做 | 線上有一支可以照抄 | `tools/fetch_online.py` → `tools/build_from_online.py` |
+| 從需求生成 | 一張截圖／一份欄位清單 | AI 寫 IR → `tools/build_from_spec.py` |
 
 核心設計決定是 **AI 不直接產生 XML**，只產生一份「意圖規格（IR）」JSON，
 再由確定性組裝器套樣板產出檔案。理由是三個實測出來的硬限制：
@@ -296,7 +312,9 @@ python -m uvicorn app.main:app --port 8002
 產出物要驗證時用 ⑤ 對 **191 測試區**；190 正式區一律不碰。
 
 詳見 [8_BPMAIworker/README.md](8_BPMAIworker/README.md) 與
-[PLAN.md](8_BPMAIworker/PLAN.md)。
+[PLAN.md](8_BPMAIworker/PLAN.md)；兩條需要 AI 參與的路線各有一份提示詞手冊：
+[線上抓取手冊](8_BPMAIworker/docs/線上抓取手冊.md)、
+[從需求生成手冊](8_BPMAIworker/docs/從需求生成手冊.md)。
 
 ---
 

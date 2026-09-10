@@ -5,6 +5,8 @@
 > 二次逃脫 XML 這三件事，LLM 逐字生成必然出錯且錯了不報錯。
 
 IR 是「人講的需求」與「鼎新的檔案格式」之間唯一的介面。
+寫好之後交給 [`tools/build_from_spec.py`](../tools/build_from_spec.py) 組裝，
+怎麼從一張圖走到這份 IR 見 [從需求生成手冊.md](從需求生成手冊.md)。
 它刻意只描述**業務意圖**，不描述樣式、座標、色彩、OID 與任何樣板值。
 
 ---
@@ -181,9 +183,15 @@ IR 是「人講的需求」與「鼎新的檔案格式」之間唯一的介面�
 | `LINK` / `BARCODE` / `QRCODE` / `HANDWRITING` | 各自的 ElementDefinition | 連結／條碼／QR／手寫 |
 | `DIALOGINPUT` / `DIALOGINPUTLABEL` / `DIALOGINPUTMULTI` / `DOUBLETEXT` | 對話輸入系列 | 按鈕＋輸入框的組合元件 |
 
-> ⚠️ `快速開發測試` 的 JSON 裡有兩處型別看起來像對調（`CheckBox16` → `SELECT`、
-> `ListBox18` → `DROPDOWN`）。那是 `controlType` 的實際值造成的，不是筆誤；
-> 產生時以本表為準，並在 M1 的往返測試中確認。
+> **2026-09-10 實測更正**：直接讀教材檔的 `controlType`，值是
+> `CheckBox16` → `SELECT_CHECK_TYPE`、`Dropdown17` → `SELECT_COMBO_TYPE`、
+> `ListBox18` → `SELECT_LIST_TYPE`，三者各自對應，沒有對調。
+> `build_from_spec.py` 依此把 `DROPDOWN` / `SELECT` 一律當下拉（`SELECT_COMBO_TYPE`），
+> 列表另立 `LISTBOX`（`SELECT_LIST_TYPE`）—— 完整對照見
+> [從需求生成手冊.md 第 5 節](從需求生成手冊.md#5-支援的元件型別)。
+>
+> ⚠️ `LIST`（表格明細）與 `SUBTAB`（分頁）**`build_from_spec.py` 目前產不出來**，
+> 會直接擋下來說明原因；要明細請走 `build_form.py` 或匯入後在設計師補。
 
 ---
 

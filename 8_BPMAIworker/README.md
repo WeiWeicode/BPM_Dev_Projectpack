@@ -82,6 +82,7 @@ AI 決定「有哪些欄位、叫什麼、在第幾列、哪個關卡看得到�
     ├── 流程生成手冊.md            .bpmn 的骨架、關卡、連線、權限、OID 規則
     ├── 表單腳本手冊.md            .js 的生命週期、全域變數、可用資源與禁忌
     ├── 線上抓取手冊.md            ★ 從線上抓既有流程當範本的提示詞、指令與邊界
+    ├── 從需求生成手冊.md          ★ 給一張圖或一份欄位清單就做出表單與流程的提示詞
     └── 驗證與驗收.md              五層驗證管線與驗收標準
 ├── templates/                   ★ 新專案的基底
 │   ├── README.md                範本清冊：裡面有什麼、缺什麼、複製時換掉哪幾格
@@ -96,19 +97,21 @@ AI 決定「有哪些欄位、叫什麼、在第幾列、哪個關卡看得到�
 │   ├── fetch_online.py          ★ 從線上抓既有流程／表單／表單 JavaScript 當範本
 │   ├── rename_ids.py            ★ 改表單／流程代號，讓匯入時不覆蓋既有定義
 │   ├── build_from_online.py     ★ 用空白範本把線上舊表單重建成響應式新專案
+│   ├── build_from_spec.py       ★ 由 AI 寫的 IR 直接組出 .form / .js / .bpmn
 │   └── verify.py                靜態檢查 + 用 1_xml_tool 反解對比
 （以下為 M2 之後才會出現）
 ├── ir/                          IR 的 JSON Schema 與範例
 └── builder/                     由 IR 直接組裝（目前是寫死設定的 build_*.py）
 ```
 
-### 兩條產出路線
+### 三條產出路線
 
 | 路線 | 什麼時候用 | 入口 |
 |:---|:---|:---|
 | **從空白範本長出來** | 要做一支全新的流程 | `tools/new_project.py` → `tools/set_permissions.py` |
 | **改造既有的教材檔** | 要一次拿到很多現成元件（表單元件庫） | `tools/build_form.py` / `tools/build_bpmn.py` |
 | **照著線上既有流程做** | 要仿造一支已經在跑的流程 | `tools/fetch_online.py` 抓下來，再 `tools/build_from_online.py` 重建 |
+| **從需求生成** | 手上只有一張截圖或一份欄位清單 | AI 寫 IR → `tools/build_from_spec.py`（見 [docs/從需求生成手冊.md](docs/從需求生成手冊.md)） |
 
 空白範本的流程剛好就是 `開單人 → 直屬主管 → 結案`，
 執行者也已經是 `PROCESS_REQUESTER` / `MANAGER`，所以新流程不必自己編執行者型別。
@@ -127,6 +130,8 @@ AI 決定「有哪些欄位、叫什麼、在第幾列、哪個關卡看得到�
 | 線上抓取 | 唯讀抓一支流程的關卡、連線、執行者、表單欄位、表單 JavaScript，並盤點腳本舊寫法 |
 | 改代號 | 一次改完 `.form` / `.bpmn` 內所有表單與流程代號（含逃脫過的欄位權限與主旨範本），並重配 OID |
 | 絕對位置 → 響應式 | 以空白範本為骨架、教材檔為元件字典，把線上舊表單的欄位、選項、版面分組與 JavaScript 重建成響應式表單，並自動反解對比（L1） |
+| IR → 表單 | 由 AI 寫的意圖規格產生元件、12 欄格線版面、選項、必填與提示，並自動反解對比（L1） |
+| IR → 流程 | 依 IR 複製、重排關卡（含通知關卡）、配執行者與連線、重畫流程圖、寫入各關卡欄位權限 |
 | 靜態檢查 | 連號、參照、版面一致性、圖形與關卡一致性、權限欄位是否真的存在 |
 
 ```bash
@@ -149,6 +154,10 @@ python 8_BPMAIworker/tools/rename_ids.py --form <檔案.form> --form-id 舊代�
 python 8_BPMAIworker/tools/build_from_online.py --source <抓取產出目錄> --form-id 新表單代號 --process-id 新流程代號 --name 中文名 --out <輸出目錄>
 ```
 
+```bash
+python 8_BPMAIworker/tools/build_from_spec.py --form-ir <form_ir.json> --process-ir <process_ir.json> --out <輸出目錄>
+```
+
 ---
 
 ## 5. 文件索引
@@ -161,6 +170,7 @@ python 8_BPMAIworker/tools/build_from_online.py --source <抓取產出目錄> --
 | [docs/流程生成手冊.md](docs/流程生成手冊.md) | 要動 `.bpmn` 結構時 |
 | [docs/表單腳本手冊.md](docs/表單腳本手冊.md) | 要產生表單 JavaScript 時 |
 | [docs/線上抓取手冊.md](docs/線上抓取手冊.md) | 要照著線上既有流程仿造時（含提示詞與唯讀邊界） |
+| [docs/從需求生成手冊.md](docs/從需求生成手冊.md) | **只有一張圖或一份欄位清單時**（含提示詞、命名規則、看圖判型別） |
 | [docs/驗證與驗收.md](docs/驗證與驗收.md) | 產出後要確認能不能用時 |
 
 上層規範一律以 [AGENTS.md](../AGENTS.md) 為準，本目錄不重複。

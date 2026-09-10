@@ -234,16 +234,31 @@ def _set_options(fragment, options, item_template):
 
 def build_element(field, library, pair_key, item_template):
     """由教材檔片段複製出一個元件（必要時連同它的標籤）。"""
-    source_id = FRAGMENT_BY_CONTROL.get(field['controlType']) \
+    # build_from_spec.py 依 IR 型別直接指名片段；線上重建則靠 controlType 與類別推
+    source_id = field.get('fragment') \
+        or FRAGMENT_BY_CONTROL.get(field['controlType']) \
         or FRAGMENT_BY_CLASS.get(field['cls'])
     if source_id is None or source_id not in library:
         return None, None, '教材檔沒有可用的 %s 片段' % field['cls']
 
     cls, fragment = library[source_id]
+
+    # 教材檔的片段本來就帶配對標籤時，**一定要跟著產一個**。
+    # 只把 <pairId> 清成空字串，設計器會把這個元件當成「只有標籤、沒有輸入元件」
+    # （rwd-node-factory.js：`pairId.length === 0` → `{label: …}`），
+    # 接著讀 `tElement.input.id` 就炸 `Cannot read properties of undefined (reading 'id')`。
+    # 例外是 Label 與分隔線 —— 它們在教材檔裡本來就是空字串，設計器讀的是 label.id。
+    source_pair = re.search(r'<pairId>([^<]*)</pairId>', library[source_id][1])
+    has_label = field['hasLabel'] or bool(source_pair and source_pair.group(1))
+
     fragment = _set_leaf(fragment, 'id', field['id'])
     fragment = _set_leaf(fragment, 'name', X.xml_escape(field['id']))
     fragment = _set_control_type(fragment, field['controlType'])
-    fragment = _set_leaf(fragment, 'pairId', pair_key if field['hasLabel'] else '')
+    fragment = _set_leaf(fragment, 'pairId', pair_key if has_label else '')
+    if field.get('required'):
+        fragment = _set_leaf(fragment, 'isRequired', 'true')
+    if field.get('hint'):
+        fragment = _set_leaf(fragment, 'hint', X.xml_escape(field['hint']))
 
     if field['options']:
         fragment, ok = _set_options(fragment, field['options'], item_template)
@@ -260,15 +275,15 @@ def build_element(field, library, pair_key, item_template):
         fragment = _set_leaf(fragment, 'caption', X.xml_escape(field['caption']))
 
     label_fragment = None
-    if field['hasLabel']:
-        label_source = 'lbl_TextBox5'
+    if has_label:
+        label_source = field.get('labelFragment') or 'lbl_TextBox5'
         if label_source in library:
             _, label_fragment = library[label_source]
             label_fragment = _set_leaf(label_fragment, 'id', 'lbl_' + field['id'])
             label_fragment = _set_leaf(label_fragment, 'name',
                                        X.xml_escape('lbl_' + field['id']))
             label_fragment = _set_leaf(label_fragment, 'textValue',
-                                       X.xml_escape(field['label']))
+                                       X.xml_escape(field['label'] or field['id']))
             label_fragment = _set_leaf(label_fragment, 'pairId', pair_key)
     return fragment, label_fragment, ''
 
@@ -331,8 +346,12 @@ def _replace_block(text, tag, inner):
     return text[:m.start()] + inner + text[m.end():]
 
 
-def build_form(fields, form_id, form_name, script, mobile_script):
-    """把元件、版面、腳本組進空白骨架，回傳 (表單 XML, BOM, 訊息清單)。"""
+def build_form(fields, form_id, form_name, script, mobile_script, layout=None):
+    """把元件、版面、腳本組進空白骨架，回傳 (表單 XML, BOM, 訊息清單)。
+
+    layout 給定時直接採用（build_from_spec.py 由 IR 的 row/col/span 算好了）；
+    不給就依來源的絕對座標分列。
+    """
     library, item_template = read_library()
     skeleton, bom = X.read_xml(SKELETON)
 
@@ -353,7 +372,8 @@ def build_form(fields, form_id, form_name, script, mobile_script):
         skeleton, 'elementDefinitions',
         '<elementDefinitions class="list">\n    %s\n  </elementDefinitions>' % body)
 
-    layout = build_rwd_layout(built)
+    if layout is None:
+        layout = build_rwd_layout(built)
     skeleton = _replace_block(
         skeleton, 'rwdLayout',
         '<rwdLayout>%s</rwdLayout>'
@@ -453,6 +473,198 @@ def check_select_items(out_form):
     return not bad
 
 
+# 設計師 rwd-node-factory.js 的 convert2JavaScriptType：類別（＋controlType）→ 內部型別。
+# 這張表是照著那支檔案抄的，改鼎新版本時要重新對一次。
+_JS_TYPE_BY_CLASS = {
+    'AttachmentElementDefinition': 'Attachment',
+    'BarcodeElementDefinition': 'Barcode',
+    'DateElementDefinition': 'DateElement',
+    'DialogInputElementDefinition': 'DialogInput',
+    'DoubleTextElementDefinition': 'DoubleTextBox',
+    'TripleTextElementDefinition': 'TripleTextBox',
+    'DialogInputLabelElementDefinition': 'DialogInputLabel',
+    'DialogInputMultiElementDefinition': 'DialogInputMulti',
+    'HorizontalLineElementDefinition': 'HorizontalLine',
+    'ImageElementDefinition': 'Image',
+    'LinkElementDefinition': 'Link',
+    'ListElementDefinition': 'Grid',
+    'OutputElementDefinition': 'Label',
+    'SerialNumberElementDefinition': 'SerialNumber',
+    'TimeElementDefinition': 'Time',
+    'TriggerElementDefinition': 'Button',
+    'TitleElementDefinition': 'Title',
+    'SubTabElementDefinition': 'SubTab',
+    'QRCodeElementDefinition': 'QRCode',
+    'HandWritingElementDefinition': 'HandWriting',
+}
+_JS_TYPE_BY_CONTROL = {
+    'INPUT_TYPE': 'TextBox',
+    'INPUT_SECRET_TYPE': 'Password',
+    'INPUT_TEXTAREA_TYPE': 'TextArea',
+    'HIDDEN_TYPE': 'HiddenTextBox',
+    'SELECT_COMBO_TYPE': 'Dropdown',
+    'SELECT_LIST_TYPE': 'ListBox',
+    'SELECT_RADIO_TYPE': 'RadioButton',
+    'SELECT_CHECK_TYPE': 'CheckBox',
+}
+
+
+def _js_type(cls, control_type):
+    if cls in ('InputElementDefinition', 'SelectElementDefinition'):
+        # JS 的 switch 沒有 default，控制項種類對不上會往下掉到 Link／SerialNumber，
+        # 這裡回 None 當成「設計師認不得」，由呼叫端報出來
+        return _JS_TYPE_BY_CONTROL.get(control_type)
+    return _JS_TYPE_BY_CLASS.get(cls)
+
+
+def check_designer_load(out_form):
+    """照著設計師 rwd-node-factory.js 的 rebuild() 走一遍，找出開檔會炸的元件。
+
+    L1 的反解對比只能保證「我們讀得回來」，讀得回來不等於設計師開得起來。
+    這個檢查把設計師真正的載入邏輯搬過來，堵住兩個已經踩過的坑：
+
+    1. `<pairId>` 是空字串時，設計師一律歸類成「只有標籤、沒有輸入元件」
+       （`pairId.length === 0` → `{label: …}`）。隱藏欄位接著讀 `tElement.input.id`
+       → `Cannot read properties of undefined (reading 'id')`；
+       其他型別則整個不進 tRegularElements，版面找不到它再炸一次。
+       Label 與 HorizontalLine 例外：設計師對這兩種讀的是 `label.id`。
+    2. 版面（rwdLayout）點到的元件必須在 tRegularElements 裡，否則
+       `showMsg("Element is null…")` 之後 `tElement.type` 又是一個例外。
+    """
+    text, _ = X.read_xml(out_form)
+    text, _ = bpm_edit.inline_numeric_refs(text)
+
+    problems = []
+    pair_objs = {}
+    non_pair = []
+    for span in X.find_blocks(
+            text, lambda n: n.startswith(FORM_NS) and n.endswith('ElementDefinition')):
+        cls = span.name[len(FORM_NS):]
+        eid = X.child_text(text, span, 'id')
+        control = _control_type(text, span)
+        js_type = _js_type(cls, control)
+        if js_type is None:
+            problems.append('%s：設計師認不得 %s／controlType=%s'
+                            % (eid, cls, control or '(無)'))
+            continue
+        node = X.child(text, span, 'pairId')
+        pair_id = None if node is None else text[node.inner_start:node.inner_end]
+        entry = {'id': eid, 'cls': cls, 'type': js_type}
+        if pair_id is None:
+            non_pair.append(dict(entry, slot='label' if js_type == 'Label' else 'input'))
+        elif pair_id == '':
+            # 這一行就是設計師的判定：空字串一律當成「只有標籤」
+            non_pair.append(dict(entry, slot='label'))
+        else:
+            group = pair_objs.setdefault(pair_id, {})
+            group['label' if js_type == 'Label' else 'input'] = entry
+            if js_type != 'Label':
+                group['type'] = js_type
+
+    # 舊表單常見的 lbl_xxx 與 xxx 隱式配對，設計師會自己併起來
+    by_id = dict([(e['id'], e) for e in non_pair])
+    merged = set()
+    for entry in non_pair:
+        if entry['slot'] == 'input' and 'lbl_' + entry['id'] in by_id:
+            merged.add(entry['id'])
+            merged.add('lbl_' + entry['id'])
+            pair_objs['_implicit_' + entry['id']] = {
+                'input': entry, 'label': by_id['lbl_' + entry['id']], 'type': entry['type']}
+    elements = [e for e in non_pair if e['id'] not in merged] + list(pair_objs.values())
+
+    known = {}
+    for element in elements:
+        js_type = element.get('type')
+        label = element.get('label')
+        given = element.get('input')
+        if element.get('slot') == 'label':
+            label, given = element, None
+        elif element.get('slot') == 'input':
+            given = element
+
+        if js_type in ('Label', 'HorizontalLine'):
+            if label is None:
+                problems.append('%s：設計師會讀 tElement.label.id，但這一組沒有標籤'
+                                % (given or {}).get('id', '?'))
+            else:
+                known[label['id']] = js_type
+        elif js_type == 'HiddenTextBox':
+            if given is None:
+                problems.append('%s：pairId 是空字串，設計師把隱藏欄位當成只有標籤，'
+                                "接著讀 tElement.input.id 會丟 "
+                                "Cannot read properties of undefined (reading 'id')"
+                                % label['id'])
+            else:
+                known[given['id']] = js_type
+        elif given is not None:
+            known[given['id']] = js_type
+        elif label is not None and label['cls'] == 'OutputElementDefinition':
+            known[label['id']] = 'Label'
+        else:
+            orphan = label or given or {}
+            problems.append('%s（%s）：pairId 是空字串又不是標籤，設計師不會建這個元件，'
+                            '版面點到它就會炸'
+                            % (orphan.get('id', '?'), orphan.get('cls', '?')))
+
+    layout = json.loads(X.xml_unescape(
+        re.search(r'<rwdLayout>(.*?)</rwdLayout>', text, re.S).group(1)) or '[]')
+    for row in layout:
+        wanted = []
+        if row.get('rowType'):
+            wanted.append(row['id'])
+        for cell in row.get('elements', []):
+            for item in cell:
+                if item.get('id'):
+                    wanted.append(item['id'])
+        for eid in wanted:
+            if eid not in known:
+                problems.append('版面點到 %s，但設計師的元件表裡沒有它' % eid)
+
+    print('  設計師載入模擬：可建出 %d 個元件，有問題的 %d 項' % (len(known), len(problems)))
+    for item in problems:
+        print('  [失敗] %s' % item)
+    return not problems
+
+
+def check_pair_ids(out_form):
+    """<pairId> 不可以是空字串（Label 與分隔線除外），非空的一定要剛好兩個元件共用。
+
+    這是設計器 `Cannot read properties of undefined (reading 'id')` 的成因：
+    rwd-node-factory.js 依 pairId 把元件分成「配對」與「非配對」兩組，
+    `pairId.length === 0` 一律歸類成「只有標籤」，之後對隱藏欄位讀 `tElement.input.id`
+    就會拿 undefined 去讀屬性；其他型別則整個從 tRegularElements 消失，
+    版面找不到它，又變成另一個 null 例外。
+
+    Label（OutputElementDefinition）與 HorizontalLine 的 pairId 在教材檔裡本來就是空字串，
+    設計器對這兩種讀的是 `tElement.label.id`，所以是安全的。
+    """
+    text, _ = X.read_xml(out_form)
+    safe_empty = ('OutputElementDefinition', 'HorizontalLineElementDefinition')
+    pairs = {}
+    bad = []
+    for span in X.find_blocks(
+            text, lambda n: n.startswith(FORM_NS) and n.endswith('ElementDefinition')):
+        cls = span.name[len(FORM_NS):]
+        eid = X.child_text(text, span, 'id')
+        node = X.child(text, span, 'pairId')
+        if node is None:
+            continue
+        value = text[node.inner_start:node.inner_end]
+        if not value:
+            if cls not in safe_empty:
+                bad.append('%s（%s）的 pairId 是空字串' % (eid, cls))
+            continue
+        pairs.setdefault(value, []).append(eid)
+    for value, members in sorted(pairs.items()):
+        if len(members) != 2:
+            bad.append('pairId「%s」被 %d 個元件用：%s'
+                       % (value, len(members), '、'.join(members)))
+    print('  配對 %d 組，pairId 有問題的 %d 項' % (len(pairs), len(bad)))
+    for item in bad:
+        print('  [失敗] %s（設計器開檔會丟 Cannot read properties of undefined）' % item)
+    return not bad
+
+
 def verify(out_form, source_fields, built):
     """反解產出的 .form，逐項與來源比對（PLAN.md 的 L1）。"""
     result = form_handler.extract(out_form)
@@ -536,6 +748,8 @@ def main(argv=None):
     good = verify(form_out, fields, built)
     good = check_layout_ids(form_out) and good
     good = check_select_items(form_out) and good
+    good = check_pair_ids(form_out) and good
+    good = check_designer_load(form_out) and good
 
     print()
     if good:
